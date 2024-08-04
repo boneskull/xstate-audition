@@ -378,7 +378,7 @@ export type AbortablePromiseKit<T> = {
   reject: (reason?: unknown) => void;
 
   /**
-   * The `rssolve` function of `promise`
+   * The `resolve` function of `promise`
    *
    * @param value Whatever `promise` should resolve with
    */

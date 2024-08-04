@@ -5,15 +5,20 @@
     "CHANGELOG.md",
     "dist",
     "node_modules",
-    "package-lock.json"
+    "package-lock.json",
+    "coverage"
   ],
   "words": [
+    "afaict",
     "boneskull",
     "commitlint",
+    "frankenpromise",
     "knip",
     "markdownlint",
+    "microstep",
     "packagejson",
     "tseslint",
-    "tshy"
+    "tshy",
+    "xstate"
   ]
 }

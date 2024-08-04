@@ -30,7 +30,19 @@
   "directories": {
     "test": "test"
   },
-  "keywords": [],
+  "keywords": [
+    "xstate",
+    "test",
+    "testing",
+    "actor",
+    "state",
+    "state-machine",
+    "jest",
+    "mocha",
+    "vitest",
+    "ava",
+    "tap"
+  ],
   "scripts": {
     "build": "tshy",
     "format": "prettier .",
