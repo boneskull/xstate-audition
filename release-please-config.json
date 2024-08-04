@@ -4,6 +4,5 @@
     ".": {
       "release-type": "node"
     }
-  },
-  "release-as": "0.1.0"
+  }
 }
