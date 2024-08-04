@@ -1,0 +1,91 @@
+{
+  "name": "xstate-audition",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Test helpers for XState v5+",
+  "author": {
+    "name": "Christopher Hiller",
+    "email": "boneskull@boneskull.com"
+  },
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "./dist/commonjs/index.js",
+  "module": "./dist/esm/index.js",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/commonjs/index.d.ts",
+        "default": "./dist/commonjs/index.js"
+      }
+    }
+  },
+  "types": "./dist/commonjs/index.d.ts",
+  "directories": {
+    "test": "test"
+  },
+  "keywords": [],
+  "scripts": {
+    "build": "tshy",
+    "format": "prettier .",
+    "lint": "eslint . --max-warnings 0",
+    "lint:commit": "commitlint",
+    "lint:fix": "eslint . --fix",
+    "lint:knip": "knip",
+    "lint:md": "markdownlint-cli2 \"**/*.md\" \".github/**/*.md\"",
+    "lint:spelling": "cspell \"**\" \".github/**/*\"",
+    "lint:staged": "lint-staged",
+    "prepare": "husky",
+    "test": "node --import tsx ./test/actor-runner.spec.ts",
+    "test:coverage": "c8 npm test",
+    "tsc": "tsc -p tsconfig.tsc.json"
+  },
+  "peerDependencies": {
+    "xstate": ">=5.0.0"
+  },
+  "dependencies": {
+    "debug": "4.3.6"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "19.3.0",
+    "@commitlint/config-conventional": "19.2.2",
+    "@eslint/js": "9.8.0",
+    "@stylistic/eslint-plugin": "2.4.0",
+    "@types/debug": "4.1.12",
+    "@types/eslint__js": "8.42.3",
+    "@types/node": "20.14.13",
+    "c8": "10.1.2",
+    "cspell": "8.13.0",
+    "eslint": "9.8.0",
+    "eslint-plugin-n": "17.10.1",
+    "eslint-plugin-perfectionist": "3.0.0",
+    "husky": "9.1.4",
+    "knip": "5.27.0",
+    "lint-staged": "15.2.7",
+    "markdownlint-cli2": "0.13.0",
+    "markdownlint-cli2-formatter-pretty": "0.0.6",
+    "prettier": "3.3.3",
+    "prettier-plugin-curly": "0.2.2",
+    "prettier-plugin-jsdoc": "1.3.0",
+    "prettier-plugin-organize-imports": "4.0.0",
+    "prettier-plugin-pkg": "0.18.1",
+    "prettier-plugin-sh": "0.14.0",
+    "tshy": "3.0.2",
+    "tsx": "4.16.2",
+    "typescript": "5.5.4",
+    "typescript-eslint": "7.18.0",
+    "xstate": "5.17.1"
+  },
+  "tshy": {
+    "exports": {
+      "./package.json": "./package.json",
+      ".": "./src/index.ts"
+    }
+  }
+}

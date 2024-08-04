@@ -1,0 +1,7 @@
+{
+  "$schema": "https://unpkg.com/knip@latest/schema.json",
+  "entry": ["src/index.ts!"],
+  "ignoreExportsUsedInFile": {"interface": true, "type": true},
+  "project": ["src/**/*.ts!"],
+  "ignoreDependencies": ["markdownlint-cli2-formatter-pretty"]
+}

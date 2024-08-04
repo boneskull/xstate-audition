@@ -1,0 +1,15 @@
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+      - uses: ./.github/actions/prepare
+      - run: npm run build
+
+name: Build
+
+on:
+  pull_request: ~
+  push:
+    branches:
+      - main

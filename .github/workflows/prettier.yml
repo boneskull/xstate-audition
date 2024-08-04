@@ -1,0 +1,15 @@
+jobs:
+  prettier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+      - uses: ./.github/actions/prepare
+      - run: npm run format -- --list-different
+
+name: Prettier
+
+on:
+  pull_request: ~
+  push:
+    branches:
+      - main
