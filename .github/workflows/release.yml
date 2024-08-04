@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Create Release
         id: release
-        uses: google-github-actions/release-please-action@e4dc86ba9405554aeba3c6bb2d169500e7d3b4ee # v4.1.1
+        uses: googleapis/release-please-action@v4 # v4.1.1
 
       # see https://github.com/google-github-actions/release-please-action#automating-publication-to-npm
       - name: Checkout Repository
