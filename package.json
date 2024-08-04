@@ -94,6 +94,14 @@
     "typescript-eslint": "7.18.0",
     "xstate": "5.17.1"
   },
+  "lint-staged": {
+    "*": [
+      "prettier --ignore-unknown --write",
+      "cspell lint --no-must-find-files"
+    ],
+    "*.md": "markdownlint-cli2",
+    "*.ts": "eslint --fix"
+  },
   "tshy": {
     "exports": {
       "./package.json": "./package.json",
