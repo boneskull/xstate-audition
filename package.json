@@ -9,7 +9,7 @@
   },
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=20"
+    "node": ">=20.2.0"
   },
   "main": "./dist/commonjs/index.js",
   "module": "./dist/esm/index.js",
@@ -45,6 +45,7 @@
   ],
   "scripts": {
     "build": "tshy",
+    "dev": "tshy --watch",
     "format": "prettier .",
     "lint": "eslint . --max-warnings 0",
     "lint:commit": "commitlint",
@@ -60,9 +61,6 @@
   },
   "peerDependencies": {
     "xstate": ">=5.0.0"
-  },
-  "dependencies": {
-    "debug": "4.3.6"
   },
   "devDependencies": {
     "@commitlint/cli": "19.3.0",
