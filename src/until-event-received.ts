@@ -3,35 +3,39 @@ import * as xs from 'xstate';
 import {attachActor, createActorThenable} from './actor.js';
 import {applyDefaults} from './defaults.js';
 import {createAbortablePromiseKit} from './promise-kit.js';
-import {type ActorThenable, type AuditionOptions} from './types.js';
+import {
+  type ActorEventTuple,
+  type ActorEventTypeTuple,
+  type ActorThenable,
+  type AuditionEventOptions,
+  type AuditionOptions,
+  type EventFromEventType,
+  type ListenableLogic,
+} from './types.js';
 import {head, startTimer} from './util.js';
-
-export type AuditionEventOptions = {
-  target?: RegExp | string;
-} & AuditionOptions;
 
 export type CurryEventReceived =
   | (() => <
-      Logic extends xs.AnyActorLogic,
+      Logic extends ListenableLogic,
       Actor extends xs.Actor<Logic>,
       const EventTypes extends ActorEventTypeTuple<Logic>,
     >(
       actor: Actor,
       events: EventTypes,
     ) => CurryEventReceivedP2<Logic, EventTypes>)
-  | (() => <Logic extends xs.AnyActorLogic, Actor extends xs.Actor<Logic>>(
+  | (() => <Logic extends ListenableLogic, Actor extends xs.Actor<Logic>>(
       actor: Actor,
     ) => CurryEventReceivedP1<Logic>)
   | (() => CurryEventReceived);
 
-export type CurryEventReceivedP1<Logic extends xs.AnyActorLogic> =
+export type CurryEventReceivedP1<Logic extends ListenableLogic> =
   | (() => CurryEventReceivedP1<Logic>)
   | (<const EventTypes extends ActorEventTypeTuple<Logic>>(
       events: EventTypes,
     ) => CurryEventReceivedP2<Logic, EventTypes>);
 
 export type CurryEventReceivedP2<
-  Logic extends xs.AnyActorLogic,
+  Logic extends ListenableLogic,
   EventTypes extends ActorEventTypeTuple<Logic>,
 > = ActorThenable<Logic, ActorEventTuple<Logic, EventTypes>>;
 
@@ -83,7 +87,7 @@ export type CurryEventReceivedWithP3<
 > = ActorThenable<Logic, ActorEventTuple<Logic, EventReceivedTypes>>;
 
 export type EventReceivedFn = <
-  Logic extends xs.AnyActorLogic,
+  Logic extends ListenableLogic,
   Actor extends xs.Actor<Logic>,
   const EventTypes extends ActorEventTypeTuple<Logic>,
 >(
@@ -92,46 +96,9 @@ export type EventReceivedFn = <
   options: AuditionEventOptions,
 ) => ActorThenable<Logic, ActorEventTuple<Logic, EventTypes>>;
 
-/**
- * Lookup for event/Event-event based on type
- */
-export type EventFromEventType<
-  T extends xs.AnyActorLogic,
-  K extends ActorEventType<T>,
-> = xs.ExtractEvent<xs.EventFromLogic<T>, K>;
-
-/**
- * Any event or Event-event from an actor
- */
-export type ActorEvent<T extends xs.AnyActorLogic> =
-  | xs.EventFrom<T>
-  | xs.EventFromLogic<T>;
-
-/**
- * A tuple of events Event by an actor, based on a {@link ActorEventTypeTuple}
- */
-export type ActorEventTuple<
-  T extends xs.AnyActorLogic,
-  EventTypes extends ActorEventTypeTuple<T>,
-> = {[K in keyof EventTypes]: EventFromEventType<T, EventTypes[K]>};
-
-/**
- * The `type` prop of any event or Event event from an actor
- */
-export type ActorEventType<T extends xs.AnyActorLogic> =
-  xs.EventFromLogic<T>['type'];
-
-/**
- * A tuple of event types (event names) Event by an actor
- */
-export type ActorEventTypeTuple<T extends xs.AnyActorLogic> = [
-  ActorEventType<T>,
-  ...ActorEventType<T>,
-];
-
 const createEventFn = <T extends EventReceivedFn>(eventFn: T, stop = false) => {
   const curryEvent = <
-    Logic extends xs.AnyActorLogic,
+    Logic extends ListenableLogic,
     Actor extends xs.Actor<Logic>,
     const EventTypes extends ActorEventTypeTuple<Logic>,
   >(
@@ -199,7 +166,7 @@ const createEventReceivedWithFn = <T extends EventReceivedFn>(
 };
 
 const untilEventReceived = <
-  Logic extends xs.AnyActorLogic,
+  Logic extends ListenableLogic,
   Actor extends xs.Actor<Logic>,
   const EventTypes extends ActorEventTypeTuple<Logic>,
 >(
@@ -386,18 +353,18 @@ export function waitForEventReceivedWith<
 export function runUntilEventReceived(): CurryEventReceived;
 
 export function runUntilEventReceived<
-  Logic extends xs.AnyActorLogic,
+  Logic extends ListenableLogic,
   Actor extends xs.Actor<Logic>,
 >(actor: Actor): CurryEventReceivedP1<Logic>;
 
 export function runUntilEventReceived<
-  Logic extends xs.AnyActorLogic,
+  Logic extends ListenableLogic,
   Actor extends xs.Actor<Logic>,
   const EventTypes extends ActorEventTypeTuple<Logic>,
 >(actor: Actor, events: EventTypes): CurryEventReceivedP2<Logic, EventTypes>;
 
 export function runUntilEventReceived<
-  Logic extends xs.AnyActorLogic,
+  Logic extends ListenableLogic,
   Actor extends xs.Actor<Logic>,
   const EventTypes extends ActorEventTypeTuple<Logic>,
 >(actor?: Actor, events?: EventTypes) {
@@ -441,18 +408,18 @@ export function runUntilEventReceivedWith<
 export function waitForEventReceived(): CurryEventReceived;
 
 export function waitForEventReceived<
-  Logic extends xs.AnyActorLogic,
+  Logic extends ListenableLogic,
   Actor extends xs.Actor<Logic>,
 >(actor: Actor): CurryEventReceivedP1<Logic>;
 
 export function waitForEventReceived<
-  Logic extends xs.AnyActorLogic,
+  Logic extends ListenableLogic,
   Actor extends xs.Actor<Logic>,
   const EventTypes extends ActorEventTypeTuple<Logic>,
 >(actor: Actor, events: EventTypes): CurryEventReceivedP2<Logic, EventTypes>;
 
 export function waitForEventReceived<
-  Logic extends xs.AnyActorLogic,
+  Logic extends ListenableLogic,
   Actor extends xs.Actor<Logic>,
   const EventTypes extends ActorEventTypeTuple<Logic>,
 >(actor?: Actor, events?: EventTypes) {

@@ -1,4 +1,10 @@
 /**
+ * Provides {@link AbortablePromiseKit} and {@link createAbortablePromiseKit}.
+ *
+ * @module promise-kit
+ */
+
+/**
  * Object containing everything you need to abort a `Promise`!
  *
  * @internal

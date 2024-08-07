@@ -3,12 +3,15 @@ import * as xs from 'xstate';
 import {attachActor, createActorThenable} from './actor.js';
 import {applyDefaults} from './defaults.js';
 import {createAbortablePromiseKit} from './promise-kit.js';
-import {type ActorThenable, type AuditionOptions} from './types.js';
+import {
+  type ActorEventTuple,
+  type ActorEventTypeTuple,
+  type ActorThenable,
+  type AuditionEventOptions,
+  type AuditionOptions,
+  type EventFromEventType,
+} from './types.js';
 import {head, startTimer} from './util.js';
-
-export type AuditionEventOptions = {
-  target?: RegExp | string;
-} & AuditionOptions;
 
 export type CurryEventSent =
   | (() => <
@@ -89,43 +92,6 @@ export type EventSentFn = <
   events: EventTypes,
   options: AuditionEventOptions,
 ) => ActorThenable<Logic, ActorEventTuple<Logic, EventTypes>>;
-
-/**
- * Lookup for event/Event-event based on type
- */
-export type EventFromEventType<
-  T extends xs.AnyActorLogic,
-  K extends ActorEventType<T>,
-> = xs.ExtractEvent<xs.EventFromLogic<T>, K>;
-
-/**
- * Any event or Event-event from an actor
- */
-export type ActorEvent<T extends xs.AnyActorLogic> =
-  | xs.EventFrom<T>
-  | xs.EventFromLogic<T>;
-
-/**
- * A tuple of events Event by an actor, based on a {@link ActorEventTypeTuple}
- */
-export type ActorEventTuple<
-  T extends xs.AnyActorLogic,
-  EventTypes extends ActorEventTypeTuple<T>,
-> = {[K in keyof EventTypes]: EventFromEventType<T, EventTypes[K]>};
-
-/**
- * The `type` prop of any event or Event event from an actor
- */
-export type ActorEventType<T extends xs.AnyActorLogic> =
-  xs.EventFromLogic<T>['type'];
-
-/**
- * A tuple of event types (event names) Event by an actor
- */
-export type ActorEventTypeTuple<T extends xs.AnyActorLogic> = [
-  ActorEventType<T>,
-  ...ActorEventType<T>,
-];
 
 const createEventFn = <T extends EventSentFn>(eventFn: T, stop = false) => {
   const curryEvent = <

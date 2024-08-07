@@ -1,3 +1,9 @@
+/**
+ * Common types
+ *
+ * @module types
+ */
+
 import type * as xs from 'xstate';
 
 /**
@@ -7,6 +13,9 @@ export type OutputtableLogic =
   | xs.ActorLogic<xs.AnyMachineSnapshot, any, any, any, any>
   | xs.ActorLogic<xs.PromiseSnapshot<any, any>, any, any, any, any>;
 
+/**
+ * Any actor logic that can receive events
+ */
 export type ListenableLogic =
   | xs.ActorLogic<xs.AnyMachineSnapshot, any, any, any, any>
   | xs.ActorLogic<xs.CallbackSnapshot<any>, any, any, any, any>
@@ -75,3 +84,44 @@ export type InspectorFn = (evt: xs.InspectionEvent) => void;
  * A logger function for an actor
  */
 export type LoggerFn = (...args: any[]) => void;
+
+/**
+ * Lookup for event/Event-event based on type
+ */
+export type EventFromEventType<
+  T extends xs.AnyActorLogic,
+  K extends ActorEventType<T>,
+> = xs.ExtractEvent<xs.EventFromLogic<T>, K>;
+
+/**
+ * Any event or Event-event from an actor
+ */
+export type ActorEvent<T extends xs.AnyActorLogic> =
+  | xs.EventFrom<T>
+  | xs.EventFromLogic<T>;
+
+/**
+ * A tuple of events Event by an actor, based on a {@link ActorEventTypeTuple}
+ */
+export type ActorEventTuple<
+  T extends xs.AnyActorLogic,
+  EventTypes extends ActorEventTypeTuple<T>,
+> = {[K in keyof EventTypes]: EventFromEventType<T, EventTypes[K]>};
+
+/**
+ * The `type` prop of any event or Event event from an actor
+ */
+export type ActorEventType<T extends xs.AnyActorLogic> =
+  xs.EventFromLogic<T>['type'];
+
+/**
+ * A tuple of event types (event names) Event by an actor
+ */
+export type ActorEventTypeTuple<T extends xs.AnyActorLogic> = [
+  ActorEventType<T>,
+  ...ActorEventType<T>,
+];
+
+export type AuditionEventOptions = {
+  target?: RegExp | string;
+} & AuditionOptions;
