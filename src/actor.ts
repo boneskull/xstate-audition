@@ -1,4 +1,4 @@
-import {type Actor, type ActorLogicFrom, type AnyActorRef} from 'xstate';
+import type * as xs from 'xstate';
 
 import {type ActorThenable, type AuditionOptions} from './types.js';
 import {noop} from './util.js';
@@ -6,24 +6,24 @@ import {noop} from './util.js';
 /**
  * Sets up an existing `Actor` with a logger and inspector.
  *
- * @param actorRef Actor
+ * @param actor Actor
  * @param options Options for instrumentation
  * @returns Instrumented actor
  * @internal
  */
-export function attachActor<Ref extends AnyActorRef>(
-  actorRef: Ref,
+export function attachActor<Ref extends xs.AnyActor>(
+  actor: Ref,
   {inspector: inspect = noop, logger = noop}: AuditionOptions = {},
 ): Ref {
-  actorRef.system.inspect(inspect);
+  actor.system.inspect(inspect);
   // @ts-expect-error private
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  actorRef.logger = actorRef._actorScope.logger = logger;
-  return actorRef;
+  actor.logger = actor._actorScope.logger = logger;
+  return actor;
 }
 
 /**
- * Creates an {@link ActorThenable} from an {@link Actor} and a {@link Promise}.
+ * Creates an {@link ActorThenable} from an `Actor` and a {@link Promise}.
  *
  * @param actor An `Actor` or an `ActorThenable`
  * @param promise Any `Promise`
@@ -31,15 +31,15 @@ export function attachActor<Ref extends AnyActorRef>(
  * @internal
  */
 export function createActorThenable<
-  Ref extends AnyActorRef,
-  Logic extends ActorLogicFrom<Ref>,
+  Logic extends xs.AnyActorLogic,
+  Actor extends xs.Actor<Logic>,
   Out = void,
 >(
-  actor: ActorThenable<Logic, Out> | Ref,
+  actor: Actor | ActorThenable<Logic, Out>,
   promise: Promise<Out>,
 ): ActorThenable<Logic, Out> {
   const isThenable = (
-    actor: ActorThenable<Logic, Out> | Ref,
+    actor: Actor | ActorThenable<Logic, Out>,
   ): actor is ActorThenable<Logic, Out> =>
     'then' in actor && 'catch' in actor && 'finally' in actor;
 

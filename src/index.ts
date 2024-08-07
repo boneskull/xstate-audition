@@ -1,7 +1,18 @@
-export * from './types.js';
+export type {
+  ActorThenable,
+  AuditionOptions,
+  InspectorFn,
+  LoggerFn,
+} from './types.js';
+
 export * from './until-done.js';
+
 export * from './until-emitted.js';
+
 export * from './until-event-sent.js';
+
 export * from './until-snapshot.js';
+
 export * from './until-spawn.js';
+
 export * from './until-transition.js';

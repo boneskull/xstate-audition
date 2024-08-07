@@ -10,7 +10,7 @@ export type AuditionEventOptions = {
   target?: RegExp | string;
 } & AuditionOptions;
 
-export type CurryEventSent =
+export type CurryEventReceived =
   | (() => <
       Logic extends xs.AnyActorLogic,
       Actor extends xs.Actor<Logic>,
@@ -18,69 +18,71 @@ export type CurryEventSent =
     >(
       actor: Actor,
       events: EventTypes,
-    ) => CurryEventSentP2<Logic, EventTypes>)
+    ) => CurryEventReceivedP2<Logic, EventTypes>)
   | (() => <Logic extends xs.AnyActorLogic, Actor extends xs.Actor<Logic>>(
       actor: Actor,
-    ) => CurryEventSentP1<Logic>)
-  | (() => CurryEventSent);
+    ) => CurryEventReceivedP1<Logic>)
+  | (() => CurryEventReceived);
 
-export type CurryEventSentP1<Logic extends xs.AnyActorLogic> =
-  | (() => CurryEventSentP1<Logic>)
+export type CurryEventReceivedP1<Logic extends xs.AnyActorLogic> =
+  | (() => CurryEventReceivedP1<Logic>)
   | (<const EventTypes extends ActorEventTypeTuple<Logic>>(
       events: EventTypes,
-    ) => CurryEventSentP2<Logic, EventTypes>);
+    ) => CurryEventReceivedP2<Logic, EventTypes>);
 
-export type CurryEventSentP2<
+export type CurryEventReceivedP2<
   Logic extends xs.AnyActorLogic,
   EventTypes extends ActorEventTypeTuple<Logic>,
 > = ActorThenable<Logic, ActorEventTuple<Logic, EventTypes>>;
 
-export type CurryEventSentWith =
+export type CurryEventReceivedWith =
   | (() => <
       Logic extends xs.AnyStateMachine,
       Actor extends xs.Actor<Logic>,
-      const EventSentTypes extends ActorEventTypeTuple<Logic>,
+      const EventReceivedTypes extends ActorEventTypeTuple<Logic>,
     >(
       actor: Actor,
-      events: EventSentTypes,
+      events: EventReceivedTypes,
       options: AuditionOptions,
-    ) => CurryEventSentWithP3<Logic, EventSentTypes>)
+    ) => CurryEventReceivedWithP3<Logic, EventReceivedTypes>)
   | (() => <
       Logic extends xs.AnyStateMachine,
       Actor extends xs.Actor<Logic>,
-      const EventSentTypes extends ActorEventTypeTuple<Logic>,
+      const EventReceivedTypes extends ActorEventTypeTuple<Logic>,
     >(
       actor: Actor,
-      events: EventSentTypes,
-    ) => CurryEventSentWithP2<Logic, EventSentTypes>)
+      events: EventReceivedTypes,
+    ) => CurryEventReceivedWithP2<Logic, EventReceivedTypes>)
   | (() => <Logic extends xs.AnyStateMachine, Actor extends xs.Actor<Logic>>(
       actor: Actor,
-    ) => CurryEventSentWithP1<Logic>)
-  | (() => CurryEventSentWith);
+    ) => CurryEventReceivedWithP1<Logic>)
+  | (() => CurryEventReceivedWith);
 
-export type CurryEventSentWithP1<Logic extends xs.AnyStateMachine> =
-  | (() => CurryEventSentWithP1<Logic>)
-  | (<const EventSentTypes extends ActorEventTypeTuple<Logic>>(
-      events: EventSentTypes,
+export type CurryEventReceivedWithP1<Logic extends xs.AnyStateMachine> =
+  | (() => CurryEventReceivedWithP1<Logic>)
+  | (<const EventReceivedTypes extends ActorEventTypeTuple<Logic>>(
+      events: EventReceivedTypes,
       options: AuditionOptions,
-    ) => CurryEventSentWithP3<Logic, EventSentTypes>)
-  | (<const EventSentTypes extends ActorEventTypeTuple<Logic>>(
-      events: EventSentTypes,
-    ) => CurryEventSentWithP2<Logic, EventSentTypes>);
+    ) => CurryEventReceivedWithP3<Logic, EventReceivedTypes>)
+  | (<const EventReceivedTypes extends ActorEventTypeTuple<Logic>>(
+      events: EventReceivedTypes,
+    ) => CurryEventReceivedWithP2<Logic, EventReceivedTypes>);
 
-export type CurryEventSentWithP2<
+export type CurryEventReceivedWithP2<
   Logic extends xs.AnyStateMachine,
-  EventSentTypes extends ActorEventTypeTuple<Logic>,
+  EventReceivedTypes extends ActorEventTypeTuple<Logic>,
 > =
-  | (() => CurryEventSentWithP2<Logic, EventSentTypes>)
-  | ((options: AuditionOptions) => CurryEventSentWithP3<Logic, EventSentTypes>);
+  | ((
+      options: AuditionOptions,
+    ) => CurryEventReceivedWithP3<Logic, EventReceivedTypes>)
+  | (() => CurryEventReceivedWithP2<Logic, EventReceivedTypes>);
 
-export type CurryEventSentWithP3<
+export type CurryEventReceivedWithP3<
   Logic extends xs.AnyStateMachine,
-  EventSentTypes extends ActorEventTypeTuple<Logic>,
-> = ActorThenable<Logic, ActorEventTuple<Logic, EventSentTypes>>;
+  EventReceivedTypes extends ActorEventTypeTuple<Logic>,
+> = ActorThenable<Logic, ActorEventTuple<Logic, EventReceivedTypes>>;
 
-export type EventSentFn = <
+export type EventReceivedFn = <
   Logic extends xs.AnyActorLogic,
   Actor extends xs.Actor<Logic>,
   const EventTypes extends ActorEventTypeTuple<Logic>,
@@ -127,7 +129,7 @@ export type ActorEventTypeTuple<T extends xs.AnyActorLogic> = [
   ...ActorEventType<T>,
 ];
 
-const createEventFn = <T extends EventSentFn>(eventFn: T, stop = false) => {
+const createEventFn = <T extends EventReceivedFn>(eventFn: T, stop = false) => {
   const curryEvent = <
     Logic extends xs.AnyActorLogic,
     Actor extends xs.Actor<Logic>,
@@ -138,7 +140,7 @@ const createEventFn = <T extends EventSentFn>(eventFn: T, stop = false) => {
   ) => {
     if (actor) {
       if (events) {
-        return eventFn(actor, events, {stop}) as CurryEventSentP2<
+        return eventFn(actor, events, {stop}) as CurryEventReceivedP2<
           Logic,
           EventTypes
         >;
@@ -146,57 +148,57 @@ const createEventFn = <T extends EventSentFn>(eventFn: T, stop = false) => {
       return ((events?: EventTypes) =>
         events
           ? curryEvent(actor, events)
-          : curryEvent(actor)) as CurryEventSentP1<Logic>;
+          : curryEvent(actor)) as CurryEventReceivedP1<Logic>;
     }
-    return curryEvent as CurryEventSent;
+    return curryEvent as CurryEventReceived;
   };
 
   return curryEvent;
 };
 
-const createEventSentWithFn = <T extends EventSentFn>(
-  eventSentWithFn: T,
+const createEventReceivedWithFn = <T extends EventReceivedFn>(
+  eventReceivedWithFn: T,
   stop = false,
 ) => {
-  const curryEventSentWith = <
+  const curryEventReceivedWith = <
     Logic extends xs.AnyStateMachine,
     Actor extends xs.Actor<Logic>,
-    const EventSentTypes extends ActorEventTypeTuple<Logic>,
+    const EventReceivedTypes extends ActorEventTypeTuple<Logic>,
   >(
     actor?: Actor,
-    events?: EventSentTypes,
+    events?: EventReceivedTypes,
     options?: AuditionOptions,
   ) => {
     if (actor) {
       if (events) {
         if (options) {
-          return eventSentWithFn(actor, events, {
+          return eventReceivedWithFn(actor, events, {
             ...options,
             stop,
           });
         }
         return ((options?: AuditionOptions) => {
           return options
-            ? curryEventSentWith(actor, events, options)
-            : curryEventSentWith(actor, events);
-        }) as CurryEventSentWithP2<Logic, EventSentTypes>;
+            ? curryEventReceivedWith(actor, events, options)
+            : curryEventReceivedWith(actor, events);
+        }) as CurryEventReceivedWithP2<Logic, EventReceivedTypes>;
       }
-      return ((events?: EventSentTypes, options?: AuditionOptions) => {
+      return ((events?: EventReceivedTypes, options?: AuditionOptions) => {
         if (events) {
           return options
-            ? curryEventSentWith(actor, events, options)
-            : curryEventSentWith(actor, events);
+            ? curryEventReceivedWith(actor, events, options)
+            : curryEventReceivedWith(actor, events);
         }
-        return curryEventSentWith(actor);
-      }) as CurryEventSentWithP1<Logic>;
+        return curryEventReceivedWith(actor);
+      }) as CurryEventReceivedWithP1<Logic>;
     }
-    return curryEventSentWith as CurryEventSentWith;
+    return curryEventReceivedWith as CurryEventReceivedWith;
   };
 
-  return curryEventSentWith;
+  return curryEventReceivedWith;
 };
 
-const untilEventSent = <
+const untilEventReceived = <
   Logic extends xs.AnyActorLogic,
   Actor extends xs.Actor<Logic>,
   const EventTypes extends ActorEventTypeTuple<Logic>,
@@ -239,15 +241,15 @@ const untilEventSent = <
    * @returns `true` if the event matches the expected type and was sent/Event
    *   from the actor with matching `id`
    */
-  const matchesEventFromActor = (
+  const matchesEventToActor = (
     evt: xs.InspectionEvent,
     type: EventTypes[number],
   ): evt is xs.InspectedEventEvent =>
     evt.type === '@xstate.event' &&
     type === evt.event.type &&
-    evt.sourceRef?.id === id;
+    evt.actorRef.id === id;
 
-  const eventSentInspector: xs.Observer<xs.InspectionEvent> = {
+  const eventReceivedInspector: xs.Observer<xs.InspectionEvent> = {
     complete: () => {
       inspectorObserver.complete?.();
       if (ac.signal.aborted) {
@@ -273,9 +275,9 @@ const untilEventSent = <
       if (expectedEventQueue.length) {
         const type = head(expectedEventQueue);
 
-        if (matchesEventFromActor(evt, type)) {
+        if (matchesEventToActor(evt, type)) {
           // in this type of event, the `actorRef` is a target actor and the `sourceRef` is a source
-          if (!matchesTarget(evt.actorRef)) {
+          if (!matchesTarget(evt.sourceRef)) {
             return;
           }
           sawEvents.push(evt.event as EventFromEventType<Logic, typeof type>);
@@ -291,7 +293,7 @@ const untilEventSent = <
     },
   };
 
-  actor = attachActor(actor, {...options, inspector: eventSentInspector});
+  actor = attachActor(actor, {...options, inspector: eventReceivedInspector});
 
   const expectedEventQueue = [...events];
 
@@ -306,13 +308,19 @@ const untilEventSent = <
   return createActorThenable(actor, promise);
 };
 
-const runUntilEventSent_ = createEventFn(untilEventSent, true);
+const runUntilEventReceived_ = createEventFn(untilEventReceived, true);
 
-const waitForEventSent_ = createEventFn(untilEventSent, false);
+const waitForEventReceived_ = createEventFn(untilEventReceived, false);
 
-const runUntilEventSentWith_ = createEventSentWithFn(untilEventSent, true);
+const runUntilEventReceivedWith_ = createEventReceivedWithFn(
+  untilEventReceived,
+  true,
+);
 
-const waitForEventSentWith_ = createEventSentWithFn(untilEventSent, false);
+const waitForEventReceivedWith_ = createEventReceivedWithFn(
+  untilEventReceived,
+  false,
+);
 
 /**
  * Runs an actor until it sends one or more events (in order), with options
@@ -329,38 +337,38 @@ const waitForEventSentWith_ = createEventSentWithFn(untilEventSent, false);
  *   (assuming they all occurred in order)
  */
 
-export function waitForEventSentWith(): CurryEventSentWith;
+export function waitForEventReceivedWith(): CurryEventReceivedWith;
 
-export function waitForEventSentWith<
+export function waitForEventReceivedWith<
   Logic extends xs.AnyStateMachine,
   Actor extends xs.Actor<Logic>,
->(actor: Actor): CurryEventSentWithP1<Logic>;
+>(actor: Actor): CurryEventReceivedWithP1<Logic>;
 
-export function waitForEventSentWith<
+export function waitForEventReceivedWith<
   Logic extends xs.AnyStateMachine,
   Actor extends xs.Actor<Logic>,
-  const EventSentTypes extends ActorEventTypeTuple<Logic>,
+  const EventReceivedTypes extends ActorEventTypeTuple<Logic>,
 >(
   actor: Actor,
-  events: EventSentTypes,
-): CurryEventSentWithP2<Logic, EventSentTypes>;
+  events: EventReceivedTypes,
+): CurryEventReceivedWithP2<Logic, EventReceivedTypes>;
 
-export function waitForEventSentWith<
+export function waitForEventReceivedWith<
   Logic extends xs.AnyStateMachine,
   Actor extends xs.Actor<Logic>,
-  const EventSentTypes extends ActorEventTypeTuple<Logic>,
+  const EventReceivedTypes extends ActorEventTypeTuple<Logic>,
 >(
   actor: Actor,
-  events: EventSentTypes,
+  events: EventReceivedTypes,
   options: AuditionOptions,
-): CurryEventSentWithP3<Logic, EventSentTypes>;
+): CurryEventReceivedWithP3<Logic, EventReceivedTypes>;
 
-export function waitForEventSentWith<
+export function waitForEventReceivedWith<
   Logic extends xs.AnyStateMachine,
   Actor extends xs.Actor<Logic>,
-  const EventSentTypes extends ActorEventTypeTuple<Logic>,
->(actor?: Actor, events?: EventSentTypes, options?: AuditionOptions) {
-  return waitForEventSentWith_(actor, events, options);
+  const EventReceivedTypes extends ActorEventTypeTuple<Logic>,
+>(actor?: Actor, events?: EventReceivedTypes, options?: AuditionOptions) {
+  return waitForEventReceivedWith_(actor, events, options);
 }
 
 /**
@@ -375,78 +383,78 @@ export function waitForEventSentWith<
  * @returns An {@link ActorThenable} which fulfills with the matching events
  *   (assuming they all occurred in order)
  */
-export function runUntilEventSent(): CurryEventSent;
+export function runUntilEventReceived(): CurryEventReceived;
 
-export function runUntilEventSent<
+export function runUntilEventReceived<
   Logic extends xs.AnyActorLogic,
   Actor extends xs.Actor<Logic>,
->(actor: Actor): CurryEventSentP1<Logic>;
+>(actor: Actor): CurryEventReceivedP1<Logic>;
 
-export function runUntilEventSent<
+export function runUntilEventReceived<
   Logic extends xs.AnyActorLogic,
   Actor extends xs.Actor<Logic>,
   const EventTypes extends ActorEventTypeTuple<Logic>,
->(actor: Actor, events: EventTypes): CurryEventSentP2<Logic, EventTypes>;
+>(actor: Actor, events: EventTypes): CurryEventReceivedP2<Logic, EventTypes>;
 
-export function runUntilEventSent<
+export function runUntilEventReceived<
   Logic extends xs.AnyActorLogic,
   Actor extends xs.Actor<Logic>,
   const EventTypes extends ActorEventTypeTuple<Logic>,
 >(actor?: Actor, events?: EventTypes) {
-  return runUntilEventSent_(actor, events);
+  return runUntilEventReceived_(actor, events);
 }
 
-export function runUntilEventSentWith(): CurryEventSentWith;
+export function runUntilEventReceivedWith(): CurryEventReceivedWith;
 
-export function runUntilEventSentWith<
+export function runUntilEventReceivedWith<
   Logic extends xs.AnyStateMachine,
   Actor extends xs.Actor<Logic>,
->(actor: Actor): CurryEventSentWithP1<Logic>;
+>(actor: Actor): CurryEventReceivedWithP1<Logic>;
 
-export function runUntilEventSentWith<
+export function runUntilEventReceivedWith<
   Logic extends xs.AnyStateMachine,
   Actor extends xs.Actor<Logic>,
-  const EventSentTypes extends ActorEventTypeTuple<Logic>,
+  const EventReceivedTypes extends ActorEventTypeTuple<Logic>,
 >(
   actor: Actor,
-  events: EventSentTypes,
-): CurryEventSentWithP2<Logic, EventSentTypes>;
+  events: EventReceivedTypes,
+): CurryEventReceivedWithP2<Logic, EventReceivedTypes>;
 
-export function runUntilEventSentWith<
+export function runUntilEventReceivedWith<
   Logic extends xs.AnyStateMachine,
   Actor extends xs.Actor<Logic>,
-  const EventSentTypes extends ActorEventTypeTuple<Logic>,
+  const EventReceivedTypes extends ActorEventTypeTuple<Logic>,
 >(
   actor: Actor,
-  events: EventSentTypes,
+  events: EventReceivedTypes,
   options: AuditionOptions,
-): CurryEventSentWithP3<Logic, EventSentTypes>;
+): CurryEventReceivedWithP3<Logic, EventReceivedTypes>;
 
-export function runUntilEventSentWith<
+export function runUntilEventReceivedWith<
   Logic extends xs.AnyStateMachine,
   Actor extends xs.Actor<Logic>,
-  const EventSentTypes extends ActorEventTypeTuple<Logic>,
->(actor?: Actor, events?: EventSentTypes, options?: AuditionOptions) {
-  return runUntilEventSentWith_(actor, events, options);
+  const EventReceivedTypes extends ActorEventTypeTuple<Logic>,
+>(actor?: Actor, events?: EventReceivedTypes, options?: AuditionOptions) {
+  return runUntilEventReceivedWith_(actor, events, options);
 }
 
-export function waitForEventSent(): CurryEventSent;
+export function waitForEventReceived(): CurryEventReceived;
 
-export function waitForEventSent<
+export function waitForEventReceived<
   Logic extends xs.AnyActorLogic,
   Actor extends xs.Actor<Logic>,
->(actor: Actor): CurryEventSentP1<Logic>;
+>(actor: Actor): CurryEventReceivedP1<Logic>;
 
-export function waitForEventSent<
+export function waitForEventReceived<
   Logic extends xs.AnyActorLogic,
   Actor extends xs.Actor<Logic>,
   const EventTypes extends ActorEventTypeTuple<Logic>,
->(actor: Actor, events: EventTypes): CurryEventSentP2<Logic, EventTypes>;
+>(actor: Actor, events: EventTypes): CurryEventReceivedP2<Logic, EventTypes>;
 
-export function waitForEventSent<
+export function waitForEventReceived<
   Logic extends xs.AnyActorLogic,
   Actor extends xs.Actor<Logic>,
   const EventTypes extends ActorEventTypeTuple<Logic>,
 >(actor?: Actor, events?: EventTypes) {
-  return waitForEventSent_(actor, events);
+  return waitForEventReceived_(actor, events);
 }

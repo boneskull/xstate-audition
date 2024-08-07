@@ -16,9 +16,12 @@
     "knip",
     "markdownlint",
     "microstep",
+    "outputtable",
     "packagejson",
+    "snapshottable",
     "tseslint",
     "tshy",
+    "uncurried",
     "xstate"
   ]
 }

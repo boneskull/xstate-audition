@@ -1,28 +1,14 @@
-import assert from 'node:assert/strict';
+import {strict as assert} from 'node:assert';
 import {describe, it} from 'node:test';
-import {
-  type ActorLogic,
-  type AnyActorLogic,
-  createActor,
-  type EventObject,
-  type Snapshot,
-} from 'xstate';
+import {type AnyActorLogic, createActor} from 'xstate';
 
 import {attachActor, createActorThenable} from '../src/actor.js';
 import {type ActorThenable, type AuditionOptions} from '../src/types.js';
+import {noop} from '../src/util.js';
+import {dummyLogic} from './fixture.js';
 
 describe('xstate-audition', () => {
   describe('actor', () => {
-    const dummyLogic: ActorLogic<Snapshot<undefined>, EventObject> = {
-      getInitialSnapshot: () => ({
-        context: undefined,
-        error: undefined,
-        output: undefined,
-        status: 'active',
-      }),
-      getPersistedSnapshot: (snapshot) => snapshot,
-      transition: (snapshot) => snapshot,
-    };
     describe('createActorThenable()', () => {
       /**
        * Dummy actor logic that does nothing.
@@ -30,7 +16,9 @@ describe('xstate-audition', () => {
 
       it('should return an ActorThenable', () => {
         const actor = createActor(dummyLogic);
+
         const promise = Promise.resolve();
+
         const thenable = createActorThenable(actor, promise);
 
         assert.ok(typeof thenable.then === 'function');
@@ -40,16 +28,21 @@ describe('xstate-audition', () => {
 
       it("should call the promise's then method", async () => {
         const actor = createActor(dummyLogic);
+
         const promise = Promise.resolve('test');
+
         const thenable = createActorThenable(actor, promise);
 
         const result = await thenable.then((value) => value);
+
         assert.equal(result, 'test');
       });
 
       it("should call the promise's catch method", async () => {
         const actor = createActor(dummyLogic);
+
         const promise = Promise.reject(new Error('test error'));
+
         const thenable = createActorThenable(actor, promise);
 
         await assert.rejects(
@@ -64,8 +57,11 @@ describe('xstate-audition', () => {
 
       it("should call the promise's finally method", async () => {
         const actor = createActor(dummyLogic);
+
         let finallyCalled = false;
+
         const promise = Promise.resolve();
+
         const thenable = createActorThenable(actor, promise);
 
         await thenable.finally(() => {
@@ -86,8 +82,11 @@ describe('xstate-audition', () => {
         }) as unknown as ActorThenable<AnyActorLogic, string>;
 
         const promise = Promise.resolve('promise then');
+
         const thenable = createActorThenable(actor, promise);
+
         const result = await thenable.then((value) => value);
+
         assert.equal(result, 'actor then');
       });
     });
@@ -98,7 +97,9 @@ describe('xstate-audition', () => {
 
       it('should set the custom logger if provided', () => {
         let actor = createActor(dummyLogic);
+
         const customLogger = () => {};
+
         const options: AuditionOptions = {logger: customLogger};
 
         actor = attachActor(actor, options);
@@ -115,7 +116,9 @@ describe('xstate-audition', () => {
 
       it('should use the default logger if none is provided', () => {
         const logger = () => {};
+
         let actor = createActor(dummyLogic, {logger});
+
         const options: AuditionOptions = {};
 
         actor = attachActor(actor, options);

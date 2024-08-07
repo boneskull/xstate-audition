@@ -46,18 +46,19 @@
   "scripts": {
     "build": "tshy",
     "dev": "tshy --watch",
+    "dev:types": "tsc -p tsconfig.tsc.json --watch",
     "format": "prettier .",
     "lint": "eslint . --max-warnings 0",
     "lint:commit": "commitlint",
-    "lint:fix": "eslint . --fix",
+    "lint:fix": "eslint . --fix && prettier --write .",
     "lint:knip": "knip",
     "lint:md": "markdownlint-cli2 \"**/*.md\" \".github/**/*.md\"",
     "lint:spelling": "cspell \"**\" \".github/**/*\"",
     "lint:staged": "lint-staged",
     "prepare": "husky",
-    "test": "node --import tsx ./test/actor-runner.spec.ts",
+    "test": "node --import tsx --test \"./test/*.spec.ts\"",
     "test:coverage": "c8 npm test",
-    "tsc": "tsc -p tsconfig.tsc.json"
+    "test:types": "tsc -p tsconfig.tsc.json"
   },
   "peerDependencies": {
     "xstate": ">=5.0.0"

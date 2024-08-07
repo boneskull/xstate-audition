@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import eslint from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
 import n from 'eslint-plugin-n';
@@ -15,7 +17,6 @@ export default tseslint.config(
   },
   eslint.configs.recommended,
   n.configs['flat/recommended'],
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
   perfectionist.configs['recommended-natural'],
   ...tseslint.config({
     extends: tseslint.configs.recommendedTypeChecked,
@@ -24,7 +25,10 @@ export default tseslint.config(
       parserOptions: {
         EXPERIMENTAL_useProjectService: {
           allowDefaultProjectForFiles: ['./*.*s', 'eslint.config.js'],
-          defaultProject: './tsconfig.json',
+          defaultProject: './tsconfig.tsc.json',
+          // https://github.com/typescript-eslint/typescript-eslint/issues/9032
+          maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING:
+            Infinity,
         },
       },
     },
@@ -51,6 +55,12 @@ export default tseslint.config(
       '@stylistic/padding-line-between-statements': [
         'error',
         {blankLine: 'always', next: 'export', prev: '*'},
+        {blankLine: 'always', next: 'const', prev: '*'},
+        {blankLine: 'always', next: '*', prev: 'const'},
+        {blankLine: 'always', next: 'let', prev: '*'},
+        {blankLine: 'always', next: '*', prev: 'const'},
+        {blankLine: 'always', next: 'type', prev: '*'},
+        {blankLine: 'always', next: '*', prev: 'type'},
       ],
 
       '@stylistic/semi': ['error', 'always'],
@@ -100,6 +110,9 @@ export default tseslint.config(
 
       // I like my template expressions
       '@typescript-eslint/restrict-template-expressions': 'off',
+
+      // this conflicts with eslint-plugin-perfectionist (just in case)
+      '@typescript-eslint/sort-type-constituents': 'off',
 
       '@typescript-eslint/switch-exhaustiveness-check': 'error',
 

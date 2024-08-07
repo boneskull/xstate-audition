@@ -1,39 +1,27 @@
-import assert from 'node:assert/strict';
+import {strict as assert} from 'node:assert';
 import {beforeEach, describe, it} from 'node:test';
-import {type ActorRefFrom, createActor, fromPromise} from 'xstate';
+import {type Actor, createActor} from 'xstate';
 
 import {runUntilDone, runUntilDoneWith} from '../src/until-done.js';
-import {wait} from '../src/util.js';
+import {promiseLogic} from './fixture.js';
+import {testCurried} from './harness.js';
 
 describe('xstate-audition', () => {
   describe('until-done', () => {
-    const promiseLogic = fromPromise<string, void>(async ({signal}) => {
-      if (signal.aborted) {
-        throw new Error('Aborted');
-      }
-      await wait(100);
-      if (signal.aborted) {
-        throw new Error('Aborted');
-      }
-      return 'hello world';
-    });
-
     describe('runUntilDone()', () => {
-      let actor: ActorRefFrom<typeof promiseLogic>;
+      let actor: Actor<typeof promiseLogic>;
 
       beforeEach(() => {
         actor = createActor(promiseLogic);
       });
 
-      describe('when not provided an actor', () => {
-        it('should return a function that accepts an actor', async () => {
-          const run = runUntilDone();
-          assert.ok(typeof run === 'function');
-
-          const output = await run(actor);
-          assert.equal(output, 'hello world');
-        });
-      });
+      testCurried(
+        runUntilDone,
+        (actual: string) => {
+          assert.equal(actual, 'hello world');
+        },
+        createActor(promiseLogic),
+      );
 
       describe('when provided an actor', () => {
         it('should return an ActorThenable', async () => {
@@ -50,9 +38,54 @@ describe('xstate-audition', () => {
           assert.equal(output, 'hello world');
         });
 
+        it('should abort the actor when the promise is settled', async () => {
+          const actor = createActor(promiseLogic);
+
+          await runUntilDone(actor);
+
+          const {status} = actor.getSnapshot();
+
+          assert.ok(status === 'done' || status === 'stopped');
+        });
+      });
+    });
+
+    describe('runUntilDoneWith()', () => {
+      let actor: Actor<typeof promiseLogic>;
+
+      beforeEach(() => {
+        actor = createActor(promiseLogic);
+      });
+
+      testCurried(
+        runUntilDoneWith,
+        (actual: string) => {
+          assert.equal(actual, 'hello world');
+        },
+        createActor(promiseLogic),
+        {},
+      );
+
+      describe('when provided an actor and options', () => {
+        it('should return an ActorThenable', async () => {
+          const thenable = runUntilDoneWith(actor, {});
+
+          assert.ok(typeof thenable.then === 'function');
+          assert.ok(typeof thenable.catch === 'function');
+          assert.ok(typeof thenable.finally === 'function');
+        });
+
+        it('should fulfill with the actor output', async () => {
+          const output = await runUntilDoneWith(actor, {});
+
+          assert.equal(output, 'hello world');
+        });
+
         it('should timeout if the actor does not complete in time', async () => {
           const timeout = 10; // Set a short timeout for testing
+
           const actor = createActor(promiseLogic);
+
           await assert.rejects(runUntilDoneWith(actor, {timeout}), (err) => {
             assert.match(
               (err as Error).message,
@@ -64,8 +97,11 @@ describe('xstate-audition', () => {
 
         it('should abort the actor when the promise is settled', async () => {
           const actor = createActor(promiseLogic);
-          await runUntilDone(actor);
+
+          await runUntilDoneWith(actor, {});
+
           const {status} = actor.getSnapshot();
+
           assert.ok(status === 'done' || status === 'stopped');
         });
       });
