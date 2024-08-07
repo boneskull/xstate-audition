@@ -1,0 +1,34 @@
+{
+  "tasks": [
+    {
+      "detail": "Build the project",
+      "label": "Build (Distribution)",
+      "script": "build",
+      "type": "npm",
+      "group": "build",
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "type": "npm",
+      "script": "dev",
+      "problemMatcher": ["$tsc-watch"],
+      "label": "Build (Watch)",
+      "detail": "tshy --watch",
+      "group": "build",
+      "isBackground": true
+    },
+    {
+      "type": "npm",
+      "script": "dev:types",
+      "problemMatcher": ["$tsc-watch"],
+      "label": "Check",
+      "detail": "tsc -p tsconfig.tsc.json --watch",
+      "isBackground": true,
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ],
+  "version": "2.0.0"
+}
