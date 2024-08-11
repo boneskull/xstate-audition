@@ -89,7 +89,7 @@
     "prettier-plugin-pkg": "0.18.1",
     "prettier-plugin-sh": "0.14.0",
     "tshy": "3.0.2",
-    "tsx": "4.16.5",
+    "tsx": "4.17.0",
     "typescript": "5.5.4",
     "typescript-eslint": "7.18.0",
     "xstate": "5.17.1"
