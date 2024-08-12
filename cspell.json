@@ -1,5 +1,5 @@
 {
-  "dictionaries": ["typescript"],
+  "dictionaries": ["typescript", "node", "npm"],
   "ignorePaths": [
     ".github",
     "CHANGELOG.md",
@@ -16,9 +16,25 @@
     "knip",
     "markdownlint",
     "microstep",
+    "onsave",
+    "outputtable",
     "packagejson",
+    "snapshottable",
+    "statecharts",
     "tseslint",
     "tshy",
+    "uncurried",
     "xstate"
+  ],
+  "enabledLanguageIds": [
+    "typescript",
+    "javascript",
+    "json",
+    "jsonc",
+    "markdown",
+    "plaintext",
+    "yaml",
+    "yml",
+    "git-commit"
   ]
 }
