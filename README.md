@@ -2,13 +2,7 @@
 
 > Harnesses for testing XState v5 Actors. Actor test...audition...get it??
 
-**xstate-audition** is a library for testing the behavior of [XState Actors][]. All actor types are supported, including:
-
-- State Machines (Statecharts)
-- Promise Actors
-- Callback Actors
-- Transition Actors
-- Observable Actors
+**xstate-audition** is a library for testing the behavior of [XState Actors][].
 
 - [Usage](#usage)
   - [`runUntilEmitted()`](#rununtilemitted)
@@ -26,11 +20,11 @@
 
 ## Usage
 
-TL;DR:
+**TL;DR:**
 
 1. Create an `Actor` using `xstate.createActor(logic)`.
-2. Create a `Promise<T>` using one of the functions below (e.g., `runUntilDone(actor)`). `runUntilDone()` resolves with the _Actor output_ (`T`), but other functions resolve with other `T`'s. If the actor hadn't yet been started, it will be started now.
-3. _If_ your actor needs external input to resolve the condition (e.g., it must receive an event), perform that operation, _before_ you `await` the `Promise<T>`.
+2. Create a `Promise<T>` using one of the functions below (e.g., `runUntilDone(actor: Actor) => Promise<T>` where `T` is the _Actor output_). If the actor hadn't yet been started, it will be started now.
+3. _If_ your actor needs external input to resolve the condition (e.g., it must receive an event), perform that operation _before_ you `await` the `Promise<T>` (examples below).
 4. Now, you can `await` the `Promise<T>` from step 2.
 5. Finally, make an assertion about `T`.
 
@@ -42,48 +36,35 @@ TL;DR:
 
 `waitForEmitted(actor, eventTypes)` / `waitForEmittedWith(actor, options, eventTypes)` are similar, but do not stop the actor.
 
+> [!NOTE]
+>
+> This function _only_ applies to events emitted via the [event emitter API][event-emitter].
+
 ```ts
 import {strict as assert} from 'node:assert';
 import {beforeEach, describe, it} from 'node:test';
 import {type Actor, createActor, emit, setup} from 'xstate';
+
 import {type CurryEmittedP1, runUntilEmitted} from 'xstate-audition';
 
-describe('runUntilEmitted()', () => {
-  type Emit1 = {type: 'EMIT1'; value: string};
+type Emit1 = {type: 'EMIT1'; value: string};
 
-  type Emit2 = {type: 'EMIT2'; value: number};
+type Emit2 = {type: 'EMIT2'; value: number};
 
-  type EmitterEmitted = Emit1 | Emit2;
+type EmitterEmitted = Emit1 | Emit2;
 
-  const emitterMachine = setup({
-    types: {
-      emitted: {} as EmitterEmitted,
-    },
-  }).createMachine({
-    initial: 'emitting',
-    states: {
-      done: {
-        type: 'final',
-      },
-      emitting: {
-        after: {
-          50: {
-            actions: [
-              emit({type: 'EMIT1', value: 'value'}),
-              emit({type: 'EMIT2', value: 42}),
-            ],
-            target: 'waitMore',
-          },
-        },
-      },
-      waitMore: {
-        after: {
-          50: 'done',
-        },
-      },
-    },
-  });
+const emitterMachine = setup({
+  types: {
+    emitted: {} as EmitterEmitted,
+  },
+}).createMachine({
+  entry: [
+    emit({type: 'EMIT1', value: 'value'}),
+    emit({type: 'EMIT2', value: 42}),
+  ],
+});
 
+describe('emitterMachine', () => {
   let actor: Actor<typeof emitterMachine>;
 
   let runUntilEmit: CurryEmittedP1<typeof actor>;
@@ -96,17 +77,11 @@ describe('runUntilEmitted()', () => {
     runUntilEmit = runUntilEmitted(actor);
   });
 
-  it('should emit events', async () => {
+  it('should emit two events', async () => {
     const [emit1Event, emit2Event] = await runUntilEmit(['EMIT1', 'EMIT2']);
 
     assert.deepEqual(emit1Event, {type: 'EMIT1', value: 'value'});
     assert.deepEqual(emit2Event, {type: 'EMIT2', value: 42});
-  });
-
-  it('should halt the actor', async () => {
-    await runUntilEmit(['EMIT1', 'EMIT2']);
-
-    assert.strictEqual(actor.getSnapshot().status, 'stopped');
   });
 });
 ```
@@ -120,7 +95,52 @@ describe('runUntilEmitted()', () => {
 `waitForTransition(actor, fromStateId, toStateId)` / `waitForStateWith(actor, options, fromStateId, toStateId)` are similar, but do not stop the actor.
 
 ```ts
-// TODO
+import {strict as assert} from 'node:assert';
+import {beforeEach, describe, it} from 'node:test';
+import {type Actor, createActor, createMachine} from 'xstate';
+
+import {type CurryTransitionP2, runUntilTransition} from '../src/index.js';
+
+const transitionMachine = createMachine({
+  // if you do not supply a default ID, then the ID will be `(machine)`
+  id: 'transitionMachine',
+  initial: 'first',
+  states: {
+    first: {
+      after: {
+        100: 'second',
+      },
+    },
+    second: {
+      after: {
+        100: 'third',
+      },
+    },
+    third: {
+      type: 'final',
+    },
+  },
+});
+
+describe('transitionMachine', () => {
+  let actor: Actor<typeof transitionMachine>;
+
+  let runWithFirst: CurryTransitionP2<typeof actor>;
+
+  beforeEach(() => {
+    actor = createActor(transitionMachine);
+    // curried
+    runWithFirst = runUntilTransition(actor, 'transitionMachine.first');
+  });
+
+  it('should transition from "first" to "second"', async () => {
+    await runWithFirst('transitionMachine.second');
+  });
+
+  it('should not transition from "first" to "third"', async () => {
+    await assert.rejects(runWithFirst('transitionMachine.third'));
+  });
+});
 ```
 
 ### `runUntilDone()`
@@ -136,7 +156,61 @@ describe('runUntilEmitted()', () => {
 > - _There is no such_ `waitForDone(...)` / `waitForDoneWith(...)` variant, since that would be silly.
 
 ```ts
-// TODO
+import {strict as assert} from 'node:assert';
+import {beforeEach, describe, it} from 'node:test';
+import {type Actor, createActor, fromPromise} from 'xstate';
+
+import {runUntilDone, runUntilDoneWith} from 'xstate-audition';
+
+const promiseLogic = fromPromise<string, string>(
+  // this signal is aborted via call to Actor.stop()
+  async ({input, signal}) => {
+    let listener!: () => void;
+    try {
+      return await new Promise((resolve, reject) => {
+        listener = () => {
+          clearTimeout(timeout);
+          // this rejection is eaten by xstate-audition
+          // in lieu of its own timeout error (seen below)
+          reject(signal.reason);
+        };
+
+        const timeout = setTimeout(() => {
+          resolve(`hello ${input}`);
+        }, 500);
+
+        signal.addEventListener('abort', listener);
+      });
+    } finally {
+      signal.removeEventListener('abort', listener);
+    }
+  },
+);
+
+describe('logic', () => {
+  let actor: Actor<typeof promiseLogic>;
+
+  beforeEach(() => {
+    actor = createActor(promiseLogic, {input: 'world'});
+  });
+
+  it('should output with the expected value', async () => {
+    const result = await runUntilDone(actor);
+
+    assert.equal(result, 'hello world');
+  });
+
+  it('should abort when provided a too-short timeout', async () => {
+    await assert.rejects(
+      runUntilDoneWith(actor, {timeout: 100}),
+      (err: Error) => {
+        assert.equal(err.message, 'Actor did not complete in 100ms');
+
+        return true;
+      },
+    );
+  });
+});
 ```
 
 ### `runUntilSnapshot()`
@@ -150,18 +224,139 @@ describe('runUntilEmitted()', () => {
 > - Like [`runUntilDone()`][runUntilDone], `runUntilSnapshot()` is not significantly different than XState's `waitFor()`.
 > - `runUntilSnapshotWith()` may be used to overwrite the internal logger and/or add an inspector callback (or `Observer`) to an Actor.
 
+```ts
+import {strict as assert} from 'node:assert';
+import {describe, it} from 'node:test';
+import {assign, createActor, setup} from 'xstate';
+
+import {runUntilSnapshot} from 'xstate-audition';
+
+const snapshotLogic = setup({
+  types: {
+    context: {} as {word?: string},
+  },
+}).createMachine({
+  initial: 'first',
+  states: {
+    done: {
+      type: 'final',
+    },
+    first: {
+      after: {
+        50: 'second',
+      },
+      entry: assign({
+        word: 'foo',
+      }),
+    },
+    second: {
+      after: {
+        50: 'third',
+      },
+      entry: assign({
+        word: 'bar',
+      }),
+    },
+    third: {
+      after: {
+        50: 'done',
+      },
+      entry: assign({
+        word: 'baz',
+      }),
+    },
+  },
+});
+
+describe('snapshotLogic', () => {
+  it('should contain word "bar" in state "second"', async () => {
+    const actor = createActor(snapshotLogic);
+
+    const snapshot = await runUntilSnapshot(actor, (snapshot) =>
+      snapshot.matches('second'),
+    );
+
+    assert.deepEqual(snapshot.context, {word: 'bar'});
+  });
+
+  it('should be in state "second" when word is "bar"', async () => {
+    const actor = createActor(snapshotLogic);
+
+    const snapshot = await runUntilSnapshot(
+      actor,
+      (snapshot) => snapshot.context.word === 'bar',
+    );
+
+    assert.equal(snapshot.value, 'second');
+  });
+});
+```
+
 ### `runUntilSpawn()`
 
-> Run a State Machine Actor Until It Spawns a Child Actor
+> Run a State Machine Actor Until Its System Spawns a Child Actor
 
-`runUntilSpawn(actor, childId)` / `runUntilSpawnWith(actor, options, childId)` are curried functions that will start an actor and run it until it spawns a child actor with `id` matching `childId` (which may be a `RegExp`). Once the child actor is spawned, the actor will immediately be stopped. The `Promise` will be resolved with a reference to the spawned actor (an `xstate.AnyActorRef`).
-
-The spawned actor will also be stopped.
+`runUntilSpawn(actor, childId)` / `runUntilSpawnWith(actor, options, childId)` are curried functions that will start an actor and run it until it spawns a child actor with `id` matching `childId` (which may be a `RegExp`). Once the child actor is spawned, the actor will immediately be stopped. The `Promise` will be resolved with a reference to the spawned actor (an `xstate.ActorRef`).
 
 `waitForSpawn(actor, childId)` / `waitForSpawnWith(actor, options, childId)` are similar, but do not stop the actor.
 
+The root State Machine Actor itself needn't spawn the child with the matching `id`, but _any_ actor within the root actor's system may spawn the child. As of this writing, there is no way to specify the _parent_ of the spawned actor.
+
+> [!NOTE]
+>
+> The _type_ of the spawned actor cannot be inferred by ID alone. For this reason, it's recommended to _provide an explicit type argument_ declaring the type of the spawned actor's `ActorLogic`, as seen in the below example.
+
 ```ts
-// TODO
+import {strict as assert} from 'node:assert';
+import {describe, it} from 'node:test';
+import {createActor, fromPromise, setup, spawnChild} from 'xstate';
+
+import {waitForSpawn} from 'xstate-audition';
+
+const noopPromiseLogic = fromPromise<void, void>(async () => {});
+
+const spawnerMachine = setup({
+  actors: {noop: noopPromiseLogic},
+  types: {events: {} as {type: 'SPAWN'}},
+}).createMachine({
+  on: {
+    SPAWN: {
+      actions: spawnChild('noop', {id: 'noopPromise'}),
+    },
+  },
+});
+
+describe('spawnerMachine', () => {
+  it('should spawn a child with ID "noopPromise" when "SPAWN" event received', async () => {
+    const actor = createActor(spawnerMachine);
+
+    try {
+      // spawnerMachine needs an event to spawn the actor. but at this point,
+      // the actor hasn't started, so we cannot send the event because nothing
+      // will be listening for it.
+      //
+      // but if we start the actor ourselves & send the event, spawning could
+      // happen before waitForSpawn can detect it! so instead of immediately
+      // awaiting, let's just set it up first.
+      const promise = waitForSpawn<typeof noopPromiseLogic>(
+        actor,
+        'noopPromise',
+      );
+
+      // the detection is now setup and the actor is active; the code running in
+      // the Promise is waiting for the spawn to occur. so let's oblige it:
+      actor.send({type: 'SPAWN'});
+
+      // ...then we can finally await the promise.
+      const actorRef = await promise;
+
+      assert.equal(actorRef.id, 'noopPromise');
+    } finally {
+      // you can shutdown manually! for fun!
+      actor.stop();
+    }
+  });
+});
 ```
 
 ### `runUntilEventReceived()`
@@ -174,9 +369,7 @@ The spawned actor will also be stopped.
 
 `withForEventReceived(actor, eventTypes)` / `waitForEventReceivedWith(actor, options, eventTypes)` are similar, but do not stop the actor.
 
-```ts
-// TODO
-```
+Usage is similar to [`runUntilEmitted()`](#rununtilemitted)—with the exception of the `otherActorId` property as described above.
 
 ### `runUntilEventSent()`
 
@@ -188,14 +381,16 @@ The spawned actor will also be stopped.
 
 `waitForEventSent(actor, eventTypes)` / `waitForEventSentWith(actor, options, eventTypes)` are similar, but do not stop the actor.
 
-```ts
-// TODO
-```
+Usage is similar to [`runUntilEmitted()`](#rununtilemitted)—with the exception of the `otherActorId` property as described above.
 
 ## Requirements
 
 - Node.js v20.0.0+ or modern browser
 - `xstate` v5.17.1+ (peer dependency)
+
+> [!CAUTION]
+>
+> Haven't tested the browser yet!
 
 ## Installation
 
@@ -207,7 +402,8 @@ npm install xstate-audition xstate -D
 
 > [!IMPORTANT]
 >
-> - The functions exposed by **xstate-audition**'s are _all curried_. The ultimate return type of each function is a `Promise<T>`.
+> - All functions exposed by **xstate-audition**'s are curried. The final return type of each function is `Promise<T>`.
+> - All functions ending in `With()` accept an [`AuditionOptions`](#auditionoptions) object as the _second_ argument. **If the function name doesn't end with `With()`, it does not accept an `AuditionOptions` object.**
 > - Any inspectors _already attached_ to an `Actor` provided to **xstate-audition** will be preserved.
 > - At this time, **xstate-audition** offers no mechanism to set global defaults for [`AuditionOptions`][AuditionOptions].
 
@@ -215,9 +411,11 @@ npm install xstate-audition xstate -D
 
 If you want to attach your own inspector, use a different logger, or set a different timeout, you can use `AuditionOptions`.
 
-All functions ending in `With()` accept an `AuditionOptions` object as the _second_ argument. **If the function name doesn't end with `With()`, it does not accept an `AuditionOptions` object.** This object may contain the following properties:
+It bears repeating: all functions ending in `With()` accept an `AuditionOptions` object as the _second_ argument. **If the function name doesn't end with `With()`, it does not accept an `AuditionOptions` object.**
 
-- **`inspector`** - `((event: xstate.InspectionEvent) => void) | xstate.Observer<xstate.InspectionEvent>`: An inspector callback or observer to attach to the actor. This _will not_ overwrite any existing inspector.
+The `AuditionOptions` object may contain the following properties:
+
+- **`inspector`** - `((event: xstate.InspectionEvent) => void) | xstate.Observer<xstate.InspectionEvent>`: An inspector callback or observer to attach to the actor. This _will not_ overwrite any existing inspector, but may be "merged" with any inspector used internally by **xstate-audition**.
 
   The behavior is similar to setting the `inspect` option when calling `xstate.createActor()`.
 
@@ -245,3 +443,4 @@ All functions ending in `With()` accept an `AuditionOptions` object as the _seco
 [AuditionOptions]: #auditionoptions
 [runUntilDone]: #rununtildone
 [boneskull]: https://github.com/boneskull
+[event-emitter]: https://stately.ai/docs/event-emitter

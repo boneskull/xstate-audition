@@ -1,3 +1,5 @@
+import {type AnyActorRef} from 'xstate';
+
 import {noop} from './util.js';
 
 /**
@@ -11,6 +13,7 @@ import {noop} from './util.js';
  * @param message Timeout message
  */
 export function startTimer(
+  actor: AnyActorRef,
   abortController: AbortController,
   timeout: number,
   message?: string,
@@ -26,6 +29,7 @@ export function startTimer(
     abortController.abort(
       new Error(message || `Timeout of ${timeout}ms exceeded`),
     );
+    actor.stop();
   }, noop);
 }
 

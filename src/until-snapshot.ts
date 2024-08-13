@@ -11,52 +11,50 @@ import {
 
 export type {SnapshottableLogic as ActorLogicWithSnapshot};
 
-export type CurrySnapshot =
-  | (() => <Actor extends AnySnapshottableActor>(
-      actor: Actor,
-      predicate: SnapshotPredicate<Actor['logic']>,
-    ) => CurrySnapshotP2<Actor>)
-  | (() => <Actor extends AnySnapshottableActor>(
-      actor: Actor,
-    ) => CurrySnapshotP1<Actor>)
-  | (() => CurrySnapshot);
+export type CurrySnapshot = (() => CurrySnapshot) &
+  (<Actor extends AnySnapshottableActor>(
+    actor: Actor,
+    predicate: SnapshotPredicate<Actor['logic']>,
+  ) => CurrySnapshotP2<Actor>) &
+  (<Actor extends AnySnapshottableActor>(
+    actor: Actor,
+  ) => CurrySnapshotP1<Actor>);
 
 export type CurrySnapshotP1<Actor extends AnySnapshottableActor> =
-  | (() => CurrySnapshotP1<Actor>)
-  | ((predicate: SnapshotPredicate<Actor['logic']>) => CurrySnapshotP2<Actor>);
+  (() => CurrySnapshotP1<Actor>) &
+    ((predicate: SnapshotPredicate<Actor['logic']>) => CurrySnapshotP2<Actor>);
 
 export type CurrySnapshotP2<Actor extends AnySnapshottableActor> = Promise<
   xs.SnapshotFrom<Actor['logic']>
 >;
 
-export type CurrySnapshotWith =
-  | (() => <Actor extends AnySnapshottableActor>(
-      actor: Actor,
-      predicate: SnapshotPredicate<Actor['logic']>,
-      options: AuditionOptions,
-    ) => CurrySnapshotWithP3<Actor>)
-  | (() => <Actor extends AnySnapshottableActor>(
-      actor: Actor,
-      predicate: SnapshotPredicate<Actor['logic']>,
-    ) => CurrySnapshotWithP2<Actor>)
-  | (() => <Actor extends AnySnapshottableActor>(
-      actor: Actor,
-    ) => CurrySnapshotWithP1<Actor>)
-  | (() => CurrySnapshotWith);
+export type CurrySnapshotWith = (() => CurrySnapshotWith) &
+  (<Actor extends AnySnapshottableActor>(
+    actor: Actor,
+    predicate: SnapshotPredicate<Actor['logic']>,
+    options: AuditionOptions,
+  ) => CurrySnapshotWithP3<Actor>) &
+  (<Actor extends AnySnapshottableActor>(
+    actor: Actor,
+    predicate: SnapshotPredicate<Actor['logic']>,
+  ) => CurrySnapshotWithP2<Actor>) &
+  (<Actor extends AnySnapshottableActor>(
+    actor: Actor,
+  ) => CurrySnapshotWithP1<Actor>);
 
-export type CurrySnapshotWithP1<Actor extends AnySnapshottableActor> =
-  | ((
-      predicate: SnapshotPredicate<Actor['logic']>,
-      options: AuditionOptions,
-    ) => CurrySnapshotWithP3<Actor>)
-  | ((
-      predicate: SnapshotPredicate<Actor['logic']>,
-    ) => CurrySnapshotWithP2<Actor>)
-  | (() => CurrySnapshotWithP1<Actor>);
+// prettier-ignore
+export type CurrySnapshotWithP1<Actor extends AnySnapshottableActor> = ((
+    predicate: SnapshotPredicate<Actor['logic']>,
+  ) => CurrySnapshotWithP2<Actor>) &
+  ((
+  predicate: SnapshotPredicate<Actor['logic']>,
+  options: AuditionOptions,
+) => CurrySnapshotWithP3<Actor>) &
+  (() => CurrySnapshotWithP1<Actor>);
 
 export type CurrySnapshotWithP2<Actor extends AnySnapshottableActor> =
-  | (() => CurrySnapshotWithP2<Actor>)
-  | ((options: AuditionOptions) => CurrySnapshotWithP3<Actor>);
+  (() => CurrySnapshotWithP2<Actor>) &
+    ((options: AuditionOptions) => CurrySnapshotWithP3<Actor>);
 
 export type CurrySnapshotWithP3<Actor extends AnySnapshottableActor> = Promise<
   xs.SnapshotFrom<Actor['logic']>
@@ -71,14 +69,10 @@ export type SnapshotPredicate<T extends SnapshottableLogic> = (
  *
  * Immediately stops the actor thereafter.
  *
- * Returns a combination of a `Promise` and an {@link xs.Actor} so that events
- * may be sent to the actor.
- *
  * @template T Actor logic which emits snapshots
  * @param actor An existing {@link Actor}
  * @param predicate Snapshot predicate; see {@link xs.waitFor}
- * @returns {@link ActorThenable} Fulfilling with the snapshot that matches the
- *   predicate
+ * @returns The snapshot that matches the predicate
  */
 export function runUntilSnapshot(): CurrySnapshot;
 
@@ -103,15 +97,11 @@ export function runUntilSnapshot<Actor extends AnySnapshottableActor>(
  *
  * Immediately stops the actor thereafter.
  *
- * Returns a combination of a `Promise` and an {@link xs.Actor} so that events
- * may be sent to the actor.
- *
  * @template T Actor logic which emits snapshots
  * @param actor An existing {@link Actor}
  * @param predicate Snapshot predicate; see {@link xs.waitFor}
  * @param options Options
- * @returns {@link ActorThenable} Fulfilling with the snapshot that matches the
- *   predicate
+ * @returns The snapshot that matches the predicate
  */
 export function runUntilSnapshotWith(): CurrySnapshotWith;
 

@@ -14,78 +14,75 @@ import {
   isInspectedMicrostepEvent,
 } from './util.js';
 
-export type CurryTransition =
-  | (() => <Actor extends AnyStateMachineActor>(
-      actor: Actor,
-      source: string,
-      target: string,
-    ) => CurryTransitionP3)
-  | (() => <Actor extends AnyStateMachineActor>(
-      actor: Actor,
-      source: string,
-    ) => CurryTransitionP2<Actor>)
-  | (() => <Actor extends AnyStateMachineActor>(
-      actor: Actor,
-    ) => CurryTransitionP1<Actor>)
-  | (() => CurryTransition);
+export type CurryTransition = (() => CurryTransition) &
+  (<Actor extends AnyStateMachineActor>(
+    actor: Actor,
+    source: string,
+    target: string,
+  ) => CurryTransitionP3) &
+  (<Actor extends AnyStateMachineActor>(
+    actor: Actor,
+    source: string,
+  ) => CurryTransitionP2<Actor>) &
+  (<Actor extends AnyStateMachineActor>(
+    actor: Actor,
+  ) => CurryTransitionP1<Actor>);
 
 export type CurryTransitionP1<Actor extends AnyStateMachineActor> =
-  | (() => CurryTransitionP1<Actor>)
-  | ((source: string) => CurryTransitionP2<Actor>)
-  | ((source: string, target: string) => CurryTransitionP3);
+  (() => CurryTransitionP1<Actor>) &
+    ((source: string) => CurryTransitionP2<Actor>) &
+    ((source: string, target: string) => CurryTransitionP3);
 
 export type CurryTransitionP2<Actor extends AnyStateMachineActor> =
-  | (() => CurryTransitionP2<Actor>)
-  | ((target: string) => CurryTransitionP3);
+  (() => CurryTransitionP2<Actor>) & ((target: string) => CurryTransitionP3);
 
 export type CurryTransitionP3 = Promise<void>;
 
-export type CurryTransitionWith =
-  | (() => <Actor extends AnyStateMachineActor>(
-      actor: Actor,
-      options: AuditionOptions,
-      source: string,
-      target: string,
-    ) => CurryTransitionWithP4)
-  | (() => <Actor extends AnyStateMachineActor>(
-      actor: Actor,
-      options: AuditionOptions,
-      source: string,
-    ) => CurryTransitionWithP3<Actor>)
-  | (() => <Actor extends AnyStateMachineActor>(
-      actor: Actor,
-      options: AuditionOptions,
-    ) => CurryTransitionWithP2<Actor>)
-  | (() => <Actor extends AnyStateMachineActor>(
-      actor: Actor,
-    ) => CurryTransitionWithP1<Actor>)
-  | (() => CurryTransitionWith);
+export type CurryTransitionWith = (() => CurryTransitionWith) &
+  (<Actor extends AnyStateMachineActor>(
+    actor: Actor,
+    options: AuditionOptions,
+    source: string,
+    target: string,
+  ) => CurryTransitionWithP4) &
+  (<Actor extends AnyStateMachineActor>(
+    actor: Actor,
+    options: AuditionOptions,
+    source: string,
+  ) => CurryTransitionWithP3<Actor>) &
+  (<Actor extends AnyStateMachineActor>(
+    actor: Actor,
+    options: AuditionOptions,
+  ) => CurryTransitionWithP2<Actor>) &
+  (<Actor extends AnyStateMachineActor>(
+    actor: Actor,
+  ) => CurryTransitionWithP1<Actor>);
 
 // conflict with eslint-plugin-perfectionist
 // prettier-ignore
 export type CurryTransitionWithP1<Actor extends AnyStateMachineActor> =
-  | ((
+  & ((
       options: AuditionOptions,
       source: string,
       target: string,
     ) => CurryTransitionWithP4)
-  | (() => CurryTransitionWithP1<Actor>)
-  | ((options: AuditionOptions) => CurryTransitionWithP2<Actor>)
-  | ((options: AuditionOptions, source: string) => CurryTransitionWithP3<Actor>);
+  & (() => CurryTransitionWithP1<Actor>)
+  & ((options: AuditionOptions) => CurryTransitionWithP2<Actor>)
+  & ((options: AuditionOptions, source: string) => CurryTransitionWithP3<Actor>);
 
 // conflict with eslint-plugin-perfectionist
 // prettier-ignore
 export type CurryTransitionWithP2<Actor extends AnyStateMachineActor> =
-  | ((
+  & ((
       source: string,
       target: string,
     ) => CurryTransitionWithP4)
-  | (() => CurryTransitionWithP2<Actor>)
-  | ((source: string) => CurryTransitionWithP3<Actor>);
+  & (() => CurryTransitionWithP2<Actor>)
+  & ((source: string) => CurryTransitionWithP3<Actor>);
 
 export type CurryTransitionWithP3<Actor extends AnyStateMachineActor> =
-  | (() => CurryTransitionWithP3<Actor>)
-  | ((target: string) => CurryTransitionWithP4);
+  (() => CurryTransitionWithP3<Actor>) &
+    ((target: string) => CurryTransitionWithP4);
 
 export type CurryTransitionWithP4 = Promise<void>;
 
@@ -93,24 +90,22 @@ export type CurryTransitionWithP4 = Promise<void>;
  * Runs the machine until a transition from the `source` state to the `target`
  * state occurs.
  *
- * Immediately stops the machine thereafter. Returns a combination of a
- * `Promise` and an {@link xs.Actor} so that events may be sent to the actor.
- *
  * @privateRemarks
  * TODO: Implement type narrowing for `source` and `target` once xstate supports
  * it
+ *
+ * TODO: Maybe resolve w/ a snapshot
  * @template T A state machine
  * @param actor An existing {@link Actor}
  * @param source Source state ID
  * @param target Target state ID
- * @returns An {@link ActorThenable} that resolves when the specified transition
- *   occurs
  */
-export function runUntilTransition(): CurryTransition;
 
 export function runUntilTransition<Actor extends AnyStateMachineActor>(
   actor: Actor,
-): CurryTransitionP1<Actor>;
+  source: string,
+  target: string,
+): CurryTransitionP3;
 
 export function runUntilTransition<Actor extends AnyStateMachineActor>(
   actor: Actor,
@@ -119,9 +114,9 @@ export function runUntilTransition<Actor extends AnyStateMachineActor>(
 
 export function runUntilTransition<Actor extends AnyStateMachineActor>(
   actor: Actor,
-  source: string,
-  target: string,
-): CurryTransitionP3;
+): CurryTransitionP1<Actor>;
+
+export function runUntilTransition(): CurryTransition;
 
 export function runUntilTransition<Actor extends AnyStateMachineActor>(
   actor?: Actor,
@@ -131,16 +126,12 @@ export function runUntilTransition<Actor extends AnyStateMachineActor>(
   return runUntilTransition_(actor, source, target);
 }
 
-export function runUntilTransitionWith(): CurryTransitionWith;
-
-export function runUntilTransitionWith<Actor extends AnyStateMachineActor>(
-  actor: Actor,
-): CurryTransitionWithP1<Actor>;
-
 export function runUntilTransitionWith<Actor extends AnyStateMachineActor>(
   actor: Actor,
   options: AuditionOptions,
-): CurryTransitionWithP2<Actor>;
+  source: string,
+  target: string,
+): CurryTransitionWithP4;
 
 export function runUntilTransitionWith<Actor extends AnyStateMachineActor>(
   actor: Actor,
@@ -151,9 +142,13 @@ export function runUntilTransitionWith<Actor extends AnyStateMachineActor>(
 export function runUntilTransitionWith<Actor extends AnyStateMachineActor>(
   actor: Actor,
   options: AuditionOptions,
-  source: string,
-  target: string,
-): CurryTransitionWithP4;
+): CurryTransitionWithP2<Actor>;
+
+export function runUntilTransitionWith<Actor extends AnyStateMachineActor>(
+  actor: Actor,
+): CurryTransitionWithP1<Actor>;
+
+export function runUntilTransitionWith(): CurryTransitionWith;
 
 export function runUntilTransitionWith<Actor extends AnyStateMachineActor>(
   actor?: Actor,
@@ -420,6 +415,7 @@ const untilTransition = <Actor extends AnyStateMachineActor>(
   }
 
   startTimer(
+    actor,
     abortController,
     timeout,
     `Transition from ${source} to ${target} not detected in ${timeout}ms`,

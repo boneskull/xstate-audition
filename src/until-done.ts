@@ -143,6 +143,7 @@ const untilDone = <
     createAbortablePromiseKit<Output>();
 
   startTimer(
+    actor,
     abortController,
     timeout,
     `Actor did not complete in ${timeout}ms`,

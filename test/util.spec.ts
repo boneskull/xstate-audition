@@ -1,5 +1,6 @@
 import {strict as assert} from 'node:assert';
 import {describe, it} from 'node:test';
+import {createEmptyActor} from 'xstate';
 
 import {startTimer, wait} from '../src/timer.js';
 
@@ -13,7 +14,7 @@ describe('xstate-audition', () => {
 
           const timeout = Infinity;
 
-          startTimer(ac, timeout);
+          startTimer(createEmptyActor(), ac, timeout);
           await wait(100, ac.signal);
           assert.ok(!ac.signal.aborted);
         });
@@ -26,7 +27,7 @@ describe('xstate-audition', () => {
 
         const message = 'Timeout exceeded';
 
-        startTimer(ac, timeout, message);
+        startTimer(createEmptyActor(), ac, timeout, message);
         try {
           await wait(timeout + 50, ac.signal);
         } catch {}
@@ -40,7 +41,7 @@ describe('xstate-audition', () => {
 
         const timeout = 10;
 
-        startTimer(ac, timeout);
+        startTimer(createEmptyActor(), ac, timeout);
         try {
           await wait(timeout + 50, ac.signal);
         } catch {}
@@ -57,7 +58,7 @@ describe('xstate-audition', () => {
 
         const timeout = 10;
 
-        startTimer(ac, timeout);
+        startTimer(createEmptyActor(), ac, timeout);
 
         await wait(0, ac.signal);
 

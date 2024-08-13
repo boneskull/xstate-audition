@@ -11,147 +11,157 @@ import {
 } from './types.js';
 import {isString} from './util.js';
 
-export type CurrySpawn =
-  | (() => <Actor extends AnyStateMachineActor>(
-      actor: Actor,
-      target: RegExp | string,
-    ) => CurrySpawnP2)
-  | (() => <Actor extends AnyStateMachineActor>(
-      actor: Actor,
-    ) => CurrySpawnP1<Actor>)
-  | (() => CurrySpawn);
+export type CurrySpawn = (() => CurrySpawn) &
+  (<Logic extends xs.AnyActorLogic>(
+    actor: AnyStateMachineActor,
+    target: RegExp | string,
+  ) => CurrySpawnP2<Logic>) &
+  (<Logic extends xs.AnyActorLogic>(
+    actor: AnyStateMachineActor,
+  ) => CurrySpawnP1<Logic>);
 
-export type CurrySpawnP1<Actor extends AnyStateMachineActor> =
-  | (() => CurrySpawnP1<Actor>)
-  | ((target: RegExp | string) => CurrySpawnP2);
+export type CurrySpawnP1<Logic extends xs.AnyActorLogic> =
+  (() => CurrySpawnP1<Logic>) &
+    ((target: RegExp | string) => CurrySpawnP2<Logic>);
 
-export type CurrySpawnP2 = Promise<xs.AnyActorRef>;
+export type CurrySpawnP2<Logic extends xs.AnyActorLogic> = Promise<
+  xs.ActorRefFrom<Logic>
+>;
 
-export type CurrySpawnWith =
-  | (() => <Actor extends AnyStateMachineActor>(
-      actor: Actor,
-      options: AuditionOptions,
-      target: RegExp | string,
-    ) => CurrySpawnWithP3)
-  | (() => <Actor extends AnyStateMachineActor>(
-      actor: Actor,
-      options: AuditionOptions,
-    ) => CurrySpawnWithP2<Actor>)
-  | (() => <Actor extends AnyStateMachineActor>(
-      actor: Actor,
-    ) => CurrySpawnWithP1<Actor>)
-  | (() => CurrySpawnWith);
+export type CurrySpawnWith = (() => CurrySpawnWith) &
+  (<Logic extends xs.AnyActorLogic>(
+    actor: AnyStateMachineActor,
+    options: AuditionOptions,
+    target: RegExp | string,
+  ) => CurrySpawnWithP3<Logic>) &
+  (<Logic extends xs.AnyActorLogic>(
+    actor: AnyStateMachineActor,
+    options: AuditionOptions,
+  ) => CurrySpawnWithP2<Logic>) &
+  (<Logic extends xs.AnyActorLogic>(
+    actor: AnyStateMachineActor,
+  ) => CurrySpawnWithP1<Logic>);
 
-export type CurrySpawnWithP1<Actor extends AnyStateMachineActor> =
-  | (() => CurrySpawnWithP1<Actor>)
-  | ((options: AuditionOptions) => CurrySpawnWithP2<Actor>)
-  | ((options: AuditionOptions, target: RegExp | string) => CurrySpawnWithP3);
+export type CurrySpawnWithP1<Logic extends xs.AnyActorLogic> = ((
+  options: AuditionOptions,
+  target: RegExp | string,
+) => CurrySpawnWithP3<Logic>) &
+  (() => CurrySpawnWithP1<Logic>) &
+  ((options: AuditionOptions) => CurrySpawnWithP2<Logic>);
 
-export type CurrySpawnWithP2<Actor extends AnyStateMachineActor> =
-  | (() => CurrySpawnWithP2<Actor>)
-  | ((target: RegExp | string) => CurrySpawnWithP3);
+export type CurrySpawnWithP2<Logic extends xs.AnyActorLogic> =
+  (() => CurrySpawnWithP2<Logic>) &
+    ((target: RegExp | string) => CurrySpawnWithP3<Logic>);
 
-export type CurrySpawnWithP3 = Promise<xs.AnyActorRef>;
+export type CurrySpawnWithP3<Logic extends xs.AnyActorLogic> = Promise<
+  xs.ActorRefFrom<Logic>
+>;
+
+export function runUntilSpawn<Logic extends xs.AnyActorLogic>(
+  actor: AnyStateMachineActor,
+  target: RegExp | string,
+): CurrySpawnP2<Logic>;
+
+export function runUntilSpawn<Logic extends xs.AnyActorLogic>(
+  actor: AnyStateMachineActor,
+): CurrySpawnP1<Logic>;
 
 export function runUntilSpawn(): CurrySpawn;
 
-export function runUntilSpawn<Actor extends AnyStateMachineActor>(
-  actor: Actor,
-): CurrySpawnP1<Actor>;
-
-export function runUntilSpawn<Actor extends AnyStateMachineActor>(
-  actor: Actor,
-  target: RegExp | string,
-): CurrySpawnP2;
-
-export function runUntilSpawn<Actor extends AnyStateMachineActor>(
-  actor?: Actor,
+export function runUntilSpawn<Logic extends xs.AnyActorLogic>(
+  actor?: AnyStateMachineActor,
   target?: RegExp | string,
 ) {
-  return runUntilSpawn_(actor, target);
+  return runUntilSpawn_<Logic>(actor, target);
 }
 
 export function runUntilSpawnWith(): CurrySpawnWith;
 
-export function runUntilSpawnWith<Actor extends AnyStateMachineActor>(
-  actor: Actor,
-): CurrySpawnWithP1<Actor>;
+export function runUntilSpawnWith<Logic extends xs.AnyActorLogic>(
+  actor: AnyStateMachineActor,
+): CurrySpawnWithP1<Logic>;
 
-export function runUntilSpawnWith<Actor extends AnyStateMachineActor>(
-  actor: Actor,
+export function runUntilSpawnWith<Logic extends xs.AnyActorLogic>(
+  actor: AnyStateMachineActor,
   options: AuditionOptions,
-): CurrySpawnWithP2<Actor>;
+): CurrySpawnWithP2<Logic>;
 
-export function runUntilSpawnWith<Actor extends AnyStateMachineActor>(
-  actor: Actor,
+export function runUntilSpawnWith<Logic extends xs.AnyActorLogic>(
+  actor: AnyStateMachineActor,
   options: AuditionOptions,
   target: RegExp | string,
-): CurrySpawnWithP3;
+): CurrySpawnWithP3<Logic>;
 
-export function runUntilSpawnWith<Actor extends AnyStateMachineActor>(
-  actor?: Actor,
+export function runUntilSpawnWith<Logic extends xs.AnyActorLogic>(
+  actor?: AnyStateMachineActor,
   options?: AuditionOptions,
   target?: RegExp | string,
 ) {
-  return runUntilSpawnWith_(actor, options, target);
+  return runUntilSpawnWith_<Logic>(actor, options, target);
 }
+
+export function waitForSpawn<Logic extends xs.AnyActorLogic>(
+  actor: AnyStateMachineActor,
+  target: RegExp | string,
+): CurrySpawnP2<Logic>;
+
+export function waitForSpawn<Logic extends xs.AnyActorLogic>(
+  actor: AnyStateMachineActor,
+): CurrySpawnP1<Logic>;
 
 export function waitForSpawn(): CurrySpawn;
 
-export function waitForSpawn<Actor extends AnyStateMachineActor>(
-  actor: Actor,
-): CurrySpawnP1<Actor>;
-
-export function waitForSpawn<Actor extends AnyStateMachineActor>(
-  actor: Actor,
-  target: RegExp | string,
-): CurrySpawnP2;
-
-export function waitForSpawn<Actor extends AnyStateMachineActor>(
-  actor?: Actor,
+export function waitForSpawn<Logic extends xs.AnyActorLogic>(
+  actor?: AnyStateMachineActor,
   target?: RegExp | string,
 ) {
-  return waitForSpawn_(actor, target);
+  return waitForSpawn_<Logic>(actor, target);
 }
+
+export function waitForSpawnWith<
+  Logic extends xs.AnyActorLogic = xs.AnyActorLogic,
+>(
+  actor: AnyStateMachineActor,
+  options: AuditionOptions,
+  target: RegExp | string,
+): CurrySpawnWithP3<Logic>;
+
+export function waitForSpawnWith<
+  Logic extends xs.AnyActorLogic = xs.AnyActorLogic,
+>(
+  actor: AnyStateMachineActor,
+  options: AuditionOptions,
+): CurrySpawnWithP2<Logic>;
+
+export function waitForSpawnWith<
+  Logic extends xs.AnyActorLogic = xs.AnyActorLogic,
+>(actor: AnyStateMachineActor): CurrySpawnWithP1<Logic>;
 
 export function waitForSpawnWith(): CurrySpawnWith;
 
-export function waitForSpawnWith<Actor extends AnyStateMachineActor>(
-  actor: Actor,
-): CurrySpawnWithP1<Actor>;
-
-export function waitForSpawnWith<Actor extends AnyStateMachineActor>(
-  actor: Actor,
-  options: AuditionOptions,
-): CurrySpawnWithP2<Actor>;
-
-export function waitForSpawnWith<Actor extends AnyStateMachineActor>(
-  actor: Actor,
-  options: AuditionOptions,
-  target: RegExp | string,
-): CurrySpawnWithP3;
-
-export function waitForSpawnWith<Actor extends AnyStateMachineActor>(
-  actor?: Actor,
+export function waitForSpawnWith<
+  Logic extends xs.AnyActorLogic = xs.AnyActorLogic,
+>(
+  actor?: AnyStateMachineActor,
   options?: AuditionOptions,
   target?: RegExp | string,
 ) {
-  return waitForSpawnWith_(actor, options, target);
+  return waitForSpawnWith_<Logic>(actor, options, target);
 }
 
 const createSpawnFn = (stop = false) => {
-  const currySpawn = <Actor extends AnyStateMachineActor>(
-    actor?: Actor,
+  const currySpawn = <Logic extends xs.AnyActorLogic>(
+    actor?: AnyStateMachineActor,
     target?: RegExp | string,
   ) => {
     if (actor) {
       if (target) {
-        return untilSpawn(actor, {stop}, target);
+        return untilSpawn(actor, {stop}, target) as CurrySpawnP2<Logic>;
       }
 
       return ((target?: RegExp | string) => {
         return target ? currySpawn(actor, target) : currySpawn(actor);
-      }) as CurrySpawnP1<Actor>;
+      }) as CurrySpawnP1<Logic>;
     }
 
     return currySpawn as CurrySpawn;
@@ -161,29 +171,33 @@ const createSpawnFn = (stop = false) => {
 };
 
 const createSpawnWithFn = (stop = false) => {
-  const currySpawnWith = <Actor extends AnyStateMachineActor>(
-    actor?: Actor,
+  const currySpawnWith = <Logic extends xs.AnyActorLogic>(
+    actor?: AnyStateMachineActor,
     options?: AuditionOptions,
     target?: RegExp | string,
   ) => {
     if (actor) {
       if (options) {
         if (target) {
-          return untilSpawn(actor, {...options, stop}, target);
+          return untilSpawn(
+            actor,
+            {...options, stop},
+            target,
+          ) as CurrySpawnWithP3<Logic>;
         }
 
         return ((target?: RegExp | string) => {
           return target
             ? currySpawnWith(actor, options, target)
             : currySpawnWith(actor, options);
-        }) as CurrySpawnWithP2<Actor>;
+        }) as CurrySpawnWithP2<Logic>;
       }
 
       return ((options?: AuditionOptions, target?: RegExp | string) => {
         return options
           ? currySpawnWith(actor, options, target)
           : currySpawnWith(actor, options);
-      }) as CurrySpawnWithP1<Actor>;
+      }) as CurrySpawnWithP1<Logic>;
     }
 
     return currySpawnWith as CurrySpawnWith;
@@ -192,11 +206,11 @@ const createSpawnWithFn = (stop = false) => {
   return currySpawnWith;
 };
 
-const untilSpawn = <Actor extends AnyStateMachineActor>(
-  actor: Actor,
+const untilSpawn = async <Logic extends xs.AnyActorLogic>(
+  actor: AnyStateMachineActor,
   options: InternalAuditionOptions,
   target: RegExp | string,
-): Promise<xs.AnyActorRef> => {
+): Promise<xs.ActorRefFrom<Logic>> => {
   const opts = applyDefaults(options);
 
   const {inspector, logger, stop, timeout} = opts;
@@ -204,7 +218,7 @@ const untilSpawn = <Actor extends AnyStateMachineActor>(
   const inspectorObserver = xs.toObserver(inspector);
 
   const {abortController, promise, reject, resolve} =
-    createAbortablePromiseKit<xs.AnyActorRef>();
+    createAbortablePromiseKit<xs.ActorRefFrom<Logic>>();
 
   const predicate = isString(target)
     ? (id: string) => id === target
@@ -253,7 +267,7 @@ const untilSpawn = <Actor extends AnyStateMachineActor>(
 
       if (predicate(evt.actorRef.id)) {
         didSpawn = true;
-        resolve(evt.actorRef);
+        resolve(evt.actorRef as xs.ActorRefFrom<Logic>);
       }
     },
   };
@@ -261,17 +275,20 @@ const untilSpawn = <Actor extends AnyStateMachineActor>(
   attachActor(actor, {...opts, inspector: spawnInspector});
   seenActors.add(actor);
   startTimer(
+    actor,
     abortController,
     timeout,
     `Failed to detect a spawned actor matching ${target} in ${timeout}ms`,
   );
   actor.start();
 
-  return promise.finally(() => {
+  try {
+    return await promise;
+  } finally {
     if (stop) {
       actor.stop();
     }
-  });
+  }
 };
 
 /**

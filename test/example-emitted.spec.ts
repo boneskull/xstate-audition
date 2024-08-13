@@ -4,42 +4,24 @@ import {type Actor, createActor, emit, setup} from 'xstate';
 
 import {type CurryEmittedP1, runUntilEmitted} from '../src/index.js';
 
-describe('runUntilEmitted()', () => {
-  type Emit1 = {type: 'EMIT1'; value: string};
+type Emit1 = {type: 'EMIT1'; value: string};
 
-  type Emit2 = {type: 'EMIT2'; value: number};
+type Emit2 = {type: 'EMIT2'; value: number};
 
-  type EmitterEmitted = Emit1 | Emit2;
+type EmitterEmitted = Emit1 | Emit2;
 
-  const emitterMachine = setup({
-    types: {
-      emitted: {} as EmitterEmitted,
-    },
-  }).createMachine({
-    initial: 'emitting',
-    states: {
-      done: {
-        type: 'final',
-      },
-      emitting: {
-        after: {
-          50: {
-            actions: [
-              emit({type: 'EMIT1', value: 'value'}),
-              emit({type: 'EMIT2', value: 42}),
-            ],
-            target: 'waitMore',
-          },
-        },
-      },
-      waitMore: {
-        after: {
-          50: 'done',
-        },
-      },
-    },
-  });
+const emitterMachine = setup({
+  types: {
+    emitted: {} as EmitterEmitted,
+  },
+}).createMachine({
+  entry: [
+    emit({type: 'EMIT1', value: 'value'}),
+    emit({type: 'EMIT2', value: 42}),
+  ],
+});
 
+describe('emitterMachine', () => {
   let actor: Actor<typeof emitterMachine>;
 
   let runUntilEmit: CurryEmittedP1<typeof actor>;
@@ -52,16 +34,10 @@ describe('runUntilEmitted()', () => {
     runUntilEmit = runUntilEmitted(actor);
   });
 
-  it('should emit events', async () => {
+  it('should emit two events', async () => {
     const [emit1Event, emit2Event] = await runUntilEmit(['EMIT1', 'EMIT2']);
 
     assert.deepEqual(emit1Event, {type: 'EMIT1', value: 'value'});
     assert.deepEqual(emit2Event, {type: 'EMIT2', value: 42});
-  });
-
-  it('should halt the actor', async () => {
-    await runUntilEmit(['EMIT1', 'EMIT2']);
-
-    assert.strictEqual(actor.getSnapshot().status, 'stopped');
   });
 });

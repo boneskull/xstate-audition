@@ -132,14 +132,10 @@ export function runUntilEmittedWith<
 /**
  * Waits for an actor to emit one or more events (in order).
  *
- * Returns a combination of a `Promise` and an `Actor` so that events may be
- * sent to the actor to trigger its behavior.
- *
  * @param events One or more _event names_ (the `type` field) to wait for (in
  *   order)
  * @param actor An existing {@link xs.Actor}
- * @returns An {@link ActorThenable} which fulfills with the matching events
- *   (assuming they all occurred in order)
+ * @returns The matching events (assuming they all occurred in order)
  */
 export function waitForEmitted(): CurryEmitted;
 
@@ -337,7 +333,12 @@ const untilEmitted = async <
 
   let eventSubscription = subscribe(expectedEventQueue.shift());
 
-  startTimer(abortController, timeout, `Event not emitted in ${timeout}ms`);
+  startTimer(
+    actor,
+    abortController,
+    timeout,
+    `Event not emitted in ${timeout}ms`,
+  );
 
   actor.start();
 

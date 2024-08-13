@@ -15,30 +15,28 @@ import {
 } from './types.js';
 import {head} from './util.js';
 
-export type CurryEventSent =
-  | (() => CurryEventSent)
-  | (<
-      Actor extends AnyActor,
-      Target extends AnyListenableActor = AnyListenableActor,
-      const EventSentTypes extends
-        ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
-    >(
-      actor: Actor,
-      eventTypes: EventSentTypes,
-    ) => CurryEventSentP2<Target, EventSentTypes>)
-  | (<Actor extends AnyActor>(actor: Actor) => CurryEventSentP1<Actor>);
+export type CurryEventSent = (() => CurryEventSent) &
+  (<
+    Actor extends AnyActor,
+    Target extends AnyListenableActor = AnyListenableActor,
+    const EventSentTypes extends
+      ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
+  >(
+    actor: Actor,
+    eventTypes: EventSentTypes,
+  ) => CurryEventSentP2<Target, EventSentTypes>) &
+  (<Actor extends AnyActor>(actor: Actor) => CurryEventSentP1<Actor>);
 
 export type CurryEventSentP1<
   Actor extends AnyActor,
   Target extends AnyListenableActor = AnyListenableActor,
-> =
-  | (() => CurryEventSentP1<Actor, Target>)
-  | (<
-      const EventSentTypes extends
-        ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
-    >(
-      eventTypes: EventSentTypes,
-    ) => CurryEventSentP2<Target, EventSentTypes>);
+> = (() => CurryEventSentP1<Actor, Target>) &
+  (<
+    const EventSentTypes extends
+      ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
+  >(
+    eventTypes: EventSentTypes,
+  ) => CurryEventSentP2<Target, EventSentTypes>);
 
 export type CurryEventSentP2<
   Target extends AnyListenableActor = AnyListenableActor,
@@ -46,31 +44,30 @@ export type CurryEventSentP2<
     ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
 > = Promise<ActorEventTuple<Target, EventSentTypes>>;
 
-export type CurryEventSentWith =
-  | (() => CurryEventSentWith)
-  | (<
-      Actor extends AnyActor,
-      Target extends AnyListenableActor = AnyListenableActor,
-      const EventSentTypes extends
-        ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
-    >(
-      actor: Actor,
-      options: AuditionEventOptions,
-      eventTypes: EventSentTypes,
-    ) => CurryEventSentWithP3<Target, EventSentTypes>)
-  | (<
-      Actor extends AnyActor,
-      Target extends AnyListenableActor = AnyListenableActor,
-    >(
-      actor: Actor,
-      options: AuditionEventOptions,
-    ) => CurryEventSentWithP2<Actor, Target>)
-  | (<Actor extends AnyActor>(actor: Actor) => CurryEventSentWithP1<Actor>);
+export type CurryEventSentWith = (() => CurryEventSentWith) &
+  (<
+    Actor extends AnyActor,
+    Target extends AnyListenableActor = AnyListenableActor,
+    const EventSentTypes extends
+      ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
+  >(
+    actor: Actor,
+    options: AuditionEventOptions,
+    eventTypes: EventSentTypes,
+  ) => CurryEventSentWithP3<Target, EventSentTypes>) &
+  (<
+    Actor extends AnyActor,
+    Target extends AnyListenableActor = AnyListenableActor,
+  >(
+    actor: Actor,
+    options: AuditionEventOptions,
+  ) => CurryEventSentWithP2<Actor, Target>) &
+  (<Actor extends AnyActor>(actor: Actor) => CurryEventSentWithP1<Actor>);
 
 export type CurryEventSentWithP1<Actor extends AnyActor> =
-  | (() => CurryEventSentWithP1<Actor>)
-  | ((options: AuditionEventOptions) => CurryEventSentWithP2<Actor>)
-  | (<
+  (() => CurryEventSentWithP1<Actor>) &
+    ((options: AuditionEventOptions) => CurryEventSentWithP2<Actor>) &
+    (<
       Target extends AnyListenableActor = AnyListenableActor,
       const EventSentTypes extends
         ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
@@ -82,14 +79,13 @@ export type CurryEventSentWithP1<Actor extends AnyActor> =
 export type CurryEventSentWithP2<
   Actor extends AnyActor,
   Target extends AnyListenableActor = AnyListenableActor,
-> =
-  | (() => CurryEventSentWithP2<Actor, Target>)
-  | (<
-      const EventSentTypes extends
-        ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
-    >(
-      eventTypes: EventSentTypes,
-    ) => CurryEventSentWithP3<Target, EventSentTypes>);
+> = (() => CurryEventSentWithP2<Actor, Target>) &
+  (<
+    const EventSentTypes extends
+      ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
+  >(
+    eventTypes: EventSentTypes,
+  ) => CurryEventSentWithP3<Target, EventSentTypes>);
 
 export type CurryEventSentWithP3<
   Target extends AnyListenableActor = AnyListenableActor,
@@ -100,14 +96,10 @@ export type CurryEventSentWithP3<
 /**
  * Runs an actor until it sends one or more events (in order).
  *
- * Returns a combination of a `Promise` and an {@link xs.Actor} so that events
- * may be sent to the actor.
- *
  * @param actor An existing {@link Actor}
  * @param events One or more _event names_ (the `type` field) to wait for (in
  *   order)
- * @returns An {@link ActorThenable} which fulfills with the matching events
- *   (assuming they all occurred in order)
+ * @returns The matching events (assuming they all occurred in order)
  */
 export function runUntilEventSent(): CurryEventSent;
 
@@ -195,15 +187,11 @@ export function waitForEventSent<
  * Runs an actor until it sends one or more events (in order), with options
  * including a target actor ID.
  *
- * Returns a combination of a `Promise` and an {@link xs.Actor} so that events
- * may be sent to the actor.
- *
  * @param actor An existing {@link Actor}
  * @param events One or more _event names_ (the `type` field) to wait for (in
  *   order)
  * @param options Options
- * @returns An {@link ActorThenable} which fulfills with the matching events
- *   (assuming they all occurred in order)
+ * @returns The matching events (assuming they all occurred in order)
  */
 export function waitForEventSentWith(): CurryEventSentWith;
 
@@ -333,6 +321,7 @@ const untilEventSent = <
   const inspectorObserver = xs.toObserver(inspector);
 
   startTimer(
+    actor,
     abortController,
     timeout,
     `Actor did not send event(s) in ${timeout}ms`,
