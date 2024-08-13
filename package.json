@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "type": "module",
   "description": "Test helpers for XState v5+",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/boneskull/xstate-audition.git"
+  },
   "author": {
     "name": "Christopher Hiller",
     "email": "boneskull@boneskull.com"
@@ -41,7 +45,9 @@
     "mocha",
     "vitest",
     "ava",
-    "tap"
+    "tap",
+    "statechart",
+    "statecharts"
   ],
   "scripts": {
     "build": "tshy",

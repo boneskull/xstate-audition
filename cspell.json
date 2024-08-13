@@ -21,6 +21,7 @@
     "outputtable",
     "packagejson",
     "snapshottable",
+    "statechart",
     "statecharts",
     "tseslint",
     "tshy",
