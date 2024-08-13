@@ -1,0 +1,30 @@
+name: 'Publish documentation'
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  publish-documentation:
+    permissions:
+      pages: 'write'
+      id-token: write # to verify the deployment originates from an appropriate source
+
+    # Deploy to the github-pages environment
+    environment:
+      name: 'github-pages'
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+      - uses: ./.github/actions/prepare
+      - run: npm run build:docs
+
+      - name: 'Upload Pages artifact'
+        uses: 'actions/upload-pages-artifact@v3'
+        with:
+          path: 'docs/'
+
+      - name: 'Deploy documentation to GitHub Pages'
+        uses: 'actions/deploy-pages@v4'
