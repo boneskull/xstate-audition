@@ -17,6 +17,7 @@
 - [API Notes](#api-notes)
   - [`AuditionOptions`](#auditionoptions)
 - [License](#license)
+- [Disclaimer](#disclaimer)
 
 ## Usage
 
@@ -432,6 +433,10 @@ The `AuditionOptions` object may contain the following properties:
 ## License
 
 ©️ 2024 [Christopher "boneskull" Hiller][boneskull]. Licensed Apache-2.0.
+
+## Disclaimer
+
+_This project is not affiliated with nor endorsed by [Stately.ai](https://stately.ai)._
 
 [promise actor]: https://stately.ai/docs/actors#frompromise
 [state machine actor]: https://stately.ai/docs/actors#createmachine
