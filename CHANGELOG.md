@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/boneskull/xstate-audition/compare/xstate-audition-v1.0.0...xstate-audition-v1.0.1) (2024-08-13)
+
+
+### Bug Fixes
+
+* **pkg:** add missing repository field ([b16ff07](https://github.com/boneskull/xstate-audition/commit/b16ff070f2ce98d3ecf41a5085237fab821665d2))
+
 ## [1.0.0](https://github.com/boneskull/xstate-audition/compare/xstate-audition-v0.1.0...xstate-audition-v1.0.0) (2024-08-13)
 
 
