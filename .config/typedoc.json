@@ -1,0 +1,29 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["../src/index.ts"],
+  "out": "../docs",
+  "externalSymbolLinkMappings": {
+    // used by {@link !Promise}
+    "global": {
+      "Promise": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise"
+    },
+    // used by type Foo = Promise<string>
+    "typescript": {
+      "Promise": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise"
+    }
+  },
+  "sort": ["kind"],
+  "kindSortOrder": [
+    "Reference",
+    "Project",
+    "Module",
+    "Namespace",
+    "Function",
+    "TypeAlias"
+  ],
+  "excludeInternal": true,
+  "excludePrivate": true,
+  "customCss": "./custom.css",
+  "plugin": ["typedoc-github-theme"],
+  "cleanOutputDir": true
+}
