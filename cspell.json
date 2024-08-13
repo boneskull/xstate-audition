@@ -23,6 +23,7 @@
     "snapshottable",
     "statechart",
     "statecharts",
+    "tsdoc",
     "tseslint",
     "tshy",
     "uncurried",
