@@ -2,7 +2,7 @@
 
 > Harnesses for testing XState v5 Actors. Actor test...audition...get it??
 
-**xstate-audition** is a library for testing the behavior of [XState Actors][].
+**xstate-audition** is a _dependency-free_ library for testing the behavior of [XState Actors][].
 
 - [Usage](#usage)
   - [`runUntilEmitted()`](#rununtilemitted)
