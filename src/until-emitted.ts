@@ -130,19 +130,31 @@ export function runUntilEmittedWith<
 }
 
 /**
- * Waits for an actor to emit one or more events (in order).
+ * This function just returns itself.
  *
- * @param events One or more _event names_ (the `type` field) to wait for (in
- *   order)
- * @param actor An existing {@link xs.Actor}
- * @returns The matching events (assuming they all occurred in order)
+ * @returns {@link CurryEmitted This function}
  */
 export function waitForEmitted(): CurryEmitted;
 
+/**
+ * Waits for a State Machine Actor to emit one or more events (in order).
+ *
+ * @param actor A State Machine Actor
+ * @returns A {@link CurryEmittedP1 function} accepting the emitted event types
+ */
 export function waitForEmitted<Actor extends AnyStateMachineActor>(
   actor: Actor,
 ): CurryEmittedP1<Actor>;
 
+/**
+ * Waits for a State Machine Actor to emit one or more events (in order).
+ *
+ * @param actor A State Machine Actor
+ * @param emittedTypes One or more _emitted event types_ (the `type` field of
+ *   the `EventObject`) to wait for (in order)
+ * @returns `Promise` resolving with the matching events in their entirety
+ *   (assuming they all occurred in order)
+ */
 export function waitForEmitted<
   Actor extends AnyStateMachineActor,
   const EmittedTypes extends ActorEmittedTypeTuple<Actor>,
