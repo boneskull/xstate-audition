@@ -25,5 +25,9 @@
   "excludePrivate": true,
   "customCss": "./custom.css",
   "plugin": ["typedoc-github-theme"],
-  "cleanOutputDir": true
+  "cleanOutputDir": true,
+  "navigationLinks": {
+    "GitHub": "https://github.com/boneskull/xstate-audition"
+  },
+  "hostedBaseUrl": "https://boneskull.github.io/xstate-audition"
 }
