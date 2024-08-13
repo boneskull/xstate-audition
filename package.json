@@ -102,6 +102,45 @@
     "typescript-eslint": "7.18.0",
     "xstate": "5.17.1"
   },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ],
+    "rules": {
+      "body-max-line-length": [
+        0
+      ],
+      "footer-max-line-length": [
+        0
+      ],
+      "header-max-length": [
+        0
+      ],
+      "subject-case": [
+        0
+      ],
+      "subject-full-stop": [
+        0
+      ]
+    }
+  },
+  "knip": {
+    "entry": [
+      "src/index.ts",
+      "test/**/*.spec.ts"
+    ],
+    "ignoreDependencies": [
+      "markdownlint-cli2-formatter-pretty"
+    ],
+    "ignoreExportsUsedInFile": {
+      "interface": true,
+      "type": true
+    },
+    "project": [
+      "src/**/*.ts",
+      "test/**/*.ts"
+    ]
+  },
   "lint-staged": {
     "*": [
       "prettier --ignore-unknown --write",
