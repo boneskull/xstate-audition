@@ -45,6 +45,9 @@ export type AuditionEventOptions = {
   otherActorId?: RegExp | string;
 } & AuditionOptions;
 
+/**
+ * @internal
+ */
 export type InternalAuditionEventOptions = {
   otherActorId?: RegExp | string;
 } & InternalAuditionOptions;
