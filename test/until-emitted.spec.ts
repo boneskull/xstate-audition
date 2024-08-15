@@ -1,10 +1,15 @@
 import {expectTypeOf} from 'expect-type';
 import {strict as assert} from 'node:assert';
-import {describe, it} from 'node:test';
+import {afterEach, beforeEach, describe, it} from 'node:test';
 import {type Actor, createActor} from 'xstate';
 
 import {
   type ActorEmittedTuple,
+  type CurryEmitted,
+  type CurryEmittedP1,
+  type CurryEmittedWith,
+  type CurryEmittedWithP1,
+  type CurryEmittedWithP2,
   runUntilEmitted,
   runUntilEmittedWith,
   waitForEmitted,
@@ -35,20 +40,51 @@ describe('xstate-audition', () => {
         },
       );
 
-      it('should return a value with the expected type', async () => {
-        const actor = createActor(emitterMachine);
+      describe('type', () => {
+        let actor: Actor<typeof emitterMachine>;
 
-        const value = await runUntilEmitted(actor, EMITTER_MACHINE_TYPES);
+        beforeEach(() => {
+          actor = createActor(emitterMachine);
+        });
 
-        expectTypeOf<typeof value>().toEqualTypeOf<
-          [{type: 'EMIT'; value: string}]
-        >();
-        expectTypeOf<typeof value>().toEqualTypeOf<
-          ActorEmittedTuple<
-            Actor<typeof emitterMachine>,
-            typeof EMITTER_MACHINE_TYPES
-          >
-        >();
+        afterEach(() => {
+          actor.stop();
+        });
+
+        it('should satisfy the expected type', () => {
+          runUntilEmitted satisfies CurryEmitted;
+        });
+
+        describe('when called with all arguments', () => {
+          it('should return a value with the expected type', async () => {
+            const value = await runUntilEmitted(actor, EMITTER_MACHINE_TYPES);
+
+            expectTypeOf<typeof value>().toEqualTypeOf<
+              ActorEmittedTuple<
+                Actor<typeof emitterMachine>,
+                typeof EMITTER_MACHINE_TYPES
+              >
+            >();
+          });
+        });
+
+        describe('when called without arguments', () => {
+          it('should return itself', async () => {
+            const func = runUntilEmitted();
+
+            expectTypeOf<typeof func>().toEqualTypeOf<CurryEmitted>();
+          });
+        });
+
+        describe('when called with one argument', () => {
+          it('should return a curried function type', async () => {
+            const func = runUntilEmitted(actor);
+
+            expectTypeOf<typeof func>().toEqualTypeOf<
+              CurryEmittedP1<typeof actor>
+            >();
+          });
+        });
       });
     });
 
@@ -57,20 +93,51 @@ describe('xstate-audition', () => {
         EMITTER_MACHINE_TYPES,
       ]);
 
-      it('should return a value with the expected type', async () => {
-        const actor = createActor(emitterMachine);
+      describe('type', () => {
+        let actor: Actor<typeof emitterMachine>;
 
-        const value = await waitForEmitted(actor, EMITTER_MACHINE_TYPES);
+        beforeEach(() => {
+          actor = createActor(emitterMachine);
+        });
 
-        expectTypeOf<typeof value>().toEqualTypeOf<
-          [{type: 'EMIT'; value: string}]
-        >();
-        expectTypeOf<typeof value>().toEqualTypeOf<
-          ActorEmittedTuple<
-            Actor<typeof emitterMachine>,
-            typeof EMITTER_MACHINE_TYPES
-          >
-        >();
+        afterEach(() => {
+          actor.stop();
+        });
+
+        it('should satisfy the expected type', () => {
+          waitForEmitted satisfies CurryEmitted;
+        });
+
+        describe('when called with all arguments', () => {
+          it('should return a value with the expected type', async () => {
+            const value = await waitForEmitted(actor, EMITTER_MACHINE_TYPES);
+
+            expectTypeOf<typeof value>().toEqualTypeOf<
+              ActorEmittedTuple<
+                Actor<typeof emitterMachine>,
+                typeof EMITTER_MACHINE_TYPES
+              >
+            >();
+          });
+        });
+
+        describe('when called without arguments', () => {
+          it('should return itself', () => {
+            const func = waitForEmitted();
+
+            expectTypeOf<typeof func>().toEqualTypeOf<CurryEmitted>();
+          });
+        });
+
+        describe('when called with one argument', () => {
+          it('should return a curried function type', () => {
+            const func = waitForEmitted(actor);
+
+            expectTypeOf<typeof func>().toEqualTypeOf<
+              CurryEmittedP1<typeof actor>
+            >();
+          });
+        });
       });
     });
 
@@ -89,24 +156,65 @@ describe('xstate-audition', () => {
         {shouldStop: true},
       );
 
-      it('should return a value with the expected type', async () => {
-        const actor = createActor(emitterMachine);
+      describe('type', () => {
+        let actor: Actor<typeof emitterMachine>;
 
-        const value = await runUntilEmittedWith(
-          actor,
-          {},
-          EMITTER_MACHINE_TYPES,
-        );
+        beforeEach(() => {
+          actor = createActor(emitterMachine);
+        });
 
-        expectTypeOf<typeof value>().toEqualTypeOf<
-          [{type: 'EMIT'; value: string}]
-        >();
-        expectTypeOf<typeof value>().toEqualTypeOf<
-          ActorEmittedTuple<
-            Actor<typeof emitterMachine>,
-            typeof EMITTER_MACHINE_TYPES
-          >
-        >();
+        afterEach(() => {
+          actor.stop();
+        });
+
+        it('should satisfy the expected type', () => {
+          runUntilEmittedWith satisfies CurryEmittedWith;
+        });
+
+        describe('when called with all arguments', () => {
+          it('should return a value with the expected type', async () => {
+            const value = await runUntilEmittedWith(
+              actor,
+              {},
+              EMITTER_MACHINE_TYPES,
+            );
+
+            expectTypeOf<typeof value>().toEqualTypeOf<
+              ActorEmittedTuple<
+                Actor<typeof emitterMachine>,
+                typeof EMITTER_MACHINE_TYPES
+              >
+            >();
+          });
+        });
+
+        describe('when called without arguments', () => {
+          it('should return itself', async () => {
+            const func = runUntilEmittedWith();
+
+            expectTypeOf<typeof func>().toEqualTypeOf<CurryEmittedWith>();
+          });
+        });
+
+        describe('when called with one argument', () => {
+          it('should return a curried function type', async () => {
+            const func = runUntilEmittedWith(actor);
+
+            expectTypeOf<typeof func>().toEqualTypeOf<
+              CurryEmittedWithP1<typeof actor>
+            >();
+          });
+        });
+
+        describe('when called with two arguments', () => {
+          it('should return a curried function type', async () => {
+            const func = runUntilEmittedWith(actor, {});
+
+            expectTypeOf<typeof func>().toEqualTypeOf<
+              CurryEmittedWithP2<typeof actor>
+            >();
+          });
+        });
       });
     });
 
@@ -125,9 +233,6 @@ describe('xstate-audition', () => {
           EMITTER_MACHINE_TYPES,
         );
 
-        expectTypeOf<typeof value>().toEqualTypeOf<
-          [{type: 'EMIT'; value: string}]
-        >();
         expectTypeOf<typeof value>().toEqualTypeOf<
           ActorEmittedTuple<
             Actor<typeof emitterMachine>,

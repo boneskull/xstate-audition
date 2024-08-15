@@ -8,8 +8,12 @@ import {
   type AnyStateMachineActor,
   type AuditionOptions,
   type InternalAuditionOptions,
+  type ReadableArray,
 } from './types.js';
 
+/**
+ * A tuple of events emitted by an actor matching `EmittedTypes`.
+ */
 export type ActorEmittedTuple<
   Actor extends AnyStateMachineActor,
   EmittedTypes extends Readonly<ActorEmittedTypeTuple<Actor>>,
@@ -20,13 +24,11 @@ export type ActorEmittedTuple<
   >;
 };
 
-type ActorEmittedType<Actor extends AnyStateMachineActor> = xs.EmittedFrom<
-  Actor['logic']
->['type'];
+export type ActorEmittedType<Actor extends AnyStateMachineActor> =
+  xs.EmittedFrom<Actor['logic']>['type'];
 
 export type ActorEmittedTypeTuple<Actor extends AnyStateMachineActor> =
-  | [ActorEmittedType<Actor>, ...ActorEmittedType<Actor>[]]
-  | readonly [ActorEmittedType<Actor>, ...ActorEmittedType<Actor>[]];
+  ReadableArray<[ActorEmittedType<Actor>, ...ActorEmittedType<Actor>[]]>;
 
 export type CurryEmitted = (() => CurryEmitted) &
   (<
@@ -76,10 +78,19 @@ export type CurryEmittedWithP2<Actor extends AnyStateMachineActor> =
       emittedTypes: EmittedTypes,
     ) => Promise<ActorEmittedTuple<Actor, EmittedTypes>>);
 
-type EmittedFromEmittedType<
+/**
+ * Given a State Machine Actor and a _emitted_
+ * {@link EventObject.type event type} (the `type` field of an `EventObject`),
+ * returns the type of the corresponding event.
+ *
+ * @template Actor The State Machine Actor
+ * @template EventType The _emitted_ event type (the `type` field of the
+ *   `EventObject`)
+ */
+export type EmittedFromEmittedType<
   Actor extends AnyStateMachineActor,
-  K extends ActorEmittedType<Actor>,
-> = xs.ExtractEvent<xs.EmittedFrom<Actor['logic']>, K>;
+  EventType extends ActorEmittedType<Actor>,
+> = xs.ExtractEvent<xs.EmittedFrom<Actor['logic']>, EventType>;
 
 export function runUntilEmitted<
   Actor extends AnyStateMachineActor,
@@ -132,7 +143,7 @@ export function runUntilEmittedWith<
 /**
  * This function just returns itself.
  *
- * @returns {@link CurryEmitted This function}
+ * @returns This function
  */
 export function waitForEmitted(): CurryEmitted;
 

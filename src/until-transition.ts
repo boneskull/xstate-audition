@@ -84,6 +84,10 @@ export type CurryTransitionWithP3<Actor extends AnyStateMachineActor> =
   (() => CurryTransitionWithP3<Actor>) &
     ((target: string) => CurryTransitionWithP4);
 
+/**
+ * Final result of {@link runUntilTransitionWith} and
+ * {@link waitForTransitionWith}.
+ */
 export type CurryTransitionWithP4 = Promise<void>;
 
 /**

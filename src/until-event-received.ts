@@ -75,19 +75,16 @@ export type CurryEventReceivedWithP3<
 > = Promise<ActorEventTuple<Actor, EventReceivedTypes>>;
 
 /**
- * Runs an actor until it sends one or more events (in order).
+ * Runs an XState `Actor` until it receives one or more events (in order).
  *
- * @param actor An existing {@link Actor}
- * @param events One or more _event names_ (the `type` field) to wait for (in
- *   order)
- * @returns The matching events (assuming they all occurred in order)
+ * @template Actor The type of `actor`
+ * @template EventReceivedTypes The type of `eventTypes`
+ * @param actor An XState `Actor` that can receive events
+ * @param eventTypes One or more _event names_ (the `type` field) to wait for
+ *   (in order)
+ * @returns A `Promise` fulfilling with the matching events (assuming they all
+ *   occurred in order)
  */
-export function runUntilEventReceived(): CurryEventReceived;
-
-export function runUntilEventReceived<Actor extends AnyListenableActor>(
-  actor: Actor,
-): CurryEventReceivedP1<Actor>;
-
 export function runUntilEventReceived<
   Actor extends AnyListenableActor,
   const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
@@ -95,6 +92,26 @@ export function runUntilEventReceived<
   actor: Actor,
   eventTypes: EventReceivedTypes,
 ): CurryEventReceivedP2<Actor, EventReceivedTypes>;
+
+/**
+ * Returns a function which runs an actor until it sends one or more events (in
+ * order).
+ *
+ * @template Actor The type of `actor`
+ * @param actor An XState `Actor` that can receive events
+ * @returns A function which runs an actor until it sends one or more events (in
+ *   order)
+ */
+export function runUntilEventReceived<Actor extends AnyListenableActor>(
+  actor: Actor,
+): CurryEventReceivedP1<Actor>;
+
+/**
+ * Returns itself.
+ *
+ * @returns A function which returns itself
+ */
+export function runUntilEventReceived(): CurryEventReceived;
 
 export function runUntilEventReceived<
   Actor extends AnyListenableActor,
@@ -152,26 +169,57 @@ export function waitForEventReceived<
 }
 
 /**
- * Runs an actor until it sends one or more events (in order), with options
- * including a target actor ID.
+ * Returns itself.
  *
- * @param actor An existing {@link Actor}
- * @param events One or more _event names_ (the `type` field) to wait for (in
- *   order)
- * @param options Options
- * @returns The matching events (assuming they all occurred in order)
+ * @returns A function which returns itself
  */
 export function waitForEventReceivedWith(): CurryEventReceivedWith;
 
+/**
+ * Returns a function which, if provided {@link AuditionEventOptions options} and
+ * {@link ActorEventTypeTuple event types}, will waits until an XState `Actor`
+ * receives one or more events (in order).
+ *
+ * @template Actor The type of `actor`
+ * @param actor An XState `Actor` that can receive events
+ * @returns Returns a function which, if provided
+ *   {@link AuditionEventOptions options} and
+ *   {@link ActorEventTypeTuple event types}, will waits until an XState `Actor`
+ *   receives one or more events (in order).
+ */
 export function waitForEventReceivedWith<Actor extends AnyListenableActor>(
   actor: Actor,
 ): CurryEventReceivedWithP1<Actor>;
 
+/**
+ * Returns a function which waits until an XState `Actor` receives one or more
+ * events (in order).
+ *
+ * @template Actor The type of `actor`
+ * @param actor An XState `Actor` that can receive events
+ * @param options Options, including `otherActorId` which will filter on the
+ *   sender
+ * @returns A `Promise` fulfilling with the matching events (assuming they all
+ *   occurred in order)
+ */
 export function waitForEventReceivedWith<Actor extends AnyListenableActor>(
   actor: Actor,
   options: AuditionEventOptions,
 ): CurryEventReceivedWithP2<Actor>;
 
+/**
+ * Wait until an XState `Actor` receives one or more events (in order).
+ *
+ * @template Actor The type of `actor`
+ * @template EventReceivedTypes The type of `eventTypes`
+ * @param actor An XState `Actor` that can receive events
+ * @param options Options, including `otherActorId` which will filter on the
+ *   sender
+ * @param eventTypes One or more _event names_ (the `type` field) to wait for
+ *   (in order)
+ * @returns A `Promise` fulfilling with the matching events (assuming they all
+ *   occurred in order)
+ */
 export function waitForEventReceivedWith<
   Actor extends AnyListenableActor,
   const EventReceivedTypes extends ActorEventTypeTuple<Actor>,

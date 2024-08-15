@@ -3,13 +3,13 @@ import * as xs from 'xstate';
 import {attachActor} from './actor.js';
 import {applyDefaults} from './defaults.js';
 import {
+  type AnySnapshotEmitterLogic,
   type AnySnapshottableActor,
   type AuditionOptions,
   type InternalAuditionOptions,
-  type SnapshottableLogic,
 } from './types.js';
 
-export type {SnapshottableLogic as ActorLogicWithSnapshot};
+export type {AnySnapshotEmitterLogic as ActorLogicWithSnapshot};
 
 export type CurrySnapshot = (() => CurrySnapshot) &
   (<Actor extends AnySnapshottableActor>(
@@ -60,7 +60,7 @@ export type CurrySnapshotWithP3<Actor extends AnySnapshottableActor> = Promise<
   xs.SnapshotFrom<Actor['logic']>
 >;
 
-export type SnapshotPredicate<T extends SnapshottableLogic> = (
+export type SnapshotPredicate<T extends AnySnapshotEmitterLogic> = (
   snapshot: xs.SnapshotFrom<T>,
 ) => boolean;
 
