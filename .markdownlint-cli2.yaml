@@ -16,6 +16,7 @@ ignores:
   - '**/dist/**'
   - '.github/CODE_OF_CONDUCT.md'
   - '**/CHANGELOG.md' # generated
+  - 'docs/**' # generated
 outputFormatters:
   - - 'markdownlint-cli2-formatter-pretty'
     - appendLink: true

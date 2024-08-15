@@ -7,7 +7,8 @@
     "node_modules",
     "package-lock.json",
     "coverage",
-    ".gitignore"
+    ".gitignore",
+    "docs"
   ],
   "words": [
     "afaict",
