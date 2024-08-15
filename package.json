@@ -52,6 +52,7 @@
   "scripts": {
     "build": "tshy",
     "build:docs": "typedoc",
+    "check": "npm test && npm run test:types && npm run lint && npm run lint:knip && npm run lint:md && npm run lint:spelling",
     "dev": "tshy --watch",
     "dev:types": "tsc -p tsconfig.tsc.json --watch",
     "format": "prettier .",
