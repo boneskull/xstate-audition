@@ -1,6 +1,6 @@
 {
   "name": "xstate-audition",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "type": "module",
   "description": "Test helpers for XState v5+",
   "repository": {
