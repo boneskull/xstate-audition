@@ -1,6 +1,6 @@
 import * as xs from 'xstate';
 
-import {attachActor} from './actor.js';
+import {patchActor} from './actor.js';
 import {applyDefaults} from './defaults.js';
 import {
   type AnySnapshotEmitterActor,
@@ -189,13 +189,13 @@ const untilSnapshot = <Actor extends AnySnapshotEmitterActor>(
     next: (evt) => {
       inspectorObserver.next?.(evt);
       if (!seenActors.has(evt.actorRef)) {
-        attachActor(evt.actorRef, {logger});
+        patchActor(evt.actorRef, {logger});
         seenActors.add(evt.actorRef);
       }
     },
   };
 
-  attachActor(actor, {...opts, inspector: snapshotInspector});
+  patchActor(actor, {...opts, inspector: snapshotInspector});
   seenActors.add(actor);
 
   const promise = xs

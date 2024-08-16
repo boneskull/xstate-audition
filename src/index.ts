@@ -1,3 +1,5 @@
+export * from './actor.js';
+
 export type * from './types.js';
 
 export * from './until-done.js';

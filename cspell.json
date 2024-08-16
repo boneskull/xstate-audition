@@ -28,6 +28,7 @@
     "tseslint",
     "tshy",
     "uncurried",
+    "unpatch",
     "xstate"
   ],
   "enabledLanguageIds": [

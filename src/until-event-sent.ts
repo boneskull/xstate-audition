@@ -1,6 +1,6 @@
 import * as xs from 'xstate';
 
-import {attachActor} from './actor.js';
+import {patchActor} from './actor.js';
 import {applyDefaults} from './defaults.js';
 import {createAbortablePromiseKit} from './promise-kit.js';
 import {startTimer} from './timer.js';
@@ -376,7 +376,7 @@ const untilEventSent = async <
       inspectorObserver.next?.(evt);
 
       if (!seenActors.has(evt.actorRef)) {
-        attachActor(evt.actorRef, {logger});
+        patchActor(evt.actorRef, {logger});
         seenActors.add(evt.actorRef);
       }
 
@@ -404,7 +404,7 @@ const untilEventSent = async <
     },
   };
 
-  attachActor(actor, {...opts, inspector: eventSentInspector});
+  patchActor(actor, {...opts, inspector: eventSentInspector});
   seenActors.add(actor);
 
   const expectedEventQueue = [...eventTypes];

@@ -1,6 +1,6 @@
 import * as xs from 'xstate';
 
-import {attachActor} from './actor.js';
+import {patchActor} from './actor.js';
 import {applyDefaults} from './defaults.js';
 import {createAbortablePromiseKit} from './promise-kit.js';
 import {startTimer} from './timer.js';
@@ -255,7 +255,7 @@ const untilSpawn = async <Logic extends xs.AnyActorLogic>(
       inspectorObserver.next?.(evt);
 
       if (!seenActors.has(evt.actorRef)) {
-        attachActor(evt.actorRef, {logger});
+        patchActor(evt.actorRef, {logger});
         seenActors.add(evt.actorRef);
       }
 
@@ -270,7 +270,7 @@ const untilSpawn = async <Logic extends xs.AnyActorLogic>(
     },
   };
 
-  attachActor(actor, {...opts, inspector: spawnInspector});
+  patchActor(actor, {...opts, inspector: spawnInspector});
   seenActors.add(actor);
   startTimer(
     actor,

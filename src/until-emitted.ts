@@ -1,6 +1,6 @@
 import * as xs from 'xstate';
 
-import {attachActor} from './actor.js';
+import {patchActor} from './actor.js';
 import {applyDefaults} from './defaults.js';
 import {createAbortablePromiseKit} from './promise-kit.js';
 import {startTimer} from './timer.js';
@@ -311,7 +311,7 @@ const untilEmitted = async <
     next: (evt) => {
       inspectorObserver.next?.(evt);
       if (!seenActors.has(evt.actorRef)) {
-        attachActor(evt.actorRef, {logger});
+        patchActor(evt.actorRef, {logger});
         seenActors.add(evt.actorRef);
       }
     },
@@ -352,7 +352,7 @@ const untilEmitted = async <
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const emitted: ActorEmittedTuple<Actor, EmittedTypes> = [] as any;
 
-  attachActor(actor, {...opts, inspector: emittedInspector});
+  patchActor(actor, {...opts, inspector: emittedInspector});
 
   let eventSubscription = subscribe(expectedEventQueue.shift());
 
