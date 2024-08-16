@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.6](https://github.com/boneskull/xstate-audition/compare/xstate-audition-v1.0.5...xstate-audition-v1.0.6) (2024-08-16)
+
+
+### Bug Fixes
+
+* catch errors thrown synchronously from actors ([e4217c5](https://github.com/boneskull/xstate-audition/commit/e4217c588817c604365596102572974e4ab59f7d))
+
 ## [1.0.5](https://github.com/boneskull/xstate-audition/compare/xstate-audition-v1.0.4...xstate-audition-v1.0.5) (2024-08-16)
 
 
