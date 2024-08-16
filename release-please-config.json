@@ -3,7 +3,7 @@
   "packages": {
     ".": {
       "release-type": "node",
-      "release-as": "1.0.3"
+      "release-as": "1.0.4"
     }
   }
 }
