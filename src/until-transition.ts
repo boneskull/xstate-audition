@@ -387,8 +387,6 @@ const untilTransition = <Actor extends AnyStateMachineActor>(
       }
 
       if (abortController.signal.aborted) {
-        actor.stop();
-
         return;
       }
 

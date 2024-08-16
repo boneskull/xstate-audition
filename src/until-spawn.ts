@@ -260,8 +260,6 @@ const untilSpawn = async <Logic extends xs.AnyActorLogic>(
       }
 
       if (abortController.signal.aborted) {
-        actor.stop();
-
         return;
       }
 

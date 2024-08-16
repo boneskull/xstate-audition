@@ -387,8 +387,6 @@ const untilEventReceived = <
       }
 
       if (abortController.signal.aborted) {
-        actor.stop();
-
         return;
       }
 
