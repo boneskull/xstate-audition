@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/boneskull/xstate-audition/compare/xstate-audition-v1.0.6...xstate-audition-v1.1.0) (2024-08-16)
+
+
+### Features
+
+* expose patchActor() ([7871118](https://github.com/boneskull/xstate-audition/commit/7871118eb7349922a884ecc1ef00ba63c725df83))
+
+
+### Bug Fixes
+
+* **types:** rename actor category types ([02cd5d2](https://github.com/boneskull/xstate-audition/commit/02cd5d23242efc192279391a91b4e4becca7526f))
+
 ## [1.0.6](https://github.com/boneskull/xstate-audition/compare/xstate-audition-v1.0.5...xstate-audition-v1.0.6) (2024-08-16)
 
 
