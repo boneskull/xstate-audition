@@ -1,6 +1,6 @@
 import {strict as assert} from 'node:assert';
 import {describe, it} from 'node:test';
-import {createActor} from 'xstate';
+import {createActor, createMachine} from 'xstate';
 
 import {runUntilDone, runUntilDoneWith} from '../src/until-done.js';
 import {promiseLogic} from './fixture.js';
@@ -27,6 +27,22 @@ describe('xstate-audition', () => {
         const {status} = actor.getSnapshot();
 
         assert.equal(status, 'done');
+      });
+
+      describe('when called with an Actor that immediately throws', () => {
+        it('should reject with the thrown error', async () => {
+          const badActor = createActor(
+            createMachine({
+              entry: () => {
+                throw new Error('yikes!');
+              },
+            }),
+          );
+
+          const promise = runUntilDone(badActor);
+
+          await assert.rejects(promise, {message: 'yikes!'});
+        });
       });
     });
 

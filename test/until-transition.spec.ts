@@ -1,6 +1,7 @@
 import {expectTypeOf} from 'expect-type';
+import {strict as assert} from 'node:assert';
 import {describe, it} from 'node:test';
-import {type Actor, createActor} from 'xstate';
+import {type Actor, createActor, createMachine} from 'xstate';
 
 import {
   runUntilTransition,
@@ -39,6 +40,34 @@ describe('xstate-audition', () => {
         const value = await promise;
 
         expectTypeOf<typeof value>().toEqualTypeOf<void>();
+      });
+
+      describe('when called with an Actor that immediately throws', () => {
+        it('should reject with the thrown error', async () => {
+          const err = new Error('yikes');
+
+          const badActor = createActor(
+            createMachine({
+              id: 'Bad',
+              initial: 'one',
+              states: {
+                one: {
+                  entry: () => {
+                    throw err;
+                  },
+                  target: 'two',
+                },
+                two: {
+                  type: 'final',
+                },
+              },
+            }),
+          );
+
+          const promise = runUntilTransition(badActor, 'Bad.one', 'Bad.two');
+
+          await assert.rejects(promise, err);
+        });
       });
     });
 

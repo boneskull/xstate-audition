@@ -299,7 +299,7 @@ const createEventSentWithFn = (stop = false) => {
   return curryEventSentWith;
 };
 
-const untilEventSent = <
+const untilEventSent = async <
   Actor extends AnyActor,
   Target extends AnyListenableActor = AnyListenableActor,
   const EventSentTypes extends
@@ -416,14 +416,16 @@ const untilEventSent = <
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const seenEvents: ActorEventTuple<Target, EventSentTypes> = [] as any;
 
+  void xs.toPromise(actor).catch(reject);
   actor.start();
 
-  return promise.finally(() => {
+  try {
+    return await promise;
+  } finally {
     if (stop) {
       actor.stop();
-      abortController.abort();
     }
-  });
+  }
 };
 
 const runUntilEventSent_ = createEventFn(true);

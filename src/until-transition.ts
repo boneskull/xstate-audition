@@ -423,6 +423,8 @@ const untilTransition = <Actor extends AnyStateMachineActor>(
     `Transition from ${source} to ${target} not detected in ${timeout}ms`,
   );
 
+  void xs.toPromise(actor).catch(reject);
+
   actor.start();
 
   return promise;

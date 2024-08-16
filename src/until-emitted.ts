@@ -363,13 +363,12 @@ const untilEmitted = async <
     `Event not emitted in ${timeout}ms`,
   );
 
+  void xs.toPromise(actor).catch(reject);
+
   actor.start();
 
   try {
     return await promise;
-  } catch (err) {
-    actor.stop();
-    throw err;
   } finally {
     if (stop) {
       actor.stop();

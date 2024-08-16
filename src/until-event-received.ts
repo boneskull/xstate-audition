@@ -307,7 +307,7 @@ const createEventReceivedWithFn = (stop = false) => {
   return curryEventReceivedWith;
 };
 
-const untilEventReceived = <
+const untilEventReceived = async <
   Actor extends AnyListenableActor,
   const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
 >(
@@ -425,9 +425,16 @@ const untilEventReceived = <
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const seenEvents: ActorEventTuple<Actor, EventReceivedTypes> = [] as any;
 
+  void xs.toPromise(actor).catch(reject);
   actor.start();
 
-  return promise;
+  try {
+    return await promise;
+  } finally {
+    if (stop) {
+      actor.stop();
+    }
+  }
 };
 
 const runUntilEventReceived_ = createEventFn(true);
