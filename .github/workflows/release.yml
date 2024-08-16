@@ -33,9 +33,13 @@ jobs:
           node-version: 20
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Install & Build
+      - name: Install
         if: ${{ steps.release.outputs.release_created }}
         uses: bahmutov/npm-install@e5c7e14408aa6089501de32bd16123b41738047e # v1.10.2
+
+      - name: Build
+        if: ${{ steps.release.outputs.release_created }}
+        run: npm run build
 
       - name: Publish to npm
         if: ${{ steps.release.outputs.release_created }}
