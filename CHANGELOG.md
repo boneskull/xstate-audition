@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.5](https://github.com/boneskull/xstate-audition/compare/xstate-audition-v1.0.4...xstate-audition-v1.0.5) (2024-08-16)
+
+
+### Bug Fixes
+
+* do not stop actors upon abort ([52cbf52](https://github.com/boneskull/xstate-audition/commit/52cbf52d38ea3e8e9187285638f527e52e5aed02))
+
 ## [1.0.4](https://github.com/boneskull/xstate-audition/compare/xstate-audition-v1.0.3...xstate-audition-v1.0.4) (2024-08-16)
 
 
