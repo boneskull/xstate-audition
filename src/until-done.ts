@@ -5,48 +5,48 @@ import {applyDefaults} from './defaults.js';
 import {createAbortablePromiseKit} from './promise-kit.js';
 import {startTimer} from './timer.js';
 import {
-  type AnyOutputtableActor,
+  type AnyTerminalActor,
   type AuditionOptions,
   type InternalAuditionOptions,
 } from './types.js';
 
 export type CurryDone =
   | (() => CurryDone)
-  | (<Actor extends AnyOutputtableActor, Output extends xs.OutputFrom<Actor>>(
+  | (<Actor extends AnyTerminalActor, Output extends xs.OutputFrom<Actor>>(
       actor: Actor,
     ) => CurryDoneP1<Actor, Output>);
 
 export type CurryDoneP1<
-  Actor extends AnyOutputtableActor,
+  Actor extends AnyTerminalActor,
   Output extends xs.OutputFrom<Actor>,
 > = Promise<Output>;
 
 export type CurryDoneWith =
   | (() => CurryDoneWith)
-  | (<Actor extends AnyOutputtableActor, Output extends xs.OutputFrom<Actor>>(
+  | (<Actor extends AnyTerminalActor, Output extends xs.OutputFrom<Actor>>(
       actor: Actor,
       options: AuditionOptions,
     ) => CurryDoneWithP2<Actor, Output>)
-  | (<Actor extends AnyOutputtableActor, Output extends xs.OutputFrom<Actor>>(
+  | (<Actor extends AnyTerminalActor, Output extends xs.OutputFrom<Actor>>(
       actor: Actor,
     ) => CurryDoneWithP1<Actor, Output>);
 
 export type CurryDoneWithP1<
-  Actor extends AnyOutputtableActor,
+  Actor extends AnyTerminalActor,
   Output extends xs.OutputFrom<Actor>,
 > =
   | (() => CurryDoneWithP1<Actor, Output>)
   | ((options: AuditionOptions) => CurryDoneWithP2<Actor, Output>);
 
 export type CurryDoneWithP2<
-  Actor extends AnyOutputtableActor,
+  Actor extends AnyTerminalActor,
   Output extends xs.OutputFrom<Actor>,
 > = Promise<Output>;
 
 export function runUntilDone(): CurryDone;
 
 export function runUntilDone<
-  Actor extends AnyOutputtableActor,
+  Actor extends AnyTerminalActor,
   Output extends xs.OutputFrom<Actor>,
 >(actor: Actor): CurryDoneP1<Actor, Output>;
 
@@ -60,24 +60,24 @@ export function runUntilDone<
  * @param actorRef An existing {@link Actor}
  * @returns `Promise` fulfilling with the actor output
  */
-export function runUntilDone<Actor extends AnyOutputtableActor>(actor?: Actor) {
+export function runUntilDone<Actor extends AnyTerminalActor>(actor?: Actor) {
   return runUntilDone_(actor);
 }
 
 export function runUntilDoneWith(): CurryDoneWith;
 
 export function runUntilDoneWith<
-  Actor extends AnyOutputtableActor,
+  Actor extends AnyTerminalActor,
   Output extends xs.OutputFrom<Actor>,
 >(actor: Actor): CurryDoneWithP1<Actor, Output>;
 
 export function runUntilDoneWith<
-  Actor extends AnyOutputtableActor,
+  Actor extends AnyTerminalActor,
   Output extends xs.OutputFrom<Actor>,
 >(actor: Actor, options: AuditionOptions): CurryDoneWithP2<Actor, Output>;
 
 export function runUntilDoneWith<
-  Actor extends AnyOutputtableActor,
+  Actor extends AnyTerminalActor,
   Output extends xs.OutputFrom<Actor>,
 >(actor?: Actor, options?: AuditionOptions) {
   return runUntilDoneWith_<Actor, Output>(actor, options);
@@ -85,7 +85,7 @@ export function runUntilDoneWith<
 
 const createDoneFn = () => {
   const curryDone = <
-    Actor extends AnyOutputtableActor,
+    Actor extends AnyTerminalActor,
     Output extends xs.OutputFrom<Actor>,
   >(
     actor?: Actor,
@@ -102,7 +102,7 @@ const createDoneFn = () => {
 
 const createDoneWithFn = () => {
   const curryDoneWith = <
-    Actor extends AnyOutputtableActor,
+    Actor extends AnyTerminalActor,
     Output extends xs.OutputFrom<Actor>,
   >(
     actor?: Actor,
@@ -129,7 +129,7 @@ const createDoneWithFn = () => {
 };
 
 const untilDone = <
-  Actor extends AnyOutputtableActor,
+  Actor extends AnyTerminalActor,
   Output extends xs.OutputFrom<Actor>,
 >(
   actor: Actor,
