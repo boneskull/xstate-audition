@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/boneskull/xstate-audition/compare/xstate-audition-v1.0.3...xstate-audition-v1.0.3) (2024-08-16)
+
+
+### Bug Fixes
+
+* **pkg:** try to force release ([416718b](https://github.com/boneskull/xstate-audition/commit/416718be0e6fcf7437fcadf4cacce554d001963d))
+
 ## [1.0.3](https://github.com/boneskull/xstate-audition/compare/xstate-audition-v1.0.2...xstate-audition-v1.0.3) (2024-08-16)
 
 
