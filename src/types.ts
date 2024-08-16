@@ -32,11 +32,11 @@ export type ActorEventTypeTuple<Actor extends AnyActor> = ReadableArray<
 
 export type AnyActor = xs.AnyActor;
 
-export type AnyListenableActor = xs.Actor<AnyEventReceiverLogic>;
+export type AnyEventReceiverActor = xs.Actor<AnyEventReceiverLogic>;
 
-export type AnyOutputtableActor = xs.Actor<AnyTerminalLogic>;
+export type AnyTerminalActor = xs.Actor<AnyTerminalLogic>;
 
-export type AnySnapshottableActor = xs.Actor<AnySnapshotEmitterLogic>;
+export type AnySnapshotEmitterActor = xs.Actor<AnySnapshotEmitterLogic>;
 
 export type AnyStateMachineActor = xs.Actor<xs.AnyStateMachine>;
 

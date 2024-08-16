@@ -3,8 +3,8 @@ import * as xs from 'xstate';
 import {attachActor} from './actor.js';
 import {applyDefaults} from './defaults.js';
 import {
+  type AnySnapshotEmitterActor,
   type AnySnapshotEmitterLogic,
-  type AnySnapshottableActor,
   type AuditionOptions,
   type InternalAuditionOptions,
 } from './types.js';
@@ -12,38 +12,38 @@ import {
 export type {AnySnapshotEmitterLogic as ActorLogicWithSnapshot};
 
 export type CurrySnapshot = (() => CurrySnapshot) &
-  (<Actor extends AnySnapshottableActor>(
+  (<Actor extends AnySnapshotEmitterActor>(
     actor: Actor,
     predicate: SnapshotPredicate<Actor['logic']>,
   ) => CurrySnapshotP2<Actor>) &
-  (<Actor extends AnySnapshottableActor>(
+  (<Actor extends AnySnapshotEmitterActor>(
     actor: Actor,
   ) => CurrySnapshotP1<Actor>);
 
-export type CurrySnapshotP1<Actor extends AnySnapshottableActor> =
+export type CurrySnapshotP1<Actor extends AnySnapshotEmitterActor> =
   (() => CurrySnapshotP1<Actor>) &
     ((predicate: SnapshotPredicate<Actor['logic']>) => CurrySnapshotP2<Actor>);
 
-export type CurrySnapshotP2<Actor extends AnySnapshottableActor> = Promise<
+export type CurrySnapshotP2<Actor extends AnySnapshotEmitterActor> = Promise<
   xs.SnapshotFrom<Actor['logic']>
 >;
 
 export type CurrySnapshotWith = (() => CurrySnapshotWith) &
-  (<Actor extends AnySnapshottableActor>(
+  (<Actor extends AnySnapshotEmitterActor>(
     actor: Actor,
     predicate: SnapshotPredicate<Actor['logic']>,
     options: AuditionOptions,
   ) => CurrySnapshotWithP3<Actor>) &
-  (<Actor extends AnySnapshottableActor>(
+  (<Actor extends AnySnapshotEmitterActor>(
     actor: Actor,
     predicate: SnapshotPredicate<Actor['logic']>,
   ) => CurrySnapshotWithP2<Actor>) &
-  (<Actor extends AnySnapshottableActor>(
+  (<Actor extends AnySnapshotEmitterActor>(
     actor: Actor,
   ) => CurrySnapshotWithP1<Actor>);
 
 // prettier-ignore
-export type CurrySnapshotWithP1<Actor extends AnySnapshottableActor> = ((
+export type CurrySnapshotWithP1<Actor extends AnySnapshotEmitterActor> = ((
     predicate: SnapshotPredicate<Actor['logic']>,
   ) => CurrySnapshotWithP2<Actor>) &
   ((
@@ -52,13 +52,12 @@ export type CurrySnapshotWithP1<Actor extends AnySnapshottableActor> = ((
 ) => CurrySnapshotWithP3<Actor>) &
   (() => CurrySnapshotWithP1<Actor>);
 
-export type CurrySnapshotWithP2<Actor extends AnySnapshottableActor> =
+export type CurrySnapshotWithP2<Actor extends AnySnapshotEmitterActor> =
   (() => CurrySnapshotWithP2<Actor>) &
     ((options: AuditionOptions) => CurrySnapshotWithP3<Actor>);
 
-export type CurrySnapshotWithP3<Actor extends AnySnapshottableActor> = Promise<
-  xs.SnapshotFrom<Actor['logic']>
->;
+export type CurrySnapshotWithP3<Actor extends AnySnapshotEmitterActor> =
+  Promise<xs.SnapshotFrom<Actor['logic']>>;
 
 export type SnapshotPredicate<T extends AnySnapshotEmitterLogic> = (
   snapshot: xs.SnapshotFrom<T>,
@@ -76,16 +75,16 @@ export type SnapshotPredicate<T extends AnySnapshotEmitterLogic> = (
  */
 export function runUntilSnapshot(): CurrySnapshot;
 
-export function runUntilSnapshot<Actor extends AnySnapshottableActor>(
+export function runUntilSnapshot<Actor extends AnySnapshotEmitterActor>(
   actor: Actor,
 ): CurrySnapshotP1<Actor>;
 
-export function runUntilSnapshot<Actor extends AnySnapshottableActor>(
+export function runUntilSnapshot<Actor extends AnySnapshotEmitterActor>(
   actor: Actor,
   predicate: SnapshotPredicate<Actor['logic']>,
 ): CurrySnapshotP2<Actor>;
 
-export function runUntilSnapshot<Actor extends AnySnapshottableActor>(
+export function runUntilSnapshot<Actor extends AnySnapshotEmitterActor>(
   actor?: Actor,
   predicate?: SnapshotPredicate<Actor['logic']>,
 ) {
@@ -105,22 +104,22 @@ export function runUntilSnapshot<Actor extends AnySnapshottableActor>(
  */
 export function runUntilSnapshotWith(): CurrySnapshotWith;
 
-export function runUntilSnapshotWith<Actor extends AnySnapshottableActor>(
+export function runUntilSnapshotWith<Actor extends AnySnapshotEmitterActor>(
   actor: Actor,
 ): CurrySnapshotWithP1<Actor>;
 
-export function runUntilSnapshotWith<Actor extends AnySnapshottableActor>(
+export function runUntilSnapshotWith<Actor extends AnySnapshotEmitterActor>(
   actor: Actor,
   options: AuditionOptions,
 ): CurrySnapshotWithP2<Actor>;
 
-export function runUntilSnapshotWith<Actor extends AnySnapshottableActor>(
+export function runUntilSnapshotWith<Actor extends AnySnapshotEmitterActor>(
   actor: Actor,
   options: AuditionOptions,
   predicate: SnapshotPredicate<Actor['logic']>,
 ): CurrySnapshotWithP3<Actor>;
 
-export function runUntilSnapshotWith<Actor extends AnySnapshottableActor>(
+export function runUntilSnapshotWith<Actor extends AnySnapshotEmitterActor>(
   actor?: Actor,
   options?: AuditionOptions,
   predicate?: SnapshotPredicate<Actor['logic']>,
@@ -130,16 +129,16 @@ export function runUntilSnapshotWith<Actor extends AnySnapshottableActor>(
 
 export function waitForSnapshot(): CurrySnapshot;
 
-export function waitForSnapshot<Actor extends AnySnapshottableActor>(
+export function waitForSnapshot<Actor extends AnySnapshotEmitterActor>(
   actor: Actor,
 ): CurrySnapshotP1<Actor>;
 
-export function waitForSnapshot<Actor extends AnySnapshottableActor>(
+export function waitForSnapshot<Actor extends AnySnapshotEmitterActor>(
   actor: Actor,
   predicate?: SnapshotPredicate<Actor['logic']>,
 ): CurrySnapshotP2<Actor>;
 
-export function waitForSnapshot<Actor extends AnySnapshottableActor>(
+export function waitForSnapshot<Actor extends AnySnapshotEmitterActor>(
   actor?: Actor,
   predicate?: SnapshotPredicate<Actor['logic']>,
 ) {
@@ -148,22 +147,22 @@ export function waitForSnapshot<Actor extends AnySnapshottableActor>(
 
 export function waitForSnapshotWith(): CurrySnapshotWith;
 
-export function waitForSnapshotWith<Actor extends AnySnapshottableActor>(
+export function waitForSnapshotWith<Actor extends AnySnapshotEmitterActor>(
   actor: Actor,
 ): CurrySnapshotWithP1<Actor>;
 
-export function waitForSnapshotWith<Actor extends AnySnapshottableActor>(
+export function waitForSnapshotWith<Actor extends AnySnapshotEmitterActor>(
   actor: Actor,
   options: AuditionOptions,
 ): CurrySnapshotWithP2<Actor>;
 
-export function waitForSnapshotWith<Actor extends AnySnapshottableActor>(
+export function waitForSnapshotWith<Actor extends AnySnapshotEmitterActor>(
   actor: Actor,
   options: AuditionOptions,
   predicate: SnapshotPredicate<Actor['logic']>,
 ): CurrySnapshotWithP3<Actor>;
 
-export function waitForSnapshotWith<Actor extends AnySnapshottableActor>(
+export function waitForSnapshotWith<Actor extends AnySnapshotEmitterActor>(
   actor?: Actor,
   options?: AuditionOptions,
   predicate?: SnapshotPredicate<Actor['logic']>,
@@ -171,7 +170,7 @@ export function waitForSnapshotWith<Actor extends AnySnapshottableActor>(
   return waitForSnapshotWith_(actor, options, predicate);
 }
 
-const untilSnapshot = <Actor extends AnySnapshottableActor>(
+const untilSnapshot = <Actor extends AnySnapshotEmitterActor>(
   actor: Actor,
   options: InternalAuditionOptions,
   predicate: SnapshotPredicate<Actor['logic']>,
@@ -232,7 +231,7 @@ const untilSnapshot = <Actor extends AnySnapshottableActor>(
 };
 
 const createSnapshotFn = (stop = false) => {
-  const currySnapshot = <Actor extends AnySnapshottableActor>(
+  const currySnapshot = <Actor extends AnySnapshotEmitterActor>(
     actor?: Actor,
     predicate?: SnapshotPredicate<Actor['logic']>,
   ) => {
@@ -260,7 +259,7 @@ const createSnapshotFn = (stop = false) => {
 };
 
 const createSnapshotWithFn = (stop = false) => {
-  const currySnapshotWith = <Actor extends AnySnapshottableActor>(
+  const currySnapshotWith = <Actor extends AnySnapshotEmitterActor>(
     actor?: Actor,
     options?: AuditionOptions,
     predicate?: SnapshotPredicate<Actor['logic']>,

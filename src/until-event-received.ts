@@ -7,7 +7,7 @@ import {startTimer} from './timer.js';
 import {
   type ActorEventTuple,
   type ActorEventTypeTuple,
-  type AnyListenableActor,
+  type AnyEventReceiverActor,
   type AuditionEventOptions,
   type AuditionOptions,
   type EventFromEventType,
@@ -17,45 +17,45 @@ import {head} from './util.js';
 
 export type CurryEventReceived = (() => CurryEventReceived) &
   (<
-    Actor extends AnyListenableActor,
+    Actor extends AnyEventReceiverActor,
     const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
   >(
     actor: Actor,
     eventTypes: EventReceivedTypes,
   ) => CurryEventReceivedP2<Actor, EventReceivedTypes>) &
-  (<Actor extends AnyListenableActor>(
+  (<Actor extends AnyEventReceiverActor>(
     actor: Actor,
   ) => CurryEventReceivedP1<Actor>);
 
-export type CurryEventReceivedP1<Actor extends AnyListenableActor> =
+export type CurryEventReceivedP1<Actor extends AnyEventReceiverActor> =
   (() => CurryEventReceivedP1<Actor>) &
     (<const EventReceivedTypes extends ActorEventTypeTuple<Actor>>(
       eventTypes: EventReceivedTypes,
     ) => CurryEventReceivedP2<Actor, EventReceivedTypes>);
 
 export type CurryEventReceivedP2<
-  Actor extends AnyListenableActor,
+  Actor extends AnyEventReceiverActor,
   EventReceivedTypes extends ActorEventTypeTuple<Actor>,
 > = Promise<ActorEventTuple<Actor, EventReceivedTypes>>;
 
 export type CurryEventReceivedWith = (() => CurryEventReceivedWith) &
   (<
-    Actor extends AnyListenableActor,
+    Actor extends AnyEventReceiverActor,
     const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
   >(
     actor: Actor,
     options: AuditionOptions,
     eventTypes: EventReceivedTypes,
   ) => CurryEventReceivedWithP3<Actor, EventReceivedTypes>) &
-  (<Actor extends AnyListenableActor>(
+  (<Actor extends AnyEventReceiverActor>(
     actor: Actor,
     options: AuditionEventOptions,
   ) => CurryEventReceivedWithP2<Actor>) &
-  (<Actor extends AnyListenableActor>(
+  (<Actor extends AnyEventReceiverActor>(
     actor: Actor,
   ) => CurryEventReceivedWithP1<Actor>);
 
-export type CurryEventReceivedWithP1<Actor extends AnyListenableActor> =
+export type CurryEventReceivedWithP1<Actor extends AnyEventReceiverActor> =
   (() => CurryEventReceivedWithP1<Actor>) &
     ((options: AuditionEventOptions) => CurryEventReceivedWithP2<Actor>) &
     (<const EventReceivedTypes extends ActorEventTypeTuple<Actor>>(
@@ -63,14 +63,14 @@ export type CurryEventReceivedWithP1<Actor extends AnyListenableActor> =
       eventTypes: EventReceivedTypes,
     ) => CurryEventReceivedWithP3<Actor, EventReceivedTypes>);
 
-export type CurryEventReceivedWithP2<Actor extends AnyListenableActor> =
+export type CurryEventReceivedWithP2<Actor extends AnyEventReceiverActor> =
   (() => CurryEventReceivedWithP2<Actor>) &
     (<const EventReceivedTypes extends ActorEventTypeTuple<Actor>>(
       eventTypes: EventReceivedTypes,
     ) => CurryEventReceivedWithP3<Actor, EventReceivedTypes>);
 
 export type CurryEventReceivedWithP3<
-  Actor extends AnyListenableActor,
+  Actor extends AnyEventReceiverActor,
   EventReceivedTypes extends ActorEventTypeTuple<Actor>,
 > = Promise<ActorEventTuple<Actor, EventReceivedTypes>>;
 
@@ -86,7 +86,7 @@ export type CurryEventReceivedWithP3<
  *   occurred in order)
  */
 export function runUntilEventReceived<
-  Actor extends AnyListenableActor,
+  Actor extends AnyEventReceiverActor,
   const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
 >(
   actor: Actor,
@@ -102,7 +102,7 @@ export function runUntilEventReceived<
  * @returns A function which runs an actor until it sends one or more events (in
  *   order)
  */
-export function runUntilEventReceived<Actor extends AnyListenableActor>(
+export function runUntilEventReceived<Actor extends AnyEventReceiverActor>(
   actor: Actor,
 ): CurryEventReceivedP1<Actor>;
 
@@ -114,7 +114,7 @@ export function runUntilEventReceived<Actor extends AnyListenableActor>(
 export function runUntilEventReceived(): CurryEventReceived;
 
 export function runUntilEventReceived<
-  Actor extends AnyListenableActor,
+  Actor extends AnyEventReceiverActor,
   const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
 >(actor?: Actor, events?: EventReceivedTypes) {
   return runUntilEventReceived_(actor, events);
@@ -122,17 +122,17 @@ export function runUntilEventReceived<
 
 export function runUntilEventReceivedWith(): CurryEventReceivedWith;
 
-export function runUntilEventReceivedWith<Actor extends AnyListenableActor>(
+export function runUntilEventReceivedWith<Actor extends AnyEventReceiverActor>(
   actor: Actor,
 ): CurryEventReceivedWithP1<Actor>;
 
-export function runUntilEventReceivedWith<Actor extends AnyListenableActor>(
+export function runUntilEventReceivedWith<Actor extends AnyEventReceiverActor>(
   actor: Actor,
   options: AuditionEventOptions,
 ): CurryEventReceivedWithP2<Actor>;
 
 export function runUntilEventReceivedWith<
-  Actor extends AnyListenableActor,
+  Actor extends AnyEventReceiverActor,
   const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
 >(
   actor: Actor,
@@ -141,7 +141,7 @@ export function runUntilEventReceivedWith<
 ): CurryEventReceivedWithP3<Actor, EventReceivedTypes>;
 
 export function runUntilEventReceivedWith<
-  Actor extends AnyListenableActor,
+  Actor extends AnyEventReceiverActor,
   const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
 >(actor?: Actor, options?: AuditionOptions, events?: EventReceivedTypes) {
   return runUntilEventReceivedWith_(actor, options, events);
@@ -149,12 +149,12 @@ export function runUntilEventReceivedWith<
 
 export function waitForEventReceived(): CurryEventReceived;
 
-export function waitForEventReceived<Actor extends AnyListenableActor>(
+export function waitForEventReceived<Actor extends AnyEventReceiverActor>(
   actor: Actor,
 ): CurryEventReceivedP1<Actor>;
 
 export function waitForEventReceived<
-  Actor extends AnyListenableActor,
+  Actor extends AnyEventReceiverActor,
   const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
 >(
   actor: Actor,
@@ -162,7 +162,7 @@ export function waitForEventReceived<
 ): CurryEventReceivedP2<Actor, EventReceivedTypes>;
 
 export function waitForEventReceived<
-  Actor extends AnyListenableActor,
+  Actor extends AnyEventReceiverActor,
   const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
 >(actor?: Actor, events?: EventReceivedTypes) {
   return waitForEventReceived_(actor, events);
@@ -187,7 +187,7 @@ export function waitForEventReceivedWith(): CurryEventReceivedWith;
  *   {@link ActorEventTypeTuple event types}, will waits until an XState `Actor`
  *   receives one or more events (in order).
  */
-export function waitForEventReceivedWith<Actor extends AnyListenableActor>(
+export function waitForEventReceivedWith<Actor extends AnyEventReceiverActor>(
   actor: Actor,
 ): CurryEventReceivedWithP1<Actor>;
 
@@ -202,7 +202,7 @@ export function waitForEventReceivedWith<Actor extends AnyListenableActor>(
  * @returns A `Promise` fulfilling with the matching events (assuming they all
  *   occurred in order)
  */
-export function waitForEventReceivedWith<Actor extends AnyListenableActor>(
+export function waitForEventReceivedWith<Actor extends AnyEventReceiverActor>(
   actor: Actor,
   options: AuditionEventOptions,
 ): CurryEventReceivedWithP2<Actor>;
@@ -221,7 +221,7 @@ export function waitForEventReceivedWith<Actor extends AnyListenableActor>(
  *   occurred in order)
  */
 export function waitForEventReceivedWith<
-  Actor extends AnyListenableActor,
+  Actor extends AnyEventReceiverActor,
   const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
 >(
   actor: Actor,
@@ -230,7 +230,7 @@ export function waitForEventReceivedWith<
 ): CurryEventReceivedWithP3<Actor, EventReceivedTypes>;
 
 export function waitForEventReceivedWith<
-  Actor extends AnyListenableActor,
+  Actor extends AnyEventReceiverActor,
   const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
 >(actor?: Actor, options?: AuditionOptions, events?: EventReceivedTypes) {
   return waitForEventReceivedWith_(actor, options, events);
@@ -238,7 +238,7 @@ export function waitForEventReceivedWith<
 
 const createEventFn = (stop = false) => {
   const curryEvent = <
-    Actor extends AnyListenableActor,
+    Actor extends AnyEventReceiverActor,
     const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
   >(
     actor?: Actor,
@@ -263,7 +263,7 @@ const createEventFn = (stop = false) => {
 
 const createEventReceivedWithFn = (stop = false) => {
   const curryEventReceivedWith = <
-    Actor extends AnyListenableActor,
+    Actor extends AnyEventReceiverActor,
     const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
   >(
     actor?: Actor,
@@ -308,7 +308,7 @@ const createEventReceivedWithFn = (stop = false) => {
 };
 
 const untilEventReceived = async <
-  Actor extends AnyListenableActor,
+  Actor extends AnyEventReceiverActor,
   const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
 >(
   actor: Actor,

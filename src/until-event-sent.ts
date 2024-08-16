@@ -8,7 +8,7 @@ import {
   type ActorEventTuple,
   type ActorEventTypeTuple,
   type AnyActor,
-  type AnyListenableActor,
+  type AnyEventReceiverActor,
   type AuditionEventOptions,
   type EventFromEventType,
   type InternalAuditionEventOptions,
@@ -18,7 +18,7 @@ import {head} from './util.js';
 export type CurryEventSent = (() => CurryEventSent) &
   (<
     Actor extends AnyActor,
-    Target extends AnyListenableActor = AnyListenableActor,
+    Target extends AnyEventReceiverActor = AnyEventReceiverActor,
     const EventSentTypes extends
       ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
   >(
@@ -29,7 +29,7 @@ export type CurryEventSent = (() => CurryEventSent) &
 
 export type CurryEventSentP1<
   Actor extends AnyActor,
-  Target extends AnyListenableActor = AnyListenableActor,
+  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
 > = (() => CurryEventSentP1<Actor, Target>) &
   (<
     const EventSentTypes extends
@@ -39,7 +39,7 @@ export type CurryEventSentP1<
   ) => CurryEventSentP2<Target, EventSentTypes>);
 
 export type CurryEventSentP2<
-  Target extends AnyListenableActor = AnyListenableActor,
+  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
   EventSentTypes extends
     ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
 > = Promise<ActorEventTuple<Target, EventSentTypes>>;
@@ -47,7 +47,7 @@ export type CurryEventSentP2<
 export type CurryEventSentWith = (() => CurryEventSentWith) &
   (<
     Actor extends AnyActor,
-    Target extends AnyListenableActor = AnyListenableActor,
+    Target extends AnyEventReceiverActor = AnyEventReceiverActor,
     const EventSentTypes extends
       ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
   >(
@@ -57,7 +57,7 @@ export type CurryEventSentWith = (() => CurryEventSentWith) &
   ) => CurryEventSentWithP3<Target, EventSentTypes>) &
   (<
     Actor extends AnyActor,
-    Target extends AnyListenableActor = AnyListenableActor,
+    Target extends AnyEventReceiverActor = AnyEventReceiverActor,
   >(
     actor: Actor,
     options: AuditionEventOptions,
@@ -68,7 +68,7 @@ export type CurryEventSentWithP1<Actor extends AnyActor> =
   (() => CurryEventSentWithP1<Actor>) &
     ((options: AuditionEventOptions) => CurryEventSentWithP2<Actor>) &
     (<
-      Target extends AnyListenableActor = AnyListenableActor,
+      Target extends AnyEventReceiverActor = AnyEventReceiverActor,
       const EventSentTypes extends
         ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
     >(
@@ -78,7 +78,7 @@ export type CurryEventSentWithP1<Actor extends AnyActor> =
 
 export type CurryEventSentWithP2<
   Actor extends AnyActor,
-  Target extends AnyListenableActor = AnyListenableActor,
+  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
 > = (() => CurryEventSentWithP2<Actor, Target>) &
   (<
     const EventSentTypes extends
@@ -88,7 +88,7 @@ export type CurryEventSentWithP2<
   ) => CurryEventSentWithP3<Target, EventSentTypes>);
 
 export type CurryEventSentWithP3<
-  Target extends AnyListenableActor = AnyListenableActor,
+  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
   EventSentTypes extends
     ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
 > = Promise<ActorEventTuple<Target, EventSentTypes>>;
@@ -105,12 +105,12 @@ export function runUntilEventSent(): CurryEventSent;
 
 export function runUntilEventSent<
   Actor extends AnyActor,
-  Target extends AnyListenableActor = AnyListenableActor,
+  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
 >(actor: Actor): CurryEventSentP1<Actor, Target>;
 
 export function runUntilEventSent<
   Actor extends AnyActor,
-  Target extends AnyListenableActor = AnyListenableActor,
+  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
   const EventSentTypes extends
     ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
 >(
@@ -120,7 +120,7 @@ export function runUntilEventSent<
 
 export function runUntilEventSent<
   Actor extends AnyActor,
-  Target extends AnyListenableActor = AnyListenableActor,
+  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
   const EventSentTypes extends
     ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
 >(actor?: Actor, eventTypes?: EventSentTypes) {
@@ -140,7 +140,7 @@ export function runUntilEventSentWith<Actor extends AnyActor>(
 
 export function runUntilEventSentWith<
   Actor extends AnyActor,
-  Target extends AnyListenableActor = AnyListenableActor,
+  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
   const EventSentTypes extends
     ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
 >(
@@ -151,7 +151,7 @@ export function runUntilEventSentWith<
 
 export function runUntilEventSentWith<
   Actor extends AnyActor,
-  Target extends AnyListenableActor = AnyListenableActor,
+  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
   const EventSentTypes extends
     ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
 >(actor?: Actor, options?: AuditionEventOptions, events?: EventSentTypes) {
@@ -166,7 +166,7 @@ export function waitForEventSent<Actor extends AnyActor>(
 
 export function waitForEventSent<
   Actor extends AnyActor,
-  Target extends AnyListenableActor = AnyListenableActor,
+  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
   const EventSentTypes extends
     ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
 >(
@@ -176,7 +176,7 @@ export function waitForEventSent<
 
 export function waitForEventSent<
   Actor extends AnyActor,
-  Target extends AnyListenableActor = AnyListenableActor,
+  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
   const EventSentTypes extends
     ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
 >(actor?: Actor, events?: EventSentTypes) {
@@ -206,7 +206,7 @@ export function waitForEventSentWith<Actor extends AnyActor>(
 
 export function waitForEventSentWith<
   Actor extends AnyActor,
-  Target extends AnyListenableActor = AnyListenableActor,
+  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
   const EventSentTypes extends
     ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
 >(
@@ -217,7 +217,7 @@ export function waitForEventSentWith<
 
 export function waitForEventSentWith<
   Actor extends AnyActor,
-  Target extends AnyListenableActor = AnyListenableActor,
+  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
   const EventSentTypes extends
     ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
 >(actor?: Actor, options?: AuditionEventOptions, events?: EventSentTypes) {
@@ -227,7 +227,7 @@ export function waitForEventSentWith<
 const createEventFn = (stop = false) => {
   const curryEvent = <
     Actor extends AnyActor,
-    Target extends AnyListenableActor = AnyListenableActor,
+    Target extends AnyEventReceiverActor = AnyEventReceiverActor,
     const EventSentTypes extends
       ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
   >(
@@ -254,7 +254,7 @@ const createEventFn = (stop = false) => {
 const createEventSentWithFn = (stop = false) => {
   const curryEventSentWith = <
     Actor extends AnyActor,
-    Target extends AnyListenableActor = AnyListenableActor,
+    Target extends AnyEventReceiverActor = AnyEventReceiverActor,
     const EventSentTypes extends
       ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
   >(
@@ -301,7 +301,7 @@ const createEventSentWithFn = (stop = false) => {
 
 const untilEventSent = async <
   Actor extends AnyActor,
-  Target extends AnyListenableActor = AnyListenableActor,
+  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
   const EventSentTypes extends
     ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
 >(
