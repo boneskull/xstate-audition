@@ -107,7 +107,7 @@
     "typedoc-github-theme": "0.1.2",
     "typescript": "5.5.4",
     "typescript-eslint": "7.18.0",
-    "xstate": "5.17.1"
+    "xstate": "5.17.2"
   },
   "commitlint": {
     "extends": [
