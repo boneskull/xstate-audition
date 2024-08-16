@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/boneskull/xstate-audition/compare/xstate-audition-v1.0.2...xstate-audition-v1.0.3) (2024-08-16)
+
+
+### Bug Fixes
+
+* add missing files ([18066d8](https://github.com/boneskull/xstate-audition/commit/18066d840ac152dffa685a6546ef116ec3762940))
+
 ## [1.0.2](https://github.com/boneskull/xstate-audition/compare/xstate-audition-v1.0.1...xstate-audition-v1.0.2) (2024-08-16)
 
 
