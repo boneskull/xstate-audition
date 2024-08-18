@@ -4,11 +4,12 @@ import eslint from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
 import n from 'eslint-plugin-n';
 import perfectionist from 'eslint-plugin-perfectionist';
+import {builtinModules} from 'node:module';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['dist', 'node_modules', 'package-lock.json', '**/*.snap', 'docs'],
+    ignores: ['dist', 'node_modules', 'package-lock.json', 'docs'],
   },
   {
     linterOptions: {
@@ -16,7 +17,6 @@ export default tseslint.config(
     },
   },
   eslint.configs.recommended,
-  n.configs['flat/recommended'],
   perfectionist.configs['recommended-natural'],
   ...tseslint.config({
     extends: tseslint.configs.recommendedTypeChecked,
@@ -140,21 +140,18 @@ export default tseslint.config(
     },
   }),
   {
-    files: ['*.jsonc'],
+    files: ['src/**/*.ts'],
     rules: {
-      'jsonc/comma-dangle': 'off',
-      'jsonc/no-comments': 'off',
-      'jsonc/sort-keys': 'error',
+      // sources should not use Node.js builtins
+      '@typescript-eslint/no-restricted-imports': [
+        'error',
+        ...builtinModules,
+        ...builtinModules.map((name) => `node:${name}`),
+      ],
     },
   },
   {
-    extends: [tseslint.configs.disableTypeChecked],
-    files: ['**/*.md/*.ts'],
-    rules: {
-      'n/no-missing-import': ['error', {allowModules: ['xstate-audition']}],
-    },
-  },
-  {
+    ...n.configs['flat/recommended'],
     files: ['test/**/*.ts'],
     rules: {
       '@typescript-eslint/no-floating-promises': 'off',
