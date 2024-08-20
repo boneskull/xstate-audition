@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.0](https://github.com/boneskull/xstate-audition/compare/xstate-audition-v1.1.0...xstate-audition-v1.2.0) (2024-08-20)
+
+
+### Features
+
+* add createActorFromLogic, createActorWith ([a5be7c0](https://github.com/boneskull/xstate-audition/commit/a5be7c07903204eda4139c8004fc3fa4bdb80727))
+
+
+### Bug Fixes
+
+* compat with XState v5.17.4 ([2c603e8](https://github.com/boneskull/xstate-audition/commit/2c603e8078e25f5a425682a151db030b380257ca))
+
 ## [1.1.0](https://github.com/boneskull/xstate-audition/compare/xstate-audition-v1.0.6...xstate-audition-v1.1.0) (2024-08-16)
 
 
