@@ -9,7 +9,14 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['dist', 'node_modules', 'package-lock.json', 'docs'],
+    ignores: [
+      'dist',
+      'node_modules',
+      'package-lock.json',
+      'docs',
+      '.tshy-build',
+      '.tshy',
+    ],
   },
   {
     linterOptions: {
