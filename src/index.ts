@@ -1,5 +1,7 @@
 export * from './actor.js';
 
+export * from './create-actor.js';
+
 export type * from './types.js';
 
 export * from './until-done.js';
