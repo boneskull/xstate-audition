@@ -12,6 +12,8 @@
   - [`runUntilSpawn()`](#rununtilspawn)
   - [`runUntilEventReceived()`](#rununtileventreceived)
   - [`runUntilEventSent()`](#rununtileventsent)
+  - [`createActorFromLogic(logic, options)`](#createactorfromlogiclogic-options)
+  - [`createActorWith(options, logic)`](#createactorwithoptions-logic)
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [API Notes](#api-notes)
@@ -383,6 +385,50 @@ Usage is similar to [`runUntilEmitted()`](#rununtilemitted)—with the exception
 `waitForEventSent(actor, eventTypes)` / `waitForEventSentWith(actor, options, eventTypes)` are similar, but do not stop the actor.
 
 Usage is similar to [`runUntilEmitted()`](#rununtilemitted)—with the exception of the `otherActorId` property as described above.
+
+### `createActorFromLogic(logic, options)`
+
+> Curried Function to Create an Actor from Logic
+
+If you find yourself creating actors repeatedly with different options, try this function. Example:
+
+```ts
+const createActor = createActorFromLogic(myLogic);
+
+it('should do x with input y', () => {
+  const actorRef = createActor({input: 'y'});
+  // ...
+});
+
+it('should do x2 with input z', () => {
+  const actorRef = createActor({input: 'z'});
+  // ...
+});
+```
+
+See also [`createActorWith()`](#createactorwithoptions-logic).
+
+### `createActorWith(options, logic)`
+
+> Curried Function to Create an Actor with Options
+
+If you find yourself using the same _options_ to repeatedly create different actors, try this function. Example:
+
+```ts
+const createYActor = createActorWith({input: 'y'}});
+
+it('should do x with FooMachine', () => {
+  const actorRef = createYActor(fooMachine);
+  // ...
+});
+
+it('should do x2 with BarMachine', () => {
+  const actorRef = createYActor(barMachine);
+  // ...
+});
+```
+
+See also [`createActorFromLogic()`](#createactorfromlogiclogic-options).
 
 ## Requirements
 
