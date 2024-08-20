@@ -1,14 +1,18 @@
-import {type AnyActorRef, type Subscription} from 'xstate';
+import {
+  type AnyActorRef,
+  type InspectionEvent,
+  type Subscription,
+} from 'xstate';
 
 import {type AuditionOptions, type LoggerFn} from './types.js';
-import {noop} from './util.js';
+import {isActorRef} from './util.js';
 
 /**
  * Data stored for each `ActorRef` that has been patched.
  *
  * @internal
  */
-type PatchData = {inspectorSubscription: Subscription; logger: LoggerFn};
+type PatchData = {inspectorSubscription?: Subscription; logger?: LoggerFn};
 
 /**
  * A `WeakMap` to store the data for each `ActorRef` that has been patched. Used
@@ -59,49 +63,54 @@ const patchData = new WeakMap<AnyActorRef, PatchData[]>();
  */
 export function patchActor<Actor extends AnyActorRef>(
   actor: Actor,
-  {inspector: inspect = noop, logger = noop}: AuditionOptions = {},
+  {inspector, logger}: AuditionOptions = {},
 ): Actor {
-  const subscription = actor.system.inspect(inspect);
+  if (!isActorRef(actor)) {
+    throw new TypeError('patchActor() called with a non-ActorRef', {
+      cause: actor,
+    });
+  }
 
-  const data: PatchData[] = patchData.get(actor) ?? [];
+  let newData: PatchData | undefined;
+
+  if (inspector) {
+    newData = {inspectorSubscription: actor.system.inspect(inspector)};
+  }
+
+  const actorData: PatchData[] = patchData.get(actor) ?? [];
 
   // if there's a reason to prefer a Proxy here, I don't know what it is.
 
-  if (actor._parent) {
-    // @ts-expect-error private
-    const oldLogger = actor.logger as LoggerFn;
+  if (logger) {
+    if (actor._parent) {
+      // @ts-expect-error private
+      const oldLogger = actor.logger as LoggerFn;
 
-    data.push({inspectorSubscription: subscription, logger: oldLogger});
+      // in this case, ref.logger should be the same as ref._actorScope.logger
+      // https://github.com/statelyai/xstate/blob/12bde7a3ff47be6bb5a54b03282a77baf76c2bd6/packages/core/src/createActor.ts#L167
 
-    // in this case, ref.logger should be the same as ref._actorScope.logger
-    // https://github.com/statelyai/xstate/blob/12bde7a3ff47be6bb5a54b03282a77baf76c2bd6/packages/core/src/createActor.ts#L167
-
-    // @ts-expect-error private
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    actor.logger = actor._actorScope.logger = (...args: any[]) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      oldLogger(...args);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      logger(...args);
-    };
-  } else {
-    const oldLogger = actor.system._logger;
-
-    data.push({inspectorSubscription: subscription, logger: oldLogger});
-    // @ts-expect-error private
-    actor.logger =
-      actor.system._logger =
       // @ts-expect-error private
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      actor._actorScope.logger =
-        (...args: any[]) => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-          oldLogger(...args);
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-          logger(...args);
-        };
+      actor.logger = actor._actorScope.logger = logger;
+
+      newData = {...newData, logger: oldLogger};
+    } else {
+      const oldLogger = actor.system._logger;
+
+      // @ts-expect-error private
+      actor.logger =
+        actor.system._logger =
+        // @ts-expect-error private
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        actor._actorScope.logger =
+          logger;
+      newData = {...newData, logger: oldLogger};
+    }
   }
-  patchData.set(actor, data);
+  if (newData) {
+    actorData.push(newData);
+  }
+  patchData.set(actor, actorData);
 
   return actor;
 }
@@ -136,8 +145,12 @@ export function unpatchActor<Actor extends AnyActorRef>(actor: Actor): Actor {
     return actor;
   }
 
-  for (const {inspectorSubscription, logger} of data.reverse()) {
+  const {inspectorSubscription, logger} = data.pop()!;
+
+  if (inspectorSubscription) {
     inspectorSubscription.unsubscribe();
+  }
+  if (logger) {
     // @ts-expect-error private
     actor.logger = actor._parent
       ? // @ts-expect-error private
@@ -148,7 +161,29 @@ export function unpatchActor<Actor extends AnyActorRef>(actor: Actor): Actor {
         (actor._actorScope.logger = actor.system._logger = logger);
   }
 
-  patchData.delete(actor);
+  if (!data.length) {
+    patchData.delete(actor);
+  }
 
   return actor;
+}
+
+/**
+ * @param param0
+ * @returns
+ */
+export function createPatcher(opts: AuditionOptions = {}) {
+  const knownActorRefs = new WeakSet<AnyActorRef>();
+
+  return (evt: AnyActorRef | InspectionEvent) => {
+    if (isActorRef(evt)) {
+      if (!knownActorRefs.has(evt)) {
+        patchActor(evt, opts);
+        knownActorRefs.add(evt);
+      }
+    } else if (isActorRef(evt.actorRef) && !knownActorRefs.has(evt.actorRef)) {
+      patchActor(evt.actorRef, opts);
+      knownActorRefs.add(evt.actorRef);
+    }
+  };
 }

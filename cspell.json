@@ -29,6 +29,7 @@
     "tshy",
     "uncurried",
     "unpatch",
+    "unpatching",
     "xstate"
   ],
   "enabledLanguageIds": [

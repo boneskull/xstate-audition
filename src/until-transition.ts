@@ -1,6 +1,6 @@
 import * as xs from 'xstate';
 
-import {patchActor} from './actor.js';
+import {createPatcher} from './actor.js';
 import {applyDefaults} from './defaults.js';
 import {createAbortablePromiseKit} from './promise-kit.js';
 import {startTimer} from './timer.js';
@@ -11,6 +11,7 @@ import {
 } from './types.js';
 import {
   type InspectedMicrostepEvent,
+  isActorRef,
   isInspectedMicrostepEvent,
 } from './util.js';
 
@@ -333,7 +334,7 @@ const untilTransition = <Actor extends AnyStateMachineActor>(
 ): Promise<void> => {
   const opts = applyDefaults(options);
 
-  const {inspector, logger, stop, timeout} = opts;
+  const {inspector, stop, timeout} = opts;
 
   const {id} = actor;
 
@@ -355,7 +356,22 @@ const untilTransition = <Actor extends AnyStateMachineActor>(
 
   const didTransition = false;
 
-  const seenActors: WeakSet<xs.AnyActorRef> = new WeakSet();
+  /**
+   * Returns `true` if the event represents the transition from the `source`
+   * state to the `target` state.
+   *
+   * @param evt Inspection event
+   * @returns `true` if the event represents the transition from the `source`
+   *   state to the `target` state
+   */
+  const isTargetTransition = (evt: xs.InspectionEvent): boolean => {
+    return (
+      isInspectedMicrostepEvent(evt) &&
+      isActorRef(evt.actorRef) &&
+      evt.actorRef.id === id &&
+      hasTransition(source, target, evt)
+    );
+  };
 
   const transitionInspector: xs.Observer<xs.InspectionEvent> = {
     complete: () => {
@@ -380,21 +396,13 @@ const untilTransition = <Actor extends AnyStateMachineActor>(
     },
     next: (evt: xs.InspectionEvent) => {
       inspectorObserver.next?.(evt);
-
-      if (!seenActors.has(evt.actorRef)) {
-        patchActor(evt.actorRef, {logger});
-        seenActors.add(evt.actorRef);
-      }
+      maybePatchActorRef(evt);
 
       if (abortController.signal.aborted) {
         return;
       }
 
-      if (
-        isInspectedMicrostepEvent(evt) &&
-        evt.actorRef.id === id &&
-        hasTransition(source, target, evt)
-      ) {
+      if (isTargetTransition(evt)) {
         if (stop) {
           actor.stop();
         }
@@ -403,11 +411,12 @@ const untilTransition = <Actor extends AnyStateMachineActor>(
     },
   };
 
-  patchActor(actor, {
+  const maybePatchActorRef = createPatcher({
     ...opts,
     inspector: transitionInspector,
   });
-  seenActors.add(actor);
+
+  maybePatchActorRef(actor);
 
   if (!hasStateKey(actor, source)) {
     throw new ReferenceError(`Unknown state ID (source): ${source}`);

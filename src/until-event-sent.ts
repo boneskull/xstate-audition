@@ -1,6 +1,6 @@
 import * as xs from 'xstate';
 
-import {patchActor} from './actor.js';
+import {createPatcher} from './actor.js';
 import {applyDefaults} from './defaults.js';
 import {createAbortablePromiseKit} from './promise-kit.js';
 import {startTimer} from './timer.js';
@@ -13,7 +13,7 @@ import {
   type EventFromEventType,
   type InternalAuditionEventOptions,
 } from './types.js';
-import {head} from './util.js';
+import {head, isActorRef} from './util.js';
 
 export type CurryEventSent = (() => CurryEventSent) &
   (<
@@ -313,7 +313,7 @@ const untilEventSent = async <
 
   const opts = applyDefaults(options);
 
-  const {inspector, logger, otherActorId, stop, timeout} = opts;
+  const {inspector, otherActorId, stop, timeout} = opts;
 
   const {abortController, promise, reject, resolve} =
     createAbortablePromiseKit<ActorEventTuple<Target, EventSentTypes>>();
@@ -349,10 +349,8 @@ const untilEventSent = async <
     type: EventSentTypes[number],
   ): evt is xs.InspectedEventEvent =>
     evt.type === '@xstate.event' &&
-    type === evt.event.type &&
-    evt.sourceRef?.id === id;
-
-  const seenActors: WeakSet<xs.AnyActorRef> = new WeakSet();
+    evt.sourceRef?.id === id &&
+    type === evt.event.type;
 
   const eventSentInspector: xs.Observer<xs.InspectionEvent> = {
     complete: () => {
@@ -375,10 +373,7 @@ const untilEventSent = async <
     next: (evt: xs.InspectionEvent) => {
       inspectorObserver.next?.(evt);
 
-      if (!seenActors.has(evt.actorRef)) {
-        patchActor(evt.actorRef, {logger});
-        seenActors.add(evt.actorRef);
-      }
+      maybePatchActorRef(evt);
 
       if (abortController.signal.aborted) {
         return;
@@ -387,7 +382,7 @@ const untilEventSent = async <
       if (evt.type === '@xstate.event' && expectedEventQueue.length) {
         const type = head(expectedEventQueue);
 
-        if (matchesEventFromActor(evt, type)) {
+        if (isActorRef(evt.actorRef) && matchesEventFromActor(evt, type)) {
           // in this type of event, the `actorRef` is a source actor and the `sourceRef` is a target
           if (!matchesTarget(evt.actorRef)) {
             return;
@@ -404,8 +399,12 @@ const untilEventSent = async <
     },
   };
 
-  patchActor(actor, {...opts, inspector: eventSentInspector});
-  seenActors.add(actor);
+  const maybePatchActorRef = createPatcher({
+    ...opts,
+    inspector: eventSentInspector,
+  });
+
+  maybePatchActorRef(actor);
 
   const expectedEventQueue = [...eventTypes];
 
