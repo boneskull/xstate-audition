@@ -1,6 +1,6 @@
 import * as xs from 'xstate';
 
-import {patchActor} from './actor.js';
+import {createPatcher} from './actor.js';
 import {applyDefaults} from './defaults.js';
 import {createAbortablePromiseKit} from './promise-kit.js';
 import {startTimer} from './timer.js';
@@ -137,7 +137,7 @@ const untilDone = <
 ): Promise<Output> => {
   const opts = applyDefaults(options);
 
-  const {inspector, logger, timeout} = opts;
+  const {inspector, timeout} = opts;
 
   const {abortController, promise, reject, resolve} =
     createAbortablePromiseKit<Output>();
@@ -151,23 +151,18 @@ const untilDone = <
 
   const inspectorObserver = xs.toObserver(inspector);
 
-  const seenActors: WeakSet<xs.AnyActorRef> = new WeakSet();
-
   const doneInspector: xs.Observer<xs.InspectionEvent> = {
     complete: inspectorObserver.complete,
     error: inspectorObserver.error,
     next: (evt) => {
       inspectorObserver.next?.(evt);
-
-      if (!seenActors.has(evt.actorRef)) {
-        patchActor(evt.actorRef, {logger});
-        seenActors.add(evt.actorRef);
-      }
+      maybePatchActorRef(evt);
     },
   };
 
-  patchActor(actor, {...opts, inspector: doneInspector});
-  seenActors.add(actor);
+  const maybePatchActorRef = createPatcher({...opts, inspector: doneInspector});
+
+  maybePatchActorRef(actor);
 
   // order is important: create promise, then start.
   void xs.toPromise(actor).then(resolve, (err) => {

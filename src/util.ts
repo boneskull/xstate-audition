@@ -3,7 +3,11 @@
  *
  * @param ctx Alternate context, if needed
  */
-import type {AnyTransitionDefinition, InspectionEvent} from 'xstate';
+import type {
+  AnyActorRef,
+  AnyTransitionDefinition,
+  InspectionEvent,
+} from 'xstate';
 
 /**
  * That's a no-op, folks
@@ -69,9 +73,22 @@ export function isInspectedMicrostepEvent(
 }
 
 /**
- * Type guard for `string`
+ * Type guard for an {@link AnyActorRef ActorRef}.
+ *
+ * @param value Any value
+ * @returns `true` if the value is an {@link AnyActorRef ActorRef}
  */
-
-export function isString(value: unknown): value is string {
-  return typeof value === 'string';
+export function isActorRef(value: unknown): value is AnyActorRef {
+  return Boolean(
+    value &&
+      typeof value === 'object' &&
+      'id' in value &&
+      value.id &&
+      'sessionId' in value &&
+      value.sessionId &&
+      'getSnapshot' in value &&
+      typeof value.getSnapshot === 'function' &&
+      'send' in value &&
+      typeof value.send === 'function',
+  );
 }

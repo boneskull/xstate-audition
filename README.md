@@ -14,6 +14,7 @@
   - [`runUntilEventSent()`](#rununtileventsent)
   - [`createActorFromLogic(logic, options)`](#createactorfromlogiclogic-options)
   - [`createActorWith(options, logic)`](#createactorwithoptions-logic)
+  - [`unpatchActor()`](#unpatchactor)
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [API Notes](#api-notes)
@@ -35,9 +36,9 @@
 
 > Run a State Machine Until It Emits Events
 
-`runUntilEmitted(actor, eventTypes)` / `runUntilEmittedWith(actor, options, eventTypes)` are curried function that will start an actor and run it until emits one or more events of the specified `type`. Once the events have been emitted, the actor will immediately be stopped.
+`runUntilEmitted(actorRef, eventTypes)` / `runUntilEmittedWith(actorRef, options, eventTypes)` are curried function that will start an actor and run it until emits one or more events of the specified `type`. Once the events have been emitted, the actor will immediately be stopped.
 
-`waitForEmitted(actor, eventTypes)` / `waitForEmittedWith(actor, options, eventTypes)` are similar, but do not stop the actor.
+`waitForEmitted(actorRef, eventTypes)` / `waitForEmittedWith(actorRef, options, eventTypes)` are similar, but do not stop the actor.
 
 > [!NOTE]
 >
@@ -93,9 +94,9 @@ describe('emitterMachine', () => {
 
 > Run a State Machine Until It Transitions from One State to Another
 
-`runUntilTransition(actor, fromStateId, toStateId)` / `runUntilTransitionWith(actor, options, fromStateId, toStateId)` are curried functions that will start an actor and run it until it transitions from state with ID `fromStateId` to state with ID `toStateId`. Once the actor transitions to the specified state, it will immediately be stopped.
+`runUntilTransition(actorRef, fromStateId, toStateId)` / `runUntilTransitionWith(actorRef, options, fromStateId, toStateId)` are curried functions that will start an actor and run it until it transitions from state with ID `fromStateId` to state with ID `toStateId`. Once the actor transitions to the specified state, it will immediately be stopped.
 
-`waitForTransition(actor, fromStateId, toStateId)` / `waitForStateWith(actor, options, fromStateId, toStateId)` are similar, but do not stop the actor.
+`waitForTransition(actorRef, fromStateId, toStateId)` / `waitForStateWith(actorRef, options, fromStateId, toStateId)` are similar, but do not stop the actor.
 
 ```ts
 import {strict as assert} from 'node:assert';
@@ -133,7 +134,7 @@ describe('transitionMachine', () => {
   beforeEach(() => {
     actor = createActor(transitionMachine);
     // curried
-    runWithFirst = runUntilTransition(actor, 'transitionMachine.first');
+    runWithFirst = runUntilTransition(actorRef, 'transitionMachine.first');
   });
 
   it('should transition from "first" to "second"', async () => {
@@ -150,7 +151,7 @@ describe('transitionMachine', () => {
 
 > Run a Promise Actor or State Machine to Completion
 
-`runUntilDone(actor)` / `runUntilDoneWith(actor, options)` are curried functions that will start a [Promise Actor][] or [State Machine Actor][] and run it until it reaches a final state. Once the actor reaches a final state, it will immediately be stopped. The `Promise` will be resolved with the output of the actor.
+`runUntilDone(actor)` / `runUntilDoneWith(actorRef, options)` are curried functions that will start a [Promise Actor][] or [State Machine Actor][] and run it until it reaches a final state. Once the actor reaches a final state, it will immediately be stopped. The `Promise` will be resolved with the output of the actor.
 
 > [!NOTE]
 >
@@ -205,7 +206,7 @@ describe('logic', () => {
 
   it('should abort when provided a too-short timeout', async () => {
     await assert.rejects(
-      runUntilDoneWith(actor, {timeout: 100}),
+      runUntilDoneWith(actorRef, {timeout: 100}),
       (err: Error) => {
         assert.equal(err.message, 'Actor did not complete in 100ms');
 
@@ -220,7 +221,7 @@ describe('logic', () => {
 
 > Run a Actor Until It Satisfies a Snapshot Predicate
 
-`runUntilSnapshot(actor, predicate)` / `runUntilSnapshotWith(actor, options,  predicate)` are curried functions that will start an actor and run it until the actor's [Snapshot][snapshot] satisfies `predicate` (which is the same type as the `predicate` parameter of [`xstate.waitFor()`][waitFor]). Once the snapshot matches the predicate, the actor will immediately be stopped.
+`runUntilSnapshot(actorRef, predicate)` / `runUntilSnapshotWith(actorRef, options,  predicate)` are curried functions that will start an actor and run it until the actor's [Snapshot][snapshot] satisfies `predicate` (which is the same type as the `predicate` parameter of [`xstate.waitFor()`][waitFor]). Once the snapshot matches the predicate, the actor will immediately be stopped.
 
 > [!NOTE]
 >
@@ -275,7 +276,7 @@ describe('snapshotLogic', () => {
   it('should contain word "bar" in state "second"', async () => {
     const actor = createActor(snapshotLogic);
 
-    const snapshot = await runUntilSnapshot(actor, (snapshot) =>
+    const snapshot = await runUntilSnapshot(actorRef, (snapshot) =>
       snapshot.matches('second'),
     );
 
@@ -299,9 +300,9 @@ describe('snapshotLogic', () => {
 
 > Run a State Machine Actor Until Its System Spawns a Child Actor
 
-`runUntilSpawn(actor, childId)` / `runUntilSpawnWith(actor, options, childId)` are curried functions that will start an actor and run it until it spawns a child actor with `id` matching `childId` (which may be a `RegExp`). Once the child actor is spawned, the actor will immediately be stopped. The `Promise` will be resolved with a reference to the spawned actor (an `xstate.ActorRef`).
+`runUntilSpawn(actorRef, childId)` / `runUntilSpawnWith(actorRef, options, childId)` are curried functions that will start an actor and run it until it spawns a child actor with `id` matching `childId` (which may be a `RegExp`). Once the child actor is spawned, the actor will immediately be stopped. The `Promise` will be resolved with a reference to the spawned actor (an `xstate.ActorRef`).
 
-`waitForSpawn(actor, childId)` / `waitForSpawnWith(actor, options, childId)` are similar, but do not stop the actor.
+`waitForSpawn(actorRef, childId)` / `waitForSpawnWith(actorRef, options, childId)` are similar, but do not stop the actor.
 
 The root State Machine Actor itself needn't spawn the child with the matching `id`, but _any_ actor within the root actor's system may spawn the child. As of this writing, there is no way to specify the _parent_ of the spawned actor.
 
@@ -366,11 +367,11 @@ describe('spawnerMachine', () => {
 
 > Run an Actor Until It Receives an Event
 
-`runUntilEventReceived(actor, eventTypes)` / `runUntilEventReceivedWith(actor, options, eventTypes)` are curried functions that will start a [State Machine Actor][], [Callback Actor][], or [Transition Actor][] and run it until it receives event(s) of the specified `type`. Once the event(s) are received, the actor will immediately be stopped. The `Promise` will be resolved with the received event(s).
+`runUntilEventReceived(actorRef, eventTypes)` / `runUntilEventReceivedWith(actorRef, options, eventTypes)` are curried functions that will start a [State Machine Actor][], [Callback Actor][], or [Transition Actor][] and run it until it receives event(s) of the specified `type`. Once the event(s) are received, the actor will immediately be stopped. The `Promise` will be resolved with the received event(s).
 
 `runUntilEventReceived()`'s `options` parameter accepts an `otherActorId` (`string` or `RegExp`) property. If set, this will ensure the event was _received from_ the actor with ID matching `otherActorId`.
 
-`withForEventReceived(actor, eventTypes)` / `waitForEventReceivedWith(actor, options, eventTypes)` are similar, but do not stop the actor.
+`withForEventReceived(actorRef, eventTypes)` / `waitForEventReceivedWith(actorRef, options, eventTypes)` are similar, but do not stop the actor.
 
 Usage is similar to [`runUntilEmitted()`](#rununtilemitted)—with the exception of the `otherActorId` property as described above.
 
@@ -378,11 +379,11 @@ Usage is similar to [`runUntilEmitted()`](#rununtilemitted)—with the exception
 
 > Run an Actor Until It Sends an Event
 
-`runUntilEventSent(actor, eventTypes)` / `runUntilEventSentWith(actor, options, eventTypes)` are curried functions that will start an Actor and run it until it sends event(s) of the specified `type`. Once the event(s) are sent, the actor will immediately be stopped. The `Promise` will be resolved with the sent event(s).
+`runUntilEventSent(actorRef, eventTypes)` / `runUntilEventSentWith(actorRef, options, eventTypes)` are curried functions that will start an Actor and run it until it sends event(s) of the specified `type`. Once the event(s) are sent, the actor will immediately be stopped. The `Promise` will be resolved with the sent event(s).
 
 `runUntilEventSentWith()`'s `options` parameter accepts an `otherActorId` (`string` or `RegExp`) property. If set, this will ensure the event was _sent to_ the actor with ID matching `otherActorId`.
 
-`waitForEventSent(actor, eventTypes)` / `waitForEventSentWith(actor, options, eventTypes)` are similar, but do not stop the actor.
+`waitForEventSent(actorRef, eventTypes)` / `waitForEventSentWith(actorRef, options, eventTypes)` are similar, but do not stop the actor.
 
 Usage is similar to [`runUntilEmitted()`](#rununtilemitted)—with the exception of the `otherActorId` property as described above.
 
@@ -429,6 +430,18 @@ it('should do x2 with BarMachine', () => {
 ```
 
 See also [`createActorFromLogic()`](#createactorfromlogiclogic-options).
+
+### `unpatchActor()`
+
+> Revert Modifications Made to an Actor by **xstate-audition**
+
+> [!WARNING]
+>
+> _This function is experimental and may be removed in a future release._
+
+`unpatchActor(actorRef)` will "undo" what **xstate-inspector** did (e.g., unsubscribe its inspector and reset the logger), you can call this function with the `ActorRef`.
+
+If **xstate-audition** has never touched the `ActorRef`, this function is a no-nop.
 
 ## Requirements
 

@@ -1,6 +1,6 @@
 import * as xs from 'xstate';
 
-import {patchActor} from './actor.js';
+import {createPatcher} from './actor.js';
 import {applyDefaults} from './defaults.js';
 import {createAbortablePromiseKit} from './promise-kit.js';
 import {startTimer} from './timer.js';
@@ -9,7 +9,7 @@ import {
   type AuditionOptions,
   type InternalAuditionOptions,
 } from './types.js';
-import {isString} from './util.js';
+import {isActorRef} from './util.js';
 
 export type CurrySpawn = (() => CurrySpawn) &
   (<Logic extends xs.AnyActorLogic>(
@@ -213,20 +213,19 @@ const untilSpawn = async <Logic extends xs.AnyActorLogic>(
 ): Promise<xs.ActorRefFrom<Logic>> => {
   const opts = applyDefaults(options);
 
-  const {inspector, logger, stop, timeout} = opts;
+  const {inspector, stop, timeout} = opts;
 
   const inspectorObserver = xs.toObserver(inspector);
 
   const {abortController, promise, reject, resolve} =
     createAbortablePromiseKit<xs.ActorRefFrom<Logic>>();
 
-  const predicate = isString(target)
-    ? (id: string) => id === target
-    : (id: string) => target.test(id);
+  const predicate =
+    typeof target === 'string'
+      ? (id: string) => id === target
+      : (id: string) => target.test(id);
 
   let didSpawn = false;
-
-  const seenActors: WeakSet<xs.AnyActorRef> = new WeakSet();
 
   const spawnInspector: xs.Observer<xs.InspectionEvent> = {
     complete: () => {
@@ -254,24 +253,26 @@ const untilSpawn = async <Logic extends xs.AnyActorLogic>(
     next: (evt) => {
       inspectorObserver.next?.(evt);
 
-      if (!seenActors.has(evt.actorRef)) {
-        patchActor(evt.actorRef, {logger});
-        seenActors.add(evt.actorRef);
-      }
+      maybePatchActorRef(evt);
 
       if (abortController.signal.aborted) {
         return;
       }
 
-      if (predicate(evt.actorRef.id)) {
+      if (isActorRef(evt.actorRef) && predicate(evt.actorRef.id)) {
         didSpawn = true;
         resolve(evt.actorRef as xs.ActorRefFrom<Logic>);
       }
     },
   };
 
-  patchActor(actor, {...opts, inspector: spawnInspector});
-  seenActors.add(actor);
+  const maybePatchActorRef = createPatcher({
+    ...opts,
+    inspector: spawnInspector,
+  });
+
+  maybePatchActorRef(actor);
+
   startTimer(
     actor,
     abortController,

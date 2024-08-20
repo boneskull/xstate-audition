@@ -1,6 +1,6 @@
 import * as xs from 'xstate';
 
-import {patchActor} from './actor.js';
+import {createPatcher} from './actor.js';
 import {applyDefaults} from './defaults.js';
 import {createAbortablePromiseKit} from './promise-kit.js';
 import {startTimer} from './timer.js';
@@ -13,7 +13,7 @@ import {
   type EventFromEventType,
   type InternalAuditionEventOptions,
 } from './types.js';
-import {head} from './util.js';
+import {head, isActorRef} from './util.js';
 
 export type CurryEventReceived = (() => CurryEventReceived) &
   (<
@@ -319,7 +319,7 @@ const untilEventReceived = async <
 
   const opts = applyDefaults(options);
 
-  const {inspector, logger, otherActorId, stop, timeout} = opts;
+  const {inspector, otherActorId, stop, timeout} = opts;
 
   const {abortController, promise, reject, resolve} =
     createAbortablePromiseKit<ActorEventTuple<Actor, EventReceivedTypes>>();
@@ -354,11 +354,10 @@ const untilEventReceived = async <
     evt: xs.InspectionEvent,
     type: EventReceivedTypes[number],
   ): evt is xs.InspectedEventEvent =>
+    isActorRef(evt.actorRef) &&
     evt.type === '@xstate.event' &&
     type === evt.event.type &&
     evt.actorRef.id === id;
-
-  const seenActors: WeakSet<xs.AnyActorRef> = new WeakSet();
 
   const eventReceivedInspector: xs.Observer<xs.InspectionEvent> = {
     complete: () => {
@@ -381,10 +380,7 @@ const untilEventReceived = async <
     next: (evt: xs.InspectionEvent) => {
       inspectorObserver.next?.(evt);
 
-      if (!seenActors.has(evt.actorRef)) {
-        patchActor(evt.actorRef, {logger});
-        seenActors.add(evt.actorRef);
-      }
+      maybePatchActorRef(evt);
 
       if (abortController.signal.aborted) {
         return;
@@ -413,8 +409,12 @@ const untilEventReceived = async <
     },
   };
 
-  patchActor(actor, {...opts, inspector: eventReceivedInspector});
-  seenActors.add(actor);
+  const maybePatchActorRef = createPatcher({
+    ...opts,
+    inspector: eventReceivedInspector,
+  });
+
+  maybePatchActorRef(actor);
 
   const expectedEventQueue = [...eventTypes];
 

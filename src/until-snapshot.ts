@@ -1,6 +1,6 @@
 import * as xs from 'xstate';
 
-import {patchActor} from './actor.js';
+import {createPatcher} from './actor.js';
 import {applyDefaults} from './defaults.js';
 import {
   type AnySnapshotEmitterActor,
@@ -177,26 +177,26 @@ const untilSnapshot = <Actor extends AnySnapshotEmitterActor>(
 ): Promise<xs.SnapshotFrom<Actor['logic']>> => {
   const opts = applyDefaults(options);
 
-  const {inspector, logger, stop, timeout} = opts;
+  const {inspector, stop, timeout} = opts;
 
   const inspectorObserver = xs.toObserver(inspector);
-
-  const seenActors: WeakSet<xs.AnyActorRef> = new WeakSet();
 
   const snapshotInspector: xs.Observer<xs.InspectionEvent> = {
     complete: inspectorObserver.complete,
     error: inspectorObserver.error,
     next: (evt) => {
       inspectorObserver.next?.(evt);
-      if (!seenActors.has(evt.actorRef)) {
-        patchActor(evt.actorRef, {logger});
-        seenActors.add(evt.actorRef);
-      }
+
+      maybePatchActorRef(evt);
     },
   };
 
-  patchActor(actor, {...opts, inspector: snapshotInspector});
-  seenActors.add(actor);
+  const maybePatchActorRef = createPatcher({
+    ...opts,
+    inspector: snapshotInspector,
+  });
+
+  maybePatchActorRef(actor);
 
   const promise = xs
     .waitFor(actor, predicate, {timeout})

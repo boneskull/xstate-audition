@@ -1,6 +1,6 @@
 import * as xs from 'xstate';
 
-import {patchActor} from './actor.js';
+import {createPatcher} from './actor.js';
 import {applyDefaults} from './defaults.js';
 import {createAbortablePromiseKit} from './promise-kit.js';
 import {startTimer} from './timer.js';
@@ -289,7 +289,7 @@ const untilEmitted = async <
 ): Promise<ActorEmittedTuple<Actor, EmittedTypes>> => {
   const opts = applyDefaults(options);
 
-  const {inspector, logger, stop, timeout} = opts;
+  const {inspector, stop, timeout} = opts;
 
   const {abortController, promise, reject, resolve} =
     createAbortablePromiseKit<ActorEmittedTuple<Actor, EmittedTypes>>();
@@ -303,17 +303,12 @@ const untilEmitted = async <
 
   const inspectorObserver = xs.toObserver(inspector);
 
-  const seenActors: WeakSet<xs.AnyActorRef> = new WeakSet();
-
   const emittedInspector: xs.Observer<xs.InspectionEvent> = {
     complete: inspectorObserver.complete,
     error: inspectorObserver.error,
     next: (evt) => {
       inspectorObserver.next?.(evt);
-      if (!seenActors.has(evt.actorRef)) {
-        patchActor(evt.actorRef, {logger});
-        seenActors.add(evt.actorRef);
-      }
+      maybePatchActorRef(evt);
     },
   };
 
@@ -352,7 +347,12 @@ const untilEmitted = async <
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const emitted: ActorEmittedTuple<Actor, EmittedTypes> = [] as any;
 
-  patchActor(actor, {...opts, inspector: emittedInspector});
+  const maybePatchActorRef = createPatcher({
+    ...opts,
+    inspector: emittedInspector,
+  });
+
+  maybePatchActorRef(actor);
 
   let eventSubscription = subscribe(expectedEventQueue.shift());
 
