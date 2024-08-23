@@ -89,7 +89,7 @@
     "eslint": "9.9.0",
     "eslint-plugin-n": "17.10.2",
     "eslint-plugin-perfectionist": "3.2.0",
-    "expect-type": "0.19.0",
+    "expect-type": "0.20.0",
     "husky": "9.1.5",
     "knip": "5.27.2",
     "lint-staged": "15.2.9",
