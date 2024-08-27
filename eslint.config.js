@@ -30,13 +30,10 @@ export default tseslint.config(
     files: ['**/*.js', '**/*.ts'],
     languageOptions: {
       parserOptions: {
-        EXPERIMENTAL_useProjectService: {
-          allowDefaultProjectForFiles: ['./*.*s', 'eslint.config.js'],
-          defaultProject: './tsconfig.tsc.json',
-          // https://github.com/typescript-eslint/typescript-eslint/issues/9032
-          maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING:
-            Infinity,
+        projectService: {
+          allowDefaultProject: ['*.js', '.*.js'],
         },
+        tsconfigRootDir: import.meta.dirname,
       },
     },
     plugins: {
