@@ -14,6 +14,7 @@ const promiseLogic = fromPromise<string, string>(
           clearTimeout(timeout);
           // this rejection is eaten by xstate-audition
           // in lieu of its own timeout error (seen below)
+          // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
           reject(signal.reason);
         };
 

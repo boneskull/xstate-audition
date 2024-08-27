@@ -23,12 +23,12 @@ describe('xstate-audition', () => {
       );
 
       it('should return a value with the expected type', async () => {
-        const value = await runUntilSnapshot(
+        const _value = await runUntilSnapshot(
           createActor(promiseLogic),
           predicate,
         );
 
-        expectTypeOf<typeof value>().toEqualTypeOf<
+        expectTypeOf<typeof _value>().toEqualTypeOf<
           PromiseSnapshot<string, void>
         >();
       });

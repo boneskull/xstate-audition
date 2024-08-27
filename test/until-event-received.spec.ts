@@ -36,9 +36,9 @@ describe('xstate-audition', () => {
 
           actor.send({type: 'PING'});
 
-          const value = await promise;
+          const _value = await promise;
 
-          expectTypeOf<typeof value>().toEqualTypeOf<[ReceiverMachineEvent]>();
+          expectTypeOf<typeof _value>().toEqualTypeOf<[ReceiverMachineEvent]>();
         });
       });
     });

@@ -57,9 +57,9 @@ describe('xstate-audition', () => {
         it('should return a value with the expected type', async () => {
           actor = createActor(spawnerMachine);
 
-          const value = await runUntilSpawn(actor, ACTOR_ID);
+          const _value = await runUntilSpawn(actor, ACTOR_ID);
 
-          expectTypeOf<typeof value>().toEqualTypeOf<AnyActorRef>();
+          expectTypeOf<typeof _value>().toEqualTypeOf<AnyActorRef>();
         });
       });
     });
@@ -106,9 +106,9 @@ describe('xstate-audition', () => {
         it('should return a value with the expected type', async () => {
           actor = createActor(spawnerMachine);
 
-          const value = await waitForSpawn(actor, ACTOR_ID);
+          const _value = await waitForSpawn(actor, ACTOR_ID);
 
-          expectTypeOf<typeof value>().toEqualTypeOf<AnyActorRef>();
+          expectTypeOf<typeof _value>().toEqualTypeOf<AnyActorRef>();
         });
       });
     });
@@ -156,9 +156,9 @@ describe('xstate-audition', () => {
         it('should return a value with the expected type', async () => {
           actor = createActor(spawnerMachine);
 
-          const value = await runUntilSpawnWith(actor, {}, ACTOR_ID);
+          const _value = await runUntilSpawnWith(actor, {}, ACTOR_ID);
 
-          expectTypeOf<typeof value>().toEqualTypeOf<AnyActorRef>();
+          expectTypeOf<typeof _value>().toEqualTypeOf<AnyActorRef>();
         });
 
         it('should timeout if the actor does not complete in time', async () => {
@@ -224,9 +224,9 @@ describe('xstate-audition', () => {
         it('should return a value with the expected type', async () => {
           actor = createActor(spawnerMachine);
 
-          const value = await waitForSpawnWith(actor, {}, ACTOR_ID);
+          const _value = await waitForSpawnWith(actor, {}, ACTOR_ID);
 
-          expectTypeOf<typeof value>().toEqualTypeOf<AnyActorRef>();
+          expectTypeOf<typeof _value>().toEqualTypeOf<AnyActorRef>();
         });
 
         it('should timeout if the actor does not complete in time', async () => {

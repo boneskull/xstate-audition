@@ -37,9 +37,9 @@ describe('xstate-audition', () => {
 
         resolver(actor);
 
-        const value = await promise;
+        const _value = await promise;
 
-        expectTypeOf<typeof value>().toEqualTypeOf<void>();
+        expectTypeOf<typeof _value>().toEqualTypeOf<void>();
       });
 
       describe('when called with an Actor that immediately throws', () => {
@@ -90,9 +90,9 @@ describe('xstate-audition', () => {
 
         resolver(actor);
 
-        const value = await promise;
+        const _value = await promise;
 
-        expectTypeOf<typeof value>().toEqualTypeOf<void>();
+        expectTypeOf<typeof _value>().toEqualTypeOf<void>();
       });
     });
 
@@ -108,9 +108,9 @@ describe('xstate-audition', () => {
 
         resolver(actor);
 
-        const value = await promise;
+        const _value = await promise;
 
-        expectTypeOf<typeof value>().toEqualTypeOf<void>();
+        expectTypeOf<typeof _value>().toEqualTypeOf<void>();
       });
     });
 
@@ -130,9 +130,9 @@ describe('xstate-audition', () => {
 
         resolver(actor);
 
-        const value = await promise;
+        const _value = await promise;
 
-        expectTypeOf<typeof value>().toEqualTypeOf<void>();
+        expectTypeOf<typeof _value>().toEqualTypeOf<void>();
       });
     });
   });
