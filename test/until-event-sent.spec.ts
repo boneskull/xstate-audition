@@ -38,13 +38,13 @@ describe('xstate-audition', () => {
       );
 
       it('should return a value with the expected type', async () => {
-        const value = await runUntilEventSent<
+        const _value = await runUntilEventSent<
           typeof actor,
           Actor<typeof receiverMachine>,
           ['PING']
         >(actor, ['PING']);
 
-        expectTypeOf<typeof value>().toEqualTypeOf<[ReceiverMachineEvent]>();
+        expectTypeOf<typeof _value>().toEqualTypeOf<[ReceiverMachineEvent]>();
       });
     });
 
@@ -65,13 +65,13 @@ describe('xstate-audition', () => {
       );
 
       it('should return a value with the expected type', async () => {
-        const value = await waitForEventSent<
+        const _value = await waitForEventSent<
           typeof actor,
           Actor<typeof receiverMachine>,
           ['PING']
         >(actor, ['PING']);
 
-        expectTypeOf<typeof value>().toEqualTypeOf<[ReceiverMachineEvent]>();
+        expectTypeOf<typeof _value>().toEqualTypeOf<[ReceiverMachineEvent]>();
       });
     });
 

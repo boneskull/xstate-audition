@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/prefer-promise-reject-errors */
 import {type AnyActorRef} from 'xstate';
 
 import {noop} from './util.js';
