@@ -11,6 +11,9 @@ config:
   header-increment: false
   no-blanks-blockquote: false
   headings: false
+  no-inline-html:
+    allowed_elements:
+      - small
 ignores:
   - '**/node_modules/**'
   - '**/dist/**'

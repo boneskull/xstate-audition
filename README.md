@@ -4,6 +4,7 @@
 
 **xstate-audition** is a _dependency-free_ library for testing the behavior of [XState Actors][].
 
+- [API Documentation](https://boneskull.github.io/xstate-audition) <small>[github.io]</small>
 - [Usage](#usage)
   - [`runUntilEmitted()`](#rununtilemitted)
   - [`runUntilTransition()`](#rununtiltransition)
