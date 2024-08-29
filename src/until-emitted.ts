@@ -12,131 +12,133 @@ import {
 } from './types.js';
 
 /**
- * A tuple of events emitted by an actor matching `EmittedTypes`.
+ * A tuple of events emitted by an actor matching `TEmittedTypes`.
  */
 export type ActorEmittedTuple<
-  Actor extends AnyStateMachineActor,
-  EmittedTypes extends Readonly<ActorEmittedTypeTuple<Actor>>,
+  TActor extends AnyStateMachineActor,
+  TEmittedTypes extends Readonly<ActorEmittedTypeTuple<TActor>>,
 > = {
-  -readonly [K in keyof EmittedTypes]: EmittedFromEmittedType<
-    Actor,
-    EmittedTypes[K]
+  -readonly [K in keyof TEmittedTypes]: EmittedFromEmittedType<
+    TActor,
+    TEmittedTypes[K]
   >;
 };
 
-export type ActorEmittedType<Actor extends AnyStateMachineActor> =
-  xs.EmittedFrom<Actor['logic']>['type'];
+export type ActorEmittedType<TActor extends AnyStateMachineActor> =
+  xs.EmittedFrom<TActor['logic']>['type'];
 
-export type ActorEmittedTypeTuple<Actor extends AnyStateMachineActor> =
-  ReadableArray<[ActorEmittedType<Actor>, ...ActorEmittedType<Actor>[]]>;
+export type ActorEmittedTypeTuple<TActor extends AnyStateMachineActor> =
+  ReadableArray<[ActorEmittedType<TActor>, ...ActorEmittedType<TActor>[]]>;
 
 export type CurryEmitted = (() => CurryEmitted) &
   (<
-    Actor extends AnyStateMachineActor,
-    const EmittedTypes extends Readonly<ActorEmittedTypeTuple<Actor>>,
+    TActor extends AnyStateMachineActor,
+    const TEmittedTypes extends Readonly<ActorEmittedTypeTuple<TActor>>,
   >(
-    actor: Actor,
-    emittedTypes: EmittedTypes,
-  ) => Promise<ActorEmittedTuple<Actor, EmittedTypes>>) &
-  (<Actor extends AnyStateMachineActor>(actor: Actor) => CurryEmittedP1<Actor>);
+    actor: TActor,
+    emittedTypes: TEmittedTypes,
+  ) => Promise<ActorEmittedTuple<TActor, TEmittedTypes>>) &
+  (<TActor extends AnyStateMachineActor>(
+    actor: TActor,
+  ) => CurryEmittedP1<TActor>);
 
-export type CurryEmittedP1<Actor extends AnyStateMachineActor> =
-  (() => CurryEmittedP1<Actor>) &
-    (<const EmittedTypes extends ActorEmittedTypeTuple<Actor>>(
-      emittedTypes: EmittedTypes,
-    ) => Promise<ActorEmittedTuple<Actor, EmittedTypes>>);
+export type CurryEmittedP1<TActor extends AnyStateMachineActor> =
+  (() => CurryEmittedP1<TActor>) &
+    (<const TEmittedTypes extends ActorEmittedTypeTuple<TActor>>(
+      emittedTypes: TEmittedTypes,
+    ) => Promise<ActorEmittedTuple<TActor, TEmittedTypes>>);
 
 export type CurryEmittedWith = (() => CurryEmittedWith) &
   (<
-    Actor extends AnyStateMachineActor,
-    const EmittedTypes extends ActorEmittedTypeTuple<Actor>,
+    TActor extends AnyStateMachineActor,
+    const TEmittedTypes extends ActorEmittedTypeTuple<TActor>,
   >(
-    actor: Actor,
+    actor: TActor,
     options: AuditionOptions,
-    emittedTypes: EmittedTypes,
-  ) => Promise<ActorEmittedTuple<Actor, EmittedTypes>>) &
-  (<Actor extends AnyStateMachineActor>(
-    actor: Actor,
+    emittedTypes: TEmittedTypes,
+  ) => Promise<ActorEmittedTuple<TActor, TEmittedTypes>>) &
+  (<TActor extends AnyStateMachineActor>(
+    actor: TActor,
     options: AuditionOptions,
-  ) => CurryEmittedWithP2<Actor>) &
-  (<Actor extends AnyStateMachineActor>(
-    actor: Actor,
-  ) => CurryEmittedWithP1<Actor>);
+  ) => CurryEmittedWithP2<TActor>) &
+  (<TActor extends AnyStateMachineActor>(
+    actor: TActor,
+  ) => CurryEmittedWithP1<TActor>);
 
-export type CurryEmittedWithP1<Actor extends AnyStateMachineActor> = ((
+export type CurryEmittedWithP1<TActor extends AnyStateMachineActor> = ((
   options: AuditionOptions,
-) => CurryEmittedWithP2<Actor>) &
-  (() => CurryEmittedWithP1<Actor>) &
-  (<const EmittedTypes extends ActorEmittedTypeTuple<Actor>>(
+) => CurryEmittedWithP2<TActor>) &
+  (() => CurryEmittedWithP1<TActor>) &
+  (<const TEmittedTypes extends ActorEmittedTypeTuple<TActor>>(
     options: AuditionOptions,
-    emittedTypes: EmittedTypes,
-  ) => Promise<ActorEmittedTuple<Actor, EmittedTypes>>);
+    emittedTypes: TEmittedTypes,
+  ) => Promise<ActorEmittedTuple<TActor, TEmittedTypes>>);
 
-export type CurryEmittedWithP2<Actor extends AnyStateMachineActor> =
-  (() => CurryEmittedWithP2<Actor>) &
-    (<const EmittedTypes extends ActorEmittedTypeTuple<Actor>>(
-      emittedTypes: EmittedTypes,
-    ) => Promise<ActorEmittedTuple<Actor, EmittedTypes>>);
+export type CurryEmittedWithP2<TActor extends AnyStateMachineActor> =
+  (() => CurryEmittedWithP2<TActor>) &
+    (<const TEmittedTypes extends ActorEmittedTypeTuple<TActor>>(
+      emittedTypes: TEmittedTypes,
+    ) => Promise<ActorEmittedTuple<TActor, TEmittedTypes>>);
 
 /**
- * Given a State Machine Actor and a _emitted_
- * {@link EventObject.type event type} (the `type` field of an `EventObject`),
+ * Given a State Machine TActor and a _emitted_
+ * {@link xs.EventObject.type event type} (the `type` field of an `EventObject`),
  * returns the type of the corresponding event.
  *
- * @template Actor The State Machine Actor
+ * @template TActor The State Machine TActor
  * @template EventType The _emitted_ event type (the `type` field of the
  *   `EventObject`)
  */
 export type EmittedFromEmittedType<
-  Actor extends AnyStateMachineActor,
-  EventType extends ActorEmittedType<Actor>,
-> = xs.ExtractEvent<xs.EmittedFrom<Actor['logic']>, EventType>;
+  TActor extends AnyStateMachineActor,
+  EventType extends ActorEmittedType<TActor>,
+> = xs.ExtractEvent<xs.EmittedFrom<TActor['logic']>, EventType>;
 
 export function runUntilEmitted<
-  Actor extends AnyStateMachineActor,
-  const EmittedTypes extends ActorEmittedTypeTuple<Actor>,
+  TActor extends AnyStateMachineActor,
+  const TEmittedTypes extends ActorEmittedTypeTuple<TActor>,
 >(
-  actor: Actor,
-  emittedTypes: EmittedTypes,
-): Promise<ActorEmittedTuple<Actor, EmittedTypes>>;
+  actor: TActor,
+  emittedTypes: TEmittedTypes,
+): Promise<ActorEmittedTuple<TActor, TEmittedTypes>>;
 
-export function runUntilEmitted<Actor extends AnyStateMachineActor>(
-  actor: Actor,
-): CurryEmittedP1<Actor>;
+export function runUntilEmitted<TActor extends AnyStateMachineActor>(
+  actor: TActor,
+): CurryEmittedP1<TActor>;
 
 export function runUntilEmitted(): CurryEmitted;
 
 export function runUntilEmitted<
-  Actor extends AnyStateMachineActor,
-  const EmittedTypes extends ActorEmittedTypeTuple<Actor>,
->(actor?: Actor, emittedTypes?: EmittedTypes) {
+  TActor extends AnyStateMachineActor,
+  const TEmittedTypes extends ActorEmittedTypeTuple<TActor>,
+>(actor?: TActor, emittedTypes?: TEmittedTypes) {
   return runUntilEmitted_(actor, emittedTypes);
 }
 
 export function runUntilEmittedWith(): CurryEmittedWith;
 
-export function runUntilEmittedWith<Actor extends AnyStateMachineActor>(
-  actor: Actor,
-): CurryEmittedWithP1<Actor>;
+export function runUntilEmittedWith<TActor extends AnyStateMachineActor>(
+  actor: TActor,
+): CurryEmittedWithP1<TActor>;
 
-export function runUntilEmittedWith<Actor extends AnyStateMachineActor>(
-  actor: Actor,
+export function runUntilEmittedWith<TActor extends AnyStateMachineActor>(
+  actor: TActor,
   options: AuditionOptions,
-): CurryEmittedWithP2<Actor>;
+): CurryEmittedWithP2<TActor>;
 
 export function runUntilEmittedWith<
-  Actor extends AnyStateMachineActor,
-  const EmittedTypes extends ActorEmittedTypeTuple<Actor>,
+  TActor extends AnyStateMachineActor,
+  const TEmittedTypes extends ActorEmittedTypeTuple<TActor>,
 >(
-  actor: Actor,
+  actor: TActor,
   options: AuditionOptions,
-  emittedTypes: EmittedTypes,
-): Promise<ActorEmittedTuple<Actor, EmittedTypes>>;
+  emittedTypes: TEmittedTypes,
+): Promise<ActorEmittedTuple<TActor, TEmittedTypes>>;
 
 export function runUntilEmittedWith<
-  Actor extends AnyStateMachineActor,
-  const EmittedTypes extends ActorEmittedTypeTuple<Actor>,
->(actor?: Actor, options?: AuditionOptions, events?: EmittedTypes) {
+  TActor extends AnyStateMachineActor,
+  const TEmittedTypes extends ActorEmittedTypeTuple<TActor>,
+>(actor?: TActor, options?: AuditionOptions, events?: TEmittedTypes) {
   return runUntilEmittedWith_(actor, options, events);
 }
 
@@ -148,83 +150,83 @@ export function runUntilEmittedWith<
 export function waitForEmitted(): CurryEmitted;
 
 /**
- * Waits for a State Machine Actor to emit one or more events (in order).
+ * Waits for a State Machine TActor to emit one or more events (in order).
  *
- * @param actor A State Machine Actor
+ * @param actor A State Machine TActor
  * @returns A {@link CurryEmittedP1 function} accepting the emitted event types
  */
-export function waitForEmitted<Actor extends AnyStateMachineActor>(
-  actor: Actor,
-): CurryEmittedP1<Actor>;
+export function waitForEmitted<TActor extends AnyStateMachineActor>(
+  actor: TActor,
+): CurryEmittedP1<TActor>;
 
 /**
- * Waits for a State Machine Actor to emit one or more events (in order).
+ * Waits for a State Machine TActor to emit one or more events (in order).
  *
- * @param actor A State Machine Actor
+ * @param actor A State Machine TActor
  * @param emittedTypes One or more _emitted event types_ (the `type` field of
  *   the `EventObject`) to wait for (in order)
  * @returns `Promise` resolving with the matching events in their entirety
  *   (assuming they all occurred in order)
  */
 export function waitForEmitted<
-  Actor extends AnyStateMachineActor,
-  const EmittedTypes extends ActorEmittedTypeTuple<Actor>,
+  TActor extends AnyStateMachineActor,
+  const TEmittedTypes extends ActorEmittedTypeTuple<TActor>,
 >(
-  actor: Actor,
-  emittedTypes: EmittedTypes,
-): Promise<ActorEmittedTuple<Actor, EmittedTypes>>;
+  actor: TActor,
+  emittedTypes: TEmittedTypes,
+): Promise<ActorEmittedTuple<TActor, TEmittedTypes>>;
 
 export function waitForEmitted<
-  Actor extends AnyStateMachineActor,
-  const EmittedTypes extends ActorEmittedTypeTuple<Actor>,
->(actor?: Actor, events?: EmittedTypes) {
+  TActor extends AnyStateMachineActor,
+  const TEmittedTypes extends ActorEmittedTypeTuple<TActor>,
+>(actor?: TActor, events?: TEmittedTypes) {
   return waitForEmitted_(actor, events);
 }
 
 export function waitForEmittedWith(): CurryEmittedWith;
 
-export function waitForEmittedWith<Actor extends AnyStateMachineActor>(
-  actor: Actor,
-): CurryEmittedWithP1<Actor>;
+export function waitForEmittedWith<TActor extends AnyStateMachineActor>(
+  actor: TActor,
+): CurryEmittedWithP1<TActor>;
 
-export function waitForEmittedWith<Actor extends AnyStateMachineActor>(
-  actor: Actor,
+export function waitForEmittedWith<TActor extends AnyStateMachineActor>(
+  actor: TActor,
   options: AuditionOptions,
-): CurryEmittedWithP2<Actor>;
+): CurryEmittedWithP2<TActor>;
 
 export function waitForEmittedWith<
-  Actor extends AnyStateMachineActor,
-  const EmittedTypes extends ActorEmittedTypeTuple<Actor>,
+  TActor extends AnyStateMachineActor,
+  const TEmittedTypes extends ActorEmittedTypeTuple<TActor>,
 >(
-  actor: Actor,
+  actor: TActor,
   options: AuditionOptions,
-  emittedTypes: EmittedTypes,
-): Promise<ActorEmittedTuple<Actor, EmittedTypes>>;
+  emittedTypes: TEmittedTypes,
+): Promise<ActorEmittedTuple<TActor, TEmittedTypes>>;
 
 export function waitForEmittedWith<
-  Actor extends AnyStateMachineActor,
-  const EmittedTypes extends ActorEmittedTypeTuple<Actor>,
->(actor?: Actor, options?: AuditionOptions, emittedTypes?: EmittedTypes) {
+  TActor extends AnyStateMachineActor,
+  const TEmittedTypes extends ActorEmittedTypeTuple<TActor>,
+>(actor?: TActor, options?: AuditionOptions, emittedTypes?: TEmittedTypes) {
   return waitForEmittedWith_(actor, options, emittedTypes);
 }
 
 const createEmittedFn = (stop = false) => {
   const curryEmitted = <
-    Actor extends AnyStateMachineActor,
-    const EmittedTypes extends ActorEmittedTypeTuple<Actor>,
+    TActor extends AnyStateMachineActor,
+    const TEmittedTypes extends ActorEmittedTypeTuple<TActor>,
   >(
-    actor?: Actor,
-    events?: EmittedTypes,
+    actor?: TActor,
+    events?: TEmittedTypes,
   ) => {
     if (actor) {
       if (events) {
         return untilEmitted(actor, {stop}, events);
       }
 
-      return ((events?: EmittedTypes) =>
+      return ((events?: TEmittedTypes) =>
         events
           ? curryEmitted(actor, events)
-          : curryEmitted(actor)) as CurryEmittedP1<Actor>;
+          : curryEmitted(actor)) as CurryEmittedP1<TActor>;
     }
 
     return curryEmitted as CurryEmitted;
@@ -235,12 +237,12 @@ const createEmittedFn = (stop = false) => {
 
 const createEmittedWithFn = (stop = false) => {
   const curryEmittedWith = <
-    Actor extends AnyStateMachineActor,
-    const EmittedTypes extends ActorEmittedTypeTuple<Actor>,
+    TActor extends AnyStateMachineActor,
+    const TEmittedTypes extends ActorEmittedTypeTuple<TActor>,
   >(
-    actor?: Actor,
+    actor?: TActor,
     options?: AuditionOptions,
-    events?: EmittedTypes,
+    events?: TEmittedTypes,
   ) => {
     if (actor) {
       if (options) {
@@ -255,14 +257,14 @@ const createEmittedWithFn = (stop = false) => {
           );
         }
 
-        return ((events?: EmittedTypes) => {
+        return ((events?: TEmittedTypes) => {
           return events
             ? curryEmittedWith(actor, options, events)
             : curryEmittedWith(actor, options);
-        }) as CurryEmittedWithP2<Actor>;
+        }) as CurryEmittedWithP2<TActor>;
       }
 
-      return ((options?: AuditionOptions, events?: EmittedTypes) => {
+      return ((options?: AuditionOptions, events?: TEmittedTypes) => {
         if (options) {
           return events
             ? curryEmittedWith(actor, options, events)
@@ -270,7 +272,7 @@ const createEmittedWithFn = (stop = false) => {
         }
 
         return curryEmittedWith(actor);
-      }) as CurryEmittedWithP1<Actor>;
+      }) as CurryEmittedWithP1<TActor>;
     }
 
     return curryEmittedWith as CurryEmittedWith;
@@ -280,19 +282,19 @@ const createEmittedWithFn = (stop = false) => {
 };
 
 const untilEmitted = async <
-  Actor extends AnyStateMachineActor,
-  const EmittedTypes extends ActorEmittedTypeTuple<Actor>,
+  TActor extends AnyStateMachineActor,
+  const TEmittedTypes extends ActorEmittedTypeTuple<TActor>,
 >(
-  actor: Actor,
+  actor: TActor,
   options: InternalAuditionOptions,
-  emittedTypes: EmittedTypes,
-): Promise<ActorEmittedTuple<Actor, EmittedTypes>> => {
+  emittedTypes: TEmittedTypes,
+): Promise<ActorEmittedTuple<TActor, TEmittedTypes>> => {
   const opts = applyDefaults(options);
 
   const {inspector, stop, timeout} = opts;
 
   const {abortController, promise, reject, resolve} =
-    createAbortablePromiseKit<ActorEmittedTuple<Actor, EmittedTypes>>();
+    createAbortablePromiseKit<ActorEmittedTuple<TActor, TEmittedTypes>>();
 
   const snapshotSubscription = actor.subscribe({
     error: (err) => {
@@ -318,10 +320,10 @@ const untilEmitted = async <
    * {@link emitted}, and when all have been accounted for, {@link promise} is
    * resolved with the array of events.
    */
-  const subscribe = <T extends EmittedTypes[number]>(
+  const subscribe = <T extends TEmittedTypes[number]>(
     type: T,
   ): xs.Subscription =>
-    actor.on(type, (event: EmittedFromEmittedType<Actor, T>) => {
+    actor.on(type, (event: EmittedFromEmittedType<TActor, T>) => {
       eventSubscription?.unsubscribe();
       if (abortController.signal.aborted) {
         return;
@@ -345,7 +347,7 @@ const untilEmitted = async <
 
   // this will eventually become the desired type if all goes well
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const emitted: ActorEmittedTuple<Actor, EmittedTypes> = [] as any;
+  const emitted: ActorEmittedTuple<TActor, TEmittedTypes> = [] as any;
 
   const maybePatchActorRef = createPatcher({
     ...opts,

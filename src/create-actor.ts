@@ -1,66 +1,88 @@
-import {
-  type Actor,
-  type ActorOptions,
-  type AnyActorLogic,
-  createActor,
-  type InputFrom,
-  type IsNotNever,
-} from 'xstate';
+import * as xs from 'xstate';
 
-export type RequiredOptions<TLogic extends AnyActorLogic> =
-  undefined extends InputFrom<TLogic> ? never : 'input';
+/**
+ * Required input values for `TLogic`.
+ *
+ * @template TLogic Actor logic type
+ * @see {@link CreateActorOptions}
+ */
+export type RequiredOptions<TLogic extends xs.AnyActorLogic> =
+  undefined extends xs.InputFrom<TLogic> ? never : 'input';
 
-export type CreateActorOptions<TLogic extends AnyActorLogic> =
-  IsNotNever<RequiredOptions<TLogic>> extends true
-    ? {input: ActorOptions<TLogic>['input']} & ActorOptions<TLogic>
-    : ActorOptions<TLogic>;
+/**
+ * Options for creating an actor from actor logic.
+ *
+ * @see {@link createActorFromLogic}
+ * @see {@link createActorWith}
+ */
+export type CreateActorOptions<TLogic extends xs.AnyActorLogic> =
+  xs.IsNotNever<RequiredOptions<TLogic>> extends true
+    ? {input: xs.ActorOptions<TLogic>['input']} & xs.ActorOptions<TLogic>
+    : xs.ActorOptions<TLogic>;
 
 export type CurryCreateActorFromLogic = (() => CurryCreateActorFromLogic) &
-  (<TLogic extends AnyActorLogic>(
+  (<TLogic extends xs.AnyActorLogic>(
     logic: TLogic,
     options: CreateActorOptions<TLogic>,
-  ) => Actor<TLogic>) &
-  (<TLogic extends AnyActorLogic>(
+  ) => xs.Actor<TLogic>) &
+  (<TLogic extends xs.AnyActorLogic>(
     logic: TLogic,
   ) => CurryCreateActorFromLogicP1<TLogic>);
 
-export type CurryCreateActorFromLogicP1<TLogic extends AnyActorLogic> = ((
+export type CurryCreateActorFromLogicP1<TLogic extends xs.AnyActorLogic> = ((
   options: CreateActorOptions<TLogic>,
-) => Actor<TLogic>) &
+) => xs.Actor<TLogic>) &
   (() => CurryCreateActorFromLogicP1<TLogic>);
 
 export type CurryCreateActorWith = (() => CurryCreateActorWith) &
-  (<TLogic extends AnyActorLogic>(
+  (<TLogic extends xs.AnyActorLogic>(
     options: CreateActorOptions<TLogic>,
     logic: TLogic,
-  ) => Actor<TLogic>) &
-  (<TLogic extends AnyActorLogic>(
+  ) => xs.Actor<TLogic>) &
+  (<TLogic extends xs.AnyActorLogic>(
     options: CreateActorOptions<TLogic>,
   ) => CurryCreateActorWithP1<TLogic>);
 
-export type CurryCreateActorWithP1<TLogic extends AnyActorLogic> = ((
+export type CurryCreateActorWithP1<TLogic extends xs.AnyActorLogic> = ((
   logic: TLogic,
-) => Actor<TLogic>) &
+) => xs.Actor<TLogic>) &
   (() => CurryCreateActorWithP1<TLogic>);
 
+/**
+ * Returns itself
+ */
 export function createActorFromLogic(): typeof createActorFromLogic;
 
-export function createActorFromLogic<TLogic extends AnyActorLogic>(
+/**
+ * Returns a function which accepts {@link CreateActorOptions} and returns a
+ * function which accepts actor logic, then creates an `Actor`.
+ *
+ * @template TLogic Actor logic type
+ * @param logic Actor logic
+ */
+export function createActorFromLogic<TLogic extends xs.AnyActorLogic>(
   logic: TLogic,
 ): CurryCreateActorFromLogicP1<TLogic>;
 
-export function createActorFromLogic<TLogic extends AnyActorLogic>(
+/**
+ * Creates an actor from actor logic and options.
+ *
+ * @template TLogic Actor logic type
+ * @param logic Actor logic
+ * @param options Options
+ */
+export function createActorFromLogic<TLogic extends xs.AnyActorLogic>(
   logic: TLogic,
   options: CreateActorOptions<TLogic>,
-): Actor<TLogic>;
+): xs.Actor<TLogic>;
 
-export function createActorFromLogic<TLogic extends AnyActorLogic>(
+export function createActorFromLogic<TLogic extends xs.AnyActorLogic>(
   logic?: TLogic,
   options?: CreateActorOptions<TLogic>,
 ) {
   if (logic) {
     if (options) {
-      return createActor(logic, options);
+      return xs.createActor(logic, options);
     }
 
     return ((options?: CreateActorOptions<TLogic>) => {
@@ -75,22 +97,22 @@ export function createActorFromLogic<TLogic extends AnyActorLogic>(
 
 export function createActorWith(): typeof createActorWith;
 
-export function createActorWith<TLogic extends AnyActorLogic>(
+export function createActorWith<TLogic extends xs.AnyActorLogic>(
   options: CreateActorOptions<TLogic>,
 ): CurryCreateActorWithP1<TLogic>;
 
-export function createActorWith<TLogic extends AnyActorLogic>(
+export function createActorWith<TLogic extends xs.AnyActorLogic>(
   options: CreateActorOptions<TLogic>,
   logic: TLogic,
-): Actor<TLogic>;
+): xs.Actor<TLogic>;
 
-export function createActorWith<TLogic extends AnyActorLogic>(
+export function createActorWith<TLogic extends xs.AnyActorLogic>(
   options?: CreateActorOptions<TLogic>,
   logic?: TLogic,
 ) {
   if (options) {
     if (logic) {
-      return createActor(logic, options);
+      return xs.createActor(logic, options);
     }
 
     return ((logic?: TLogic) => {

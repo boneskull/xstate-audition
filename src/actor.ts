@@ -1,8 +1,4 @@
-import {
-  type AnyActorRef,
-  type InspectionEvent,
-  type Subscription,
-} from 'xstate';
+import type * as xs from 'xstate';
 
 import {type AuditionOptions, type LoggerFn} from './types.js';
 import {isActorRef} from './util.js';
@@ -12,7 +8,7 @@ import {isActorRef} from './util.js';
  *
  * @internal
  */
-type PatchData = {inspectorSubscription?: Subscription; logger?: LoggerFn};
+type PatchData = {inspectorSubscription?: xs.Subscription; logger?: LoggerFn};
 
 /**
  * A `WeakMap` to store the data for each `ActorRef` that has been patched. Used
@@ -20,10 +16,10 @@ type PatchData = {inspectorSubscription?: Subscription; logger?: LoggerFn};
  *
  * @internal
  */
-const patchData = new WeakMap<AnyActorRef, PatchData[]>();
+const patchData = new WeakMap<xs.AnyActorRef, PatchData[]>();
 
 /**
- * Utility to _mutate_ an existing {@link ActorRef} allowing addition of an
+ * Utility to _mutate_ an existing {@link TActor} allowing addition of an
  * inspector and/or new logger.
  *
  * Inspectors are additive, so adding a new inspector is not destructive.
@@ -55,16 +51,16 @@ const patchData = new WeakMap<AnyActorRef, PatchData[]>();
  * });
  * ```
  *
- * @template Actor The type of `ActorRef` to patch
- * @param actor An `ActorRef` (or `Actor`)
+ * @template TActor The type of `ActorRef` to patch
+ * @param actor An {@link xs.ActorRef} (or {@link xs.Actor})
  * @param options Options
  * @returns The original `actor`, but modified
  * @see {@link https://stately.ai/docs/inspection}
  */
-export function patchActor<Actor extends AnyActorRef>(
-  actor: Actor,
+export function patchActor<TActor extends xs.AnyActorRef>(
+  actor: TActor,
   {inspector, logger}: AuditionOptions = {},
-): Actor {
+): TActor {
   if (!isActorRef(actor)) {
     throw new TypeError('patchActor() called with a non-ActorRef', {
       cause: actor,
@@ -133,12 +129,14 @@ export function patchActor<Actor extends AnyActorRef>(
  * This function is not currently used internally and is considered
  * **experimental**. It may be removed in the future if it does not prove to
  * have a reasonable use-case.
- * @template Actor The type of the `ActorRef` to unpatch
+ * @template TActor The type of the `ActorRef` to unpatch
  * @param actor `ActorRef` or `Actor` to unpatch
  * @returns `actor`, but unpatched
  * @experimental
  */
-export function unpatchActor<Actor extends AnyActorRef>(actor: Actor): Actor {
+export function unpatchActor<TActor extends xs.AnyActorRef>(
+  actor: TActor,
+): TActor {
   const data = patchData.get(actor);
 
   if (!data) {
@@ -169,13 +167,18 @@ export function unpatchActor<Actor extends AnyActorRef>(actor: Actor): Actor {
 }
 
 /**
- * @param param0
- * @returns
+ * Returns a function which patches an `ActorRef` with the given options.
+ *
+ * Avoids patching the same `ActorRef` multiple times.
+ *
+ * @param options
+ * @returns Function to patch an `ActorRef`
+ * @internal
  */
 export function createPatcher(opts: AuditionOptions = {}) {
-  const knownActorRefs = new WeakSet<AnyActorRef>();
+  const knownActorRefs = new WeakSet<xs.AnyActorRef>();
 
-  return (evt: AnyActorRef | InspectionEvent) => {
+  return (evt: xs.AnyActorRef | xs.InspectionEvent) => {
     if (isActorRef(evt)) {
       if (!knownActorRefs.has(evt)) {
         patchActor(evt, opts);

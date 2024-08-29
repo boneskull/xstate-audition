@@ -1,6 +1,7 @@
 import * as xs from 'xstate';
 
 import {createPatcher} from './actor.js';
+import {XSTATE_EVENT} from './constants.js';
 import {applyDefaults} from './defaults.js';
 import {createAbortablePromiseKit} from './promise-kit.js';
 import {startTimer} from './timer.js';
@@ -17,232 +18,287 @@ import {head, isActorRef} from './util.js';
 
 export type CurryEventSent = (() => CurryEventSent) &
   (<
-    Actor extends AnyActor,
-    Target extends AnyEventReceiverActor = AnyEventReceiverActor,
-    const EventSentTypes extends
-      ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
+    TActor extends AnyActor,
+    TReceiver extends AnyEventReceiverActor = AnyEventReceiverActor,
+    const TEventTypes extends
+      ActorEventTypeTuple<TReceiver> = ActorEventTypeTuple<TReceiver>,
   >(
-    actor: Actor,
-    eventTypes: EventSentTypes,
-  ) => CurryEventSentP2<Target, EventSentTypes>) &
+    actor: TActor,
+    eventTypes: TEventTypes,
+  ) => CurryEventSentP2<TReceiver, TEventTypes>) &
   (<Actor extends AnyActor>(actor: Actor) => CurryEventSentP1<Actor>);
 
 export type CurryEventSentP1<
-  Actor extends AnyActor,
-  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
-> = (() => CurryEventSentP1<Actor, Target>) &
+  TActor extends AnyActor,
+  TReceiver extends AnyEventReceiverActor = AnyEventReceiverActor,
+> = (() => CurryEventSentP1<TActor, TReceiver>) &
   (<
-    const EventSentTypes extends
-      ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
+    const TEventTypes extends
+      ActorEventTypeTuple<TReceiver> = ActorEventTypeTuple<TReceiver>,
   >(
-    eventTypes: EventSentTypes,
-  ) => CurryEventSentP2<Target, EventSentTypes>);
+    eventTypes: TEventTypes,
+  ) => CurryEventSentP2<TReceiver, TEventTypes>);
 
 export type CurryEventSentP2<
-  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
-  EventSentTypes extends
-    ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
-> = Promise<ActorEventTuple<Target, EventSentTypes>>;
+  TReceiver extends AnyEventReceiverActor = AnyEventReceiverActor,
+  TEventTypes extends
+    ActorEventTypeTuple<TReceiver> = ActorEventTypeTuple<TReceiver>,
+> = Promise<ActorEventTuple<TReceiver, TEventTypes>>;
 
 export type CurryEventSentWith = (() => CurryEventSentWith) &
   (<
-    Actor extends AnyActor,
-    Target extends AnyEventReceiverActor = AnyEventReceiverActor,
-    const EventSentTypes extends
-      ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
+    TActor extends AnyActor,
+    TReceiver extends AnyEventReceiverActor = AnyEventReceiverActor,
+    const TEventTypes extends
+      ActorEventTypeTuple<TReceiver> = ActorEventTypeTuple<TReceiver>,
   >(
-    actor: Actor,
+    actor: TActor,
     options: AuditionEventOptions,
-    eventTypes: EventSentTypes,
-  ) => CurryEventSentWithP3<Target, EventSentTypes>) &
+    eventTypes: TEventTypes,
+  ) => CurryEventSentWithP3<TReceiver, TEventTypes>) &
   (<
-    Actor extends AnyActor,
-    Target extends AnyEventReceiverActor = AnyEventReceiverActor,
+    TActor extends AnyActor,
+    TReceiver extends AnyEventReceiverActor = AnyEventReceiverActor,
   >(
-    actor: Actor,
+    actor: TActor,
     options: AuditionEventOptions,
-  ) => CurryEventSentWithP2<Actor, Target>) &
-  (<Actor extends AnyActor>(actor: Actor) => CurryEventSentWithP1<Actor>);
+  ) => CurryEventSentWithP2<TActor, TReceiver>) &
+  (<TActor extends AnyActor>(actor: TActor) => CurryEventSentWithP1<TActor>);
 
-export type CurryEventSentWithP1<Actor extends AnyActor> =
-  (() => CurryEventSentWithP1<Actor>) &
-    ((options: AuditionEventOptions) => CurryEventSentWithP2<Actor>) &
+export type CurryEventSentWithP1<TActor extends AnyActor> =
+  (() => CurryEventSentWithP1<TActor>) &
+    ((options: AuditionEventOptions) => CurryEventSentWithP2<TActor>) &
     (<
-      Target extends AnyEventReceiverActor = AnyEventReceiverActor,
-      const EventSentTypes extends
-        ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
+      TReceiver extends AnyEventReceiverActor = AnyEventReceiverActor,
+      const TEventTypes extends
+        ActorEventTypeTuple<TReceiver> = ActorEventTypeTuple<TReceiver>,
     >(
       options: AuditionEventOptions,
-      eventTypes: EventSentTypes,
-    ) => CurryEventSentWithP3<Target, EventSentTypes>);
+      eventTypes: TEventTypes,
+    ) => CurryEventSentWithP3<TReceiver, TEventTypes>);
 
 export type CurryEventSentWithP2<
-  Actor extends AnyActor,
-  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
-> = (() => CurryEventSentWithP2<Actor, Target>) &
+  TActor extends AnyActor,
+  TReceiver extends AnyEventReceiverActor = AnyEventReceiverActor,
+> = (() => CurryEventSentWithP2<TActor, TReceiver>) &
   (<
-    const EventSentTypes extends
-      ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
+    const TEventTypes extends
+      ActorEventTypeTuple<TReceiver> = ActorEventTypeTuple<TReceiver>,
   >(
-    eventTypes: EventSentTypes,
-  ) => CurryEventSentWithP3<Target, EventSentTypes>);
+    eventTypes: TEventTypes,
+  ) => CurryEventSentWithP3<TReceiver, TEventTypes>);
 
 export type CurryEventSentWithP3<
-  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
-  EventSentTypes extends
-    ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
-> = Promise<ActorEventTuple<Target, EventSentTypes>>;
+  TReceiver extends AnyEventReceiverActor = AnyEventReceiverActor,
+  TEventTypes extends
+    ActorEventTypeTuple<TReceiver> = ActorEventTypeTuple<TReceiver>,
+> = Promise<ActorEventTuple<TReceiver, TEventTypes>>;
 
 /**
- * Runs an actor until it sends one or more events (in order).
- *
- * @param actor An existing {@link Actor}
- * @param events One or more _event names_ (the `type` field) to wait for (in
- *   order)
- * @returns The matching events (assuming they all occurred in order)
+ * Returns itself.
  */
 export function runUntilEventSent(): CurryEventSent;
 
+/**
+ * Returns a function accepting an array of one or more _event types_ which
+ * resolves with the matching events.
+ *
+ * @param actor An existing `Actor`
+ * @returns A function accepting an array of one or more _event types_ which
+ *   resolves with the matching events
+ */
 export function runUntilEventSent<
-  Actor extends AnyActor,
-  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
->(actor: Actor): CurryEventSentP1<Actor, Target>;
+  TActor extends AnyActor,
+  TReceiver extends AnyEventReceiverActor = AnyEventReceiverActor,
+>(actor: TActor): CurryEventSentP1<TActor, TReceiver>;
 
+/**
+ * Runs an {@link xs.Actor} until it sends one or more events (in order).
+ *
+ * @param actor An existing `Actor`
+ * @param eventTypes One or more _event types_ (the `type` field of an
+ *   {@link xs.EventObject EventObject}) to wait for (in order)
+ * @returns The matching events (assuming they all occurred in order)
+ */
 export function runUntilEventSent<
-  Actor extends AnyActor,
-  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
-  const EventSentTypes extends
-    ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
+  TActor extends AnyActor,
+  TReceiver extends AnyEventReceiverActor = AnyEventReceiverActor,
+  const TEventTypes extends
+    ActorEventTypeTuple<TReceiver> = ActorEventTypeTuple<TReceiver>,
 >(
-  actor: Actor,
-  eventTypes: EventSentTypes,
-): CurryEventSentP2<Target, EventSentTypes>;
+  actor: TActor,
+  eventTypes: TEventTypes,
+): CurryEventSentP2<TReceiver, TEventTypes>;
 
 export function runUntilEventSent<
-  Actor extends AnyActor,
-  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
-  const EventSentTypes extends
-    ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
->(actor?: Actor, eventTypes?: EventSentTypes) {
+  TActor extends AnyActor,
+  TReceiver extends AnyEventReceiverActor = AnyEventReceiverActor,
+  const TEventTypes extends
+    ActorEventTypeTuple<TReceiver> = ActorEventTypeTuple<TReceiver>,
+>(actor?: TActor, eventTypes?: TEventTypes) {
   return runUntilEventSent_(actor, eventTypes);
 }
 
 export function runUntilEventSentWith(): CurryEventSentWith;
 
-export function runUntilEventSentWith<Actor extends AnyActor>(
-  actor: Actor,
-): CurryEventSentWithP1<Actor>;
+export function runUntilEventSentWith<TActor extends AnyActor>(
+  actor: TActor,
+): CurryEventSentWithP1<TActor>;
 
-export function runUntilEventSentWith<Actor extends AnyActor>(
-  actor: Actor,
+export function runUntilEventSentWith<TActor extends AnyActor>(
+  actor: TActor,
   options: AuditionEventOptions,
-): CurryEventSentWithP2<Actor>;
+): CurryEventSentWithP2<TActor>;
 
 export function runUntilEventSentWith<
-  Actor extends AnyActor,
-  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
-  const EventSentTypes extends
-    ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
+  TActor extends AnyActor,
+  TReceiver extends AnyEventReceiverActor = AnyEventReceiverActor,
+  const TEventTypes extends
+    ActorEventTypeTuple<TReceiver> = ActorEventTypeTuple<TReceiver>,
 >(
-  actor: Actor,
+  actor: TActor,
   options: AuditionEventOptions,
-  eventTypes: EventSentTypes,
-): CurryEventSentWithP3<Target, EventSentTypes>;
+  eventTypes: TEventTypes,
+): CurryEventSentWithP3<TReceiver, TEventTypes>;
 
 export function runUntilEventSentWith<
-  Actor extends AnyActor,
-  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
-  const EventSentTypes extends
-    ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
->(actor?: Actor, options?: AuditionEventOptions, events?: EventSentTypes) {
+  TActor extends AnyActor,
+  TReceiver extends AnyEventReceiverActor = AnyEventReceiverActor,
+  const TEventTypes extends
+    ActorEventTypeTuple<TReceiver> = ActorEventTypeTuple<TReceiver>,
+>(actor?: TActor, options?: AuditionEventOptions, events?: TEventTypes) {
   return runUntilEventSentWith_(actor, options, events);
 }
 
+/**
+ * Returns itself
+ */
 export function waitForEventSent(): CurryEventSent;
 
-export function waitForEventSent<Actor extends AnyActor>(
-  actor: Actor,
-): CurryEventSentP1<Actor>;
+/**
+ * Returns a function which accepts one or more _event types_ and resolves once
+ * the actor sends one or more events (in order).
+ *
+ * @param actor An existing {@link xs.Actor}
+ * @returns A function which accepts one or more _event types_ and resolves once
+ *   the actor sends one or more events (in order).
+ */
+export function waitForEventSent<TActor extends AnyActor>(
+  actor: TActor,
+): CurryEventSentP1<TActor>;
 
+/**
+ * Resolves once the actor sends one or more events (in order).
+ *
+ * @template TActor The type of the actor
+ * @template TReceiver The type of the receiver actor
+ * @template TEventTypes The type of the event types
+ * @param actor An existing {@link xs.Actor}
+ * @param eventTypes One or more _event types_ (the {@link xs.EventObject.type}
+ *   field)
+ */
 export function waitForEventSent<
-  Actor extends AnyActor,
-  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
-  const EventSentTypes extends
-    ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
+  TActor extends AnyActor,
+  TReceiver extends AnyEventReceiverActor = AnyEventReceiverActor,
+  const TEventTypes extends
+    ActorEventTypeTuple<TReceiver> = ActorEventTypeTuple<TReceiver>,
 >(
-  actor: Actor,
-  eventTypes: EventSentTypes,
-): CurryEventSentP2<Target, EventSentTypes>;
+  actor: TActor,
+  eventTypes: TEventTypes,
+): CurryEventSentP2<TReceiver, TEventTypes>;
 
 export function waitForEventSent<
-  Actor extends AnyActor,
-  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
-  const EventSentTypes extends
-    ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
->(actor?: Actor, events?: EventSentTypes) {
+  TActor extends AnyActor,
+  TReceiver extends AnyEventReceiverActor = AnyEventReceiverActor,
+  const TEventTypes extends
+    ActorEventTypeTuple<TReceiver> = ActorEventTypeTuple<TReceiver>,
+>(actor?: TActor, events?: TEventTypes) {
   return waitForEventSent_(actor, events);
 }
+
+/**
+ * Returns itself
+ */
+export function waitForEventSentWith(): CurryEventSentWith;
+
+/**
+ * Returns a function which accepts options and/or one or more _event types_.
+ *
+ * If event types are provided, the function runs an actor until it sends one or
+ * more events (in order); otherwise it returns a function which accepts one or
+ * more _event types_ and returns a function which runs an actor until it sends
+ * one or more events (in order).
+ *
+ * @param actor An existing {@link xs.Actor}
+ */
+export function waitForEventSentWith<TActor extends AnyActor>(
+  actor: TActor,
+): CurryEventSentWithP1<TActor>;
+
+/**
+ * Returns a function which accepts one or more _event types_ and runs an actor
+ * until it sends one or more events (in order), with options including a target
+ * actor ID.
+ *
+ * @param actor An existing {@link xs.Actor}
+ * @param options Options
+ * @returns A function which accepts one or more _event types_ and runs an actor
+ *   until it sends one or more events (in order)
+ */
+export function waitForEventSentWith<TActor extends AnyActor>(
+  actor: TActor,
+  options: AuditionEventOptions,
+): CurryEventSentWithP2<TActor>;
 
 /**
  * Runs an actor until it sends one or more events (in order), with options
  * including a target actor ID.
  *
- * @param actor An existing {@link Actor}
- * @param events One or more _event names_ (the `type` field) to wait for (in
- *   order)
+ * @param actor An existing {@link xs.Actor}
  * @param options Options
+ * @param eventTypes One or more _event types_ (the {@link xs.EventObject.type}
+ *   field) to wait for (in order)
  * @returns The matching events (assuming they all occurred in order)
  */
-export function waitForEventSentWith(): CurryEventSentWith;
-
-export function waitForEventSentWith<Actor extends AnyActor>(
-  actor: Actor,
-): CurryEventSentWithP1<Actor>;
-
-export function waitForEventSentWith<Actor extends AnyActor>(
-  actor: Actor,
-  options: AuditionEventOptions,
-): CurryEventSentWithP2<Actor>;
-
 export function waitForEventSentWith<
-  Actor extends AnyActor,
-  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
-  const EventSentTypes extends
-    ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
+  TActor extends AnyActor,
+  TReceiver extends AnyEventReceiverActor = AnyEventReceiverActor,
+  const TEventTypes extends
+    ActorEventTypeTuple<TReceiver> = ActorEventTypeTuple<TReceiver>,
 >(
-  actor: Actor,
+  actor: TActor,
   options: AuditionEventOptions,
-  eventTypes: EventSentTypes,
-): CurryEventSentWithP3<Target, EventSentTypes>;
+  eventTypes: TEventTypes,
+): CurryEventSentWithP3<TReceiver, TEventTypes>;
 
 export function waitForEventSentWith<
-  Actor extends AnyActor,
-  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
-  const EventSentTypes extends
-    ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
->(actor?: Actor, options?: AuditionEventOptions, events?: EventSentTypes) {
+  TActor extends AnyActor,
+  TReceiver extends AnyEventReceiverActor = AnyEventReceiverActor,
+  const TEventTypes extends
+    ActorEventTypeTuple<TReceiver> = ActorEventTypeTuple<TReceiver>,
+>(actor?: TActor, options?: AuditionEventOptions, events?: TEventTypes) {
   return waitForEventSentWith_(actor, options, events);
 }
 
 const createEventFn = (stop = false) => {
   const curryEvent = <
-    Actor extends AnyActor,
-    Target extends AnyEventReceiverActor = AnyEventReceiverActor,
-    const EventSentTypes extends
-      ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
+    TActor extends AnyActor,
+    TReceiver extends AnyEventReceiverActor = AnyEventReceiverActor,
+    const TEventTypes extends
+      ActorEventTypeTuple<TReceiver> = ActorEventTypeTuple<TReceiver>,
   >(
-    actor?: Actor,
-    events?: EventSentTypes,
+    actor?: TActor,
+    events?: TEventTypes,
   ) => {
     if (actor) {
       if (events) {
         return untilEventSent(actor, {stop}, events);
       }
 
-      return ((events?: EventSentTypes) =>
+      return ((events?: TEventTypes) =>
         events
           ? curryEvent(actor, events)
-          : curryEvent(actor)) as CurryEventSentP1<Actor, Target>;
+          : curryEvent(actor)) as CurryEventSentP1<TActor, TReceiver>;
     }
 
     return curryEvent as CurryEventSent;
@@ -253,14 +309,14 @@ const createEventFn = (stop = false) => {
 
 const createEventSentWithFn = (stop = false) => {
   const curryEventSentWith = <
-    Actor extends AnyActor,
-    Target extends AnyEventReceiverActor = AnyEventReceiverActor,
-    const EventSentTypes extends
-      ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
+    TActor extends AnyActor,
+    TReceiver extends AnyEventReceiverActor = AnyEventReceiverActor,
+    const TEventTypes extends
+      ActorEventTypeTuple<TReceiver> = ActorEventTypeTuple<TReceiver>,
   >(
-    actor?: Actor,
+    actor?: TActor,
     options?: AuditionEventOptions,
-    events?: EventSentTypes,
+    events?: TEventTypes,
   ) => {
     if (actor) {
       if (options) {
@@ -275,14 +331,14 @@ const createEventSentWithFn = (stop = false) => {
           );
         }
 
-        return ((events?: EventSentTypes) => {
+        return ((events?: TEventTypes) => {
           return events
             ? curryEventSentWith(actor, options, events)
             : curryEventSentWith(actor, options);
-        }) as CurryEventSentWithP2<Actor>;
+        }) as CurryEventSentWithP2<TActor>;
       }
 
-      return ((options?: AuditionEventOptions, events?: EventSentTypes) => {
+      return ((options?: AuditionEventOptions, events?: TEventTypes) => {
         if (options) {
           return events
             ? curryEventSentWith(actor, options, events)
@@ -290,7 +346,7 @@ const createEventSentWithFn = (stop = false) => {
         }
 
         return curryEventSentWith(actor);
-      }) as CurryEventSentWithP1<Actor>;
+      }) as CurryEventSentWithP1<TActor>;
     }
 
     return curryEventSentWith as CurryEventSentWith;
@@ -300,15 +356,15 @@ const createEventSentWithFn = (stop = false) => {
 };
 
 const untilEventSent = async <
-  Actor extends AnyActor,
-  Target extends AnyEventReceiverActor = AnyEventReceiverActor,
-  const EventSentTypes extends
-    ActorEventTypeTuple<Target> = ActorEventTypeTuple<Target>,
+  TActor extends AnyActor,
+  TReceiver extends AnyEventReceiverActor = AnyEventReceiverActor,
+  const TEventTypes extends
+    ActorEventTypeTuple<TReceiver> = ActorEventTypeTuple<TReceiver>,
 >(
-  actor: Actor,
+  actor: TActor,
   options: InternalAuditionEventOptions,
-  eventTypes: EventSentTypes,
-): Promise<ActorEventTuple<Target, EventSentTypes>> => {
+  eventTypes: TEventTypes,
+): Promise<ActorEventTuple<TReceiver, TEventTypes>> => {
   const {id} = actor;
 
   const opts = applyDefaults(options);
@@ -316,7 +372,7 @@ const untilEventSent = async <
   const {inspector, otherActorId, stop, timeout} = opts;
 
   const {abortController, promise, reject, resolve} =
-    createAbortablePromiseKit<ActorEventTuple<Target, EventSentTypes>>();
+    createAbortablePromiseKit<ActorEventTuple<TReceiver, TEventTypes>>();
 
   const inspectorObserver = xs.toObserver(inspector);
 
@@ -346,9 +402,9 @@ const untilEventSent = async <
    */
   const matchesEventFromActor = (
     evt: xs.InspectionEvent,
-    type: EventSentTypes[number],
+    type: TEventTypes[number],
   ): evt is xs.InspectedEventEvent =>
-    evt.type === '@xstate.event' &&
+    evt.type === XSTATE_EVENT &&
     evt.sourceRef?.id === id &&
     type === evt.event.type;
 
@@ -379,7 +435,7 @@ const untilEventSent = async <
         return;
       }
 
-      if (evt.type === '@xstate.event' && expectedEventQueue.length) {
+      if (evt.type === XSTATE_EVENT && expectedEventQueue.length) {
         const type = head(expectedEventQueue);
 
         if (isActorRef(evt.actorRef) && matchesEventFromActor(evt, type)) {
@@ -388,7 +444,7 @@ const untilEventSent = async <
             return;
           }
 
-          seenEvents.push(evt.event as EventFromEventType<Actor, typeof type>);
+          seenEvents.push(evt.event as EventFromEventType<TActor, typeof type>);
           expectedEventQueue.shift();
 
           if (!expectedEventQueue.length) {
@@ -413,7 +469,7 @@ const untilEventSent = async <
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const seenEvents: ActorEventTuple<Target, EventSentTypes> = [] as any;
+  const seenEvents: ActorEventTuple<TReceiver, TEventTypes> = [] as any;
 
   void xs.toPromise(actor).catch(reject);
   actor.start();

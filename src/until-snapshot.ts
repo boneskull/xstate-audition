@@ -9,172 +9,174 @@ import {
   type InternalAuditionOptions,
 } from './types.js';
 
-export type {AnySnapshotEmitterLogic as ActorLogicWithSnapshot};
-
 export type CurrySnapshot = (() => CurrySnapshot) &
-  (<Actor extends AnySnapshotEmitterActor>(
-    actor: Actor,
-    predicate: SnapshotPredicate<Actor['logic']>,
-  ) => CurrySnapshotP2<Actor>) &
-  (<Actor extends AnySnapshotEmitterActor>(
-    actor: Actor,
-  ) => CurrySnapshotP1<Actor>);
+  (<TActor extends AnySnapshotEmitterActor>(
+    actor: TActor,
+    predicate: SnapshotPredicate<TActor['logic']>,
+  ) => CurrySnapshotP2<TActor>) &
+  (<TActor extends AnySnapshotEmitterActor>(
+    actor: TActor,
+  ) => CurrySnapshotP1<TActor>);
 
-export type CurrySnapshotP1<Actor extends AnySnapshotEmitterActor> =
-  (() => CurrySnapshotP1<Actor>) &
-    ((predicate: SnapshotPredicate<Actor['logic']>) => CurrySnapshotP2<Actor>);
+export type CurrySnapshotP1<TActor extends AnySnapshotEmitterActor> = ((
+  predicate: SnapshotPredicate<TActor['logic']>,
+) => CurrySnapshotP2<TActor>) &
+  (() => CurrySnapshotP1<TActor>);
 
-export type CurrySnapshotP2<Actor extends AnySnapshotEmitterActor> = Promise<
-  xs.SnapshotFrom<Actor['logic']>
+export type CurrySnapshotP2<TActor extends AnySnapshotEmitterActor> = Promise<
+  xs.SnapshotFrom<TActor['logic']>
 >;
 
 export type CurrySnapshotWith = (() => CurrySnapshotWith) &
-  (<Actor extends AnySnapshotEmitterActor>(
-    actor: Actor,
-    predicate: SnapshotPredicate<Actor['logic']>,
+  (<TActor extends AnySnapshotEmitterActor>(
+    actor: TActor,
+    predicate: SnapshotPredicate<TActor['logic']>,
     options: AuditionOptions,
-  ) => CurrySnapshotWithP3<Actor>) &
-  (<Actor extends AnySnapshotEmitterActor>(
-    actor: Actor,
-    predicate: SnapshotPredicate<Actor['logic']>,
-  ) => CurrySnapshotWithP2<Actor>) &
-  (<Actor extends AnySnapshotEmitterActor>(
-    actor: Actor,
-  ) => CurrySnapshotWithP1<Actor>);
+  ) => CurrySnapshotWithP3<TActor>) &
+  (<TActor extends AnySnapshotEmitterActor>(
+    actor: TActor,
+    predicate: SnapshotPredicate<TActor['logic']>,
+  ) => CurrySnapshotWithP2<TActor>) &
+  (<TActor extends AnySnapshotEmitterActor>(
+    actor: TActor,
+  ) => CurrySnapshotWithP1<TActor>);
 
 // prettier-ignore
-export type CurrySnapshotWithP1<Actor extends AnySnapshotEmitterActor> = ((
-    predicate: SnapshotPredicate<Actor['logic']>,
-  ) => CurrySnapshotWithP2<Actor>) &
+export type CurrySnapshotWithP1<TActor extends AnySnapshotEmitterActor> = ((
+    predicate: SnapshotPredicate<TActor['logic']>,
+  ) => CurrySnapshotWithP2<TActor>) &
   ((
-  predicate: SnapshotPredicate<Actor['logic']>,
+  predicate: SnapshotPredicate<TActor['logic']>,
   options: AuditionOptions,
-) => CurrySnapshotWithP3<Actor>) &
-  (() => CurrySnapshotWithP1<Actor>);
+) => CurrySnapshotWithP3<TActor>) &
+  (() => CurrySnapshotWithP1<TActor>);
 
-export type CurrySnapshotWithP2<Actor extends AnySnapshotEmitterActor> =
-  (() => CurrySnapshotWithP2<Actor>) &
-    ((options: AuditionOptions) => CurrySnapshotWithP3<Actor>);
+export type CurrySnapshotWithP2<TActor extends AnySnapshotEmitterActor> =
+  (() => CurrySnapshotWithP2<TActor>) &
+    ((options: AuditionOptions) => CurrySnapshotWithP3<TActor>);
 
-export type CurrySnapshotWithP3<Actor extends AnySnapshotEmitterActor> =
-  Promise<xs.SnapshotFrom<Actor['logic']>>;
+export type CurrySnapshotWithP3<TActor extends AnySnapshotEmitterActor> =
+  Promise<xs.SnapshotFrom<TActor['logic']>>;
 
 export type SnapshotPredicate<T extends AnySnapshotEmitterLogic> = (
   snapshot: xs.SnapshotFrom<T>,
 ) => boolean;
 
+export function runUntilSnapshot(): CurrySnapshot;
+
+export function runUntilSnapshot<TActor extends AnySnapshotEmitterActor>(
+  actor: TActor,
+): CurrySnapshotP1<TActor>;
+
 /**
  * Runs an actor until the snapshot predicate returns `true`.
  *
  * Immediately stops the actor thereafter.
  *
- * @template T Actor logic which emits snapshots
- * @param actor An existing {@link Actor}
+ * @template TActor Actor logic which emits snapshots
+ * @param actor An existing {@link xs.Actor}
  * @param predicate Snapshot predicate; see {@link xs.waitFor}
  * @returns The snapshot that matches the predicate
+ * @see {@link https://stately.ai/docs/actors#waitfor}
  */
-export function runUntilSnapshot(): CurrySnapshot;
+export function runUntilSnapshot<TActor extends AnySnapshotEmitterActor>(
+  actor: TActor,
+  predicate: SnapshotPredicate<TActor['logic']>,
+): CurrySnapshotP2<TActor>;
 
-export function runUntilSnapshot<Actor extends AnySnapshotEmitterActor>(
-  actor: Actor,
-): CurrySnapshotP1<Actor>;
-
-export function runUntilSnapshot<Actor extends AnySnapshotEmitterActor>(
-  actor: Actor,
-  predicate: SnapshotPredicate<Actor['logic']>,
-): CurrySnapshotP2<Actor>;
-
-export function runUntilSnapshot<Actor extends AnySnapshotEmitterActor>(
-  actor?: Actor,
-  predicate?: SnapshotPredicate<Actor['logic']>,
+export function runUntilSnapshot<TActor extends AnySnapshotEmitterActor>(
+  actor?: TActor,
+  predicate?: SnapshotPredicate<TActor['logic']>,
 ) {
   return runUntilSnapshot_(actor, predicate);
 }
 
+export function runUntilSnapshotWith(): CurrySnapshotWith;
+
+export function runUntilSnapshotWith<TActor extends AnySnapshotEmitterActor>(
+  actor: TActor,
+): CurrySnapshotWithP1<TActor>;
+
+export function runUntilSnapshotWith<TActor extends AnySnapshotEmitterActor>(
+  actor: TActor,
+  options: AuditionOptions,
+): CurrySnapshotWithP2<TActor>;
+
 /**
  * Runs an actor until the snapshot predicate returns `true`.
  *
  * Immediately stops the actor thereafter.
  *
- * @template T Actor logic which emits snapshots
- * @param actor An existing {@link Actor}
- * @param predicate Snapshot predicate; see {@link xs.waitFor}
+ * @template TActor Actor logic which emits snapshots
+ * @param actor An existing {@link xs.Actor}
  * @param options Options
+ * @param predicate Snapshot predicate; see {@link xs.waitFor}
  * @returns The snapshot that matches the predicate
+ * @see {@link https://stately.ai/docs/actors#waitfor}
  */
-export function runUntilSnapshotWith(): CurrySnapshotWith;
 
-export function runUntilSnapshotWith<Actor extends AnySnapshotEmitterActor>(
-  actor: Actor,
-): CurrySnapshotWithP1<Actor>;
-
-export function runUntilSnapshotWith<Actor extends AnySnapshotEmitterActor>(
-  actor: Actor,
+export function runUntilSnapshotWith<TActor extends AnySnapshotEmitterActor>(
+  actor: TActor,
   options: AuditionOptions,
-): CurrySnapshotWithP2<Actor>;
+  predicate: SnapshotPredicate<TActor['logic']>,
+): CurrySnapshotWithP3<TActor>;
 
-export function runUntilSnapshotWith<Actor extends AnySnapshotEmitterActor>(
-  actor: Actor,
-  options: AuditionOptions,
-  predicate: SnapshotPredicate<Actor['logic']>,
-): CurrySnapshotWithP3<Actor>;
-
-export function runUntilSnapshotWith<Actor extends AnySnapshotEmitterActor>(
-  actor?: Actor,
+export function runUntilSnapshotWith<TActor extends AnySnapshotEmitterActor>(
+  actor?: TActor,
   options?: AuditionOptions,
-  predicate?: SnapshotPredicate<Actor['logic']>,
+  predicate?: SnapshotPredicate<TActor['logic']>,
 ) {
   return runUntilSnapshotWith_(actor, options, predicate);
 }
 
 export function waitForSnapshot(): CurrySnapshot;
 
-export function waitForSnapshot<Actor extends AnySnapshotEmitterActor>(
-  actor: Actor,
-): CurrySnapshotP1<Actor>;
+export function waitForSnapshot<TActor extends AnySnapshotEmitterActor>(
+  actor: TActor,
+): CurrySnapshotP1<TActor>;
 
-export function waitForSnapshot<Actor extends AnySnapshotEmitterActor>(
-  actor: Actor,
-  predicate?: SnapshotPredicate<Actor['logic']>,
-): CurrySnapshotP2<Actor>;
+export function waitForSnapshot<TActor extends AnySnapshotEmitterActor>(
+  actor: TActor,
+  predicate?: SnapshotPredicate<TActor['logic']>,
+): CurrySnapshotP2<TActor>;
 
-export function waitForSnapshot<Actor extends AnySnapshotEmitterActor>(
-  actor?: Actor,
-  predicate?: SnapshotPredicate<Actor['logic']>,
+export function waitForSnapshot<TActor extends AnySnapshotEmitterActor>(
+  actor?: TActor,
+  predicate?: SnapshotPredicate<TActor['logic']>,
 ) {
   return waitForSnapshot_(actor, predicate);
 }
 
 export function waitForSnapshotWith(): CurrySnapshotWith;
 
-export function waitForSnapshotWith<Actor extends AnySnapshotEmitterActor>(
-  actor: Actor,
-): CurrySnapshotWithP1<Actor>;
+export function waitForSnapshotWith<TActor extends AnySnapshotEmitterActor>(
+  actor: TActor,
+): CurrySnapshotWithP1<TActor>;
 
-export function waitForSnapshotWith<Actor extends AnySnapshotEmitterActor>(
-  actor: Actor,
+export function waitForSnapshotWith<TActor extends AnySnapshotEmitterActor>(
+  actor: TActor,
   options: AuditionOptions,
-): CurrySnapshotWithP2<Actor>;
+): CurrySnapshotWithP2<TActor>;
 
-export function waitForSnapshotWith<Actor extends AnySnapshotEmitterActor>(
-  actor: Actor,
+export function waitForSnapshotWith<TActor extends AnySnapshotEmitterActor>(
+  actor: TActor,
   options: AuditionOptions,
-  predicate: SnapshotPredicate<Actor['logic']>,
-): CurrySnapshotWithP3<Actor>;
+  predicate: SnapshotPredicate<TActor['logic']>,
+): CurrySnapshotWithP3<TActor>;
 
-export function waitForSnapshotWith<Actor extends AnySnapshotEmitterActor>(
-  actor?: Actor,
+export function waitForSnapshotWith<TActor extends AnySnapshotEmitterActor>(
+  actor?: TActor,
   options?: AuditionOptions,
-  predicate?: SnapshotPredicate<Actor['logic']>,
+  predicate?: SnapshotPredicate<TActor['logic']>,
 ) {
   return waitForSnapshotWith_(actor, options, predicate);
 }
 
-const untilSnapshot = <Actor extends AnySnapshotEmitterActor>(
-  actor: Actor,
+const untilSnapshot = <TActor extends AnySnapshotEmitterActor>(
+  actor: TActor,
   options: InternalAuditionOptions,
-  predicate: SnapshotPredicate<Actor['logic']>,
-): Promise<xs.SnapshotFrom<Actor['logic']>> => {
+  predicate: SnapshotPredicate<TActor['logic']>,
+): Promise<xs.SnapshotFrom<TActor['logic']>> => {
   const opts = applyDefaults(options);
 
   const {inspector, stop, timeout} = opts;
@@ -209,7 +211,7 @@ const untilSnapshot = <Actor extends AnySnapshotEmitterActor>(
           });
         } else if (
           err.message.startsWith(
-            'Actor terminated without satisfying predicate',
+            'TActor terminated without satisfying predicate',
           )
         ) {
           throw new Error(`Actor terminated before satisfying predicate`, {
@@ -231,9 +233,9 @@ const untilSnapshot = <Actor extends AnySnapshotEmitterActor>(
 };
 
 const createSnapshotFn = (stop = false) => {
-  const currySnapshot = <Actor extends AnySnapshotEmitterActor>(
-    actor?: Actor,
-    predicate?: SnapshotPredicate<Actor['logic']>,
+  const currySnapshot = <TActor extends AnySnapshotEmitterActor>(
+    actor?: TActor,
+    predicate?: SnapshotPredicate<TActor['logic']>,
   ) => {
     if (actor) {
       if (predicate) {
@@ -243,13 +245,13 @@ const createSnapshotFn = (stop = false) => {
             stop,
           },
           predicate,
-        ) as CurrySnapshotP2<Actor>;
+        ) as CurrySnapshotP2<TActor>;
       }
 
-      return ((predicate?: SnapshotPredicate<Actor['logic']>) =>
+      return ((predicate?: SnapshotPredicate<TActor['logic']>) =>
         predicate
           ? currySnapshot(actor, predicate)
-          : currySnapshot(actor)) as CurrySnapshotP1<Actor>;
+          : currySnapshot(actor)) as CurrySnapshotP1<TActor>;
     }
 
     return currySnapshot as CurrySnapshot;
@@ -259,10 +261,10 @@ const createSnapshotFn = (stop = false) => {
 };
 
 const createSnapshotWithFn = (stop = false) => {
-  const currySnapshotWith = <Actor extends AnySnapshotEmitterActor>(
-    actor?: Actor,
+  const currySnapshotWith = <TActor extends AnySnapshotEmitterActor>(
+    actor?: TActor,
     options?: AuditionOptions,
-    predicate?: SnapshotPredicate<Actor['logic']>,
+    predicate?: SnapshotPredicate<TActor['logic']>,
   ) => {
     if (actor) {
       if (options) {
@@ -277,16 +279,16 @@ const createSnapshotWithFn = (stop = false) => {
           );
         }
 
-        return ((predicate?: SnapshotPredicate<Actor['logic']>) => {
+        return ((predicate?: SnapshotPredicate<TActor['logic']>) => {
           return predicate
             ? currySnapshotWith(actor, options, predicate)
             : currySnapshotWith(actor, options);
-        }) as CurrySnapshotWithP2<Actor>;
+        }) as CurrySnapshotWithP2<TActor>;
       }
 
       return ((
         options?: AuditionOptions,
-        predicate?: SnapshotPredicate<Actor['logic']>,
+        predicate?: SnapshotPredicate<TActor['logic']>,
       ) => {
         if (options) {
           return predicate
@@ -295,7 +297,7 @@ const createSnapshotWithFn = (stop = false) => {
         }
 
         return currySnapshotWith(actor);
-      }) as CurrySnapshotWithP1<Actor>;
+      }) as CurrySnapshotWithP1<TActor>;
     }
 
     return currySnapshotWith as CurrySnapshotWith;

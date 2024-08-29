@@ -9,25 +9,28 @@ import type * as xs from 'xstate';
  * A tuple of events Event by an actor, based on a {@link ActorEventTypeTuple}
  */
 export type ActorEventTuple<
-  Actor extends AnyActor,
-  EventTypes extends Readonly<ActorEventTypeTuple<Actor>>,
+  TActor extends AnyActor,
+  TEventTypes extends Readonly<ActorEventTypeTuple<TActor>>,
 > = {
-  -readonly [K in keyof EventTypes]: EventFromEventType<Actor, EventTypes[K]>;
+  -readonly [K in keyof TEventTypes]: EventFromEventType<
+    TActor,
+    TEventTypes[K]
+  >;
 };
 
 /**
  * The `type` prop of any event or Event event from an actor
  */
-export type ActorEventType<Actor extends AnyActor> =
-  xs.EventFromLogic<Actor['logic']> extends xs.EventObject
-    ? xs.EventFromLogic<Actor['logic']>['type']
+export type ActorEventType<TActor extends AnyActor> =
+  xs.EventFromLogic<TActor['logic']> extends xs.EventObject
+    ? xs.EventFromLogic<TActor['logic']>['type']
     : string;
 
 /**
  * A tuple of event types (event names) Event by an actor
  */
-export type ActorEventTypeTuple<Actor extends AnyActor> = ReadableArray<
-  [ActorEventType<Actor>, ...ActorEventType<Actor>[]]
+export type ActorEventTypeTuple<TActor extends AnyActor> = ReadableArray<
+  [ActorEventType<TActor>, ...ActorEventType<TActor>[]]
 >;
 
 export type AnyActor = xs.AnyActor;
@@ -71,18 +74,18 @@ export type AuditionOptions = {
 };
 
 /**
- * Given a XState Actor and an {@link EventObject.type event type} (the `type`
+ * Given a XState Actor and an {@link xs.EventObject.type event type} (the `type`
  * field of an `EventObject`), returns the type of the corresponding event.
  *
  * Does not apply to "emitted" events.
  *
- * @template Actor The State Machine Actor
- * @template EventType The event type (the `type` field of the `EventObject`)
+ * @template TActor The State Machine Actor
+ * @template TEventType The event type (the `type` field of the `EventObject`)
  */
 export type EventFromEventType<
-  Actor extends AnyActor,
-  EventType extends ActorEventType<Actor>,
-> = xs.ExtractEvent<xs.EventFromLogic<Actor['logic']>, EventType>;
+  TActor extends AnyActor,
+  TEventType extends ActorEventType<TActor>,
+> = xs.ExtractEvent<xs.EventFromLogic<TActor['logic']>, TEventType>;
 
 /**
  * An inspector function or XState `Observer` for an Actor
@@ -128,13 +131,6 @@ export type AnyEventReceiverLogic =
   | AnyStateMachineLogic
   | SomeTransitionLogic
   | xs.ActorLogic<xs.CallbackSnapshot<any>, any, any, any, any>;
-
-/**
- * Any actor logic that can send events
- *
- * @see {@link https://stately.ai/docs/actors#actor-logic-capabilities}
- */
-export type AnyEventSenderLogic = xs.AnyActorLogic;
 
 /**
  * Any actor logic which can theoretically emit snapshots
