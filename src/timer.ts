@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/prefer-promise-reject-errors */
-import {type AnyActorRef} from 'xstate';
+import type * as xs from 'xstate';
 
 import {noop} from './util.js';
 
@@ -14,7 +14,7 @@ import {noop} from './util.js';
  * @param message Timeout message
  */
 export function startTimer(
-  actor: AnyActorRef,
+  actor: xs.AnyActorRef,
   abortController: AbortController,
   timeout: number,
   message?: string,

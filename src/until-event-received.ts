@@ -1,6 +1,7 @@
 import * as xs from 'xstate';
 
 import {createPatcher} from './actor.js';
+import {XSTATE_EVENT} from './constants.js';
 import {applyDefaults} from './defaults.js';
 import {createAbortablePromiseKit} from './promise-kit.js';
 import {startTimer} from './timer.js';
@@ -17,68 +18,68 @@ import {head, isActorRef} from './util.js';
 
 export type CurryEventReceived = (() => CurryEventReceived) &
   (<
-    Actor extends AnyEventReceiverActor,
-    const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
+    TActor extends AnyEventReceiverActor,
+    const TEventTypes extends ActorEventTypeTuple<TActor>,
   >(
-    actor: Actor,
-    eventTypes: EventReceivedTypes,
-  ) => CurryEventReceivedP2<Actor, EventReceivedTypes>) &
-  (<Actor extends AnyEventReceiverActor>(
-    actor: Actor,
-  ) => CurryEventReceivedP1<Actor>);
+    actor: TActor,
+    eventTypes: TEventTypes,
+  ) => CurryEventReceivedP2<TActor, TEventTypes>) &
+  (<TActor extends AnyEventReceiverActor>(
+    actor: TActor,
+  ) => CurryEventReceivedP1<TActor>);
 
-export type CurryEventReceivedP1<Actor extends AnyEventReceiverActor> =
-  (() => CurryEventReceivedP1<Actor>) &
-    (<const EventReceivedTypes extends ActorEventTypeTuple<Actor>>(
-      eventTypes: EventReceivedTypes,
-    ) => CurryEventReceivedP2<Actor, EventReceivedTypes>);
+export type CurryEventReceivedP1<TActor extends AnyEventReceiverActor> =
+  (() => CurryEventReceivedP1<TActor>) &
+    (<const TEventTypes extends ActorEventTypeTuple<TActor>>(
+      eventTypes: TEventTypes,
+    ) => CurryEventReceivedP2<TActor, TEventTypes>);
 
 export type CurryEventReceivedP2<
-  Actor extends AnyEventReceiverActor,
-  EventReceivedTypes extends ActorEventTypeTuple<Actor>,
-> = Promise<ActorEventTuple<Actor, EventReceivedTypes>>;
+  TActor extends AnyEventReceiverActor,
+  TEventTypes extends ActorEventTypeTuple<TActor>,
+> = Promise<ActorEventTuple<TActor, TEventTypes>>;
 
 export type CurryEventReceivedWith = (() => CurryEventReceivedWith) &
   (<
-    Actor extends AnyEventReceiverActor,
-    const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
+    TActor extends AnyEventReceiverActor,
+    const TEventTypes extends ActorEventTypeTuple<TActor>,
   >(
-    actor: Actor,
+    actor: TActor,
     options: AuditionOptions,
-    eventTypes: EventReceivedTypes,
-  ) => CurryEventReceivedWithP3<Actor, EventReceivedTypes>) &
-  (<Actor extends AnyEventReceiverActor>(
-    actor: Actor,
+    eventTypes: TEventTypes,
+  ) => CurryEventReceivedWithP3<TActor, TEventTypes>) &
+  (<TActor extends AnyEventReceiverActor>(
+    actor: TActor,
     options: AuditionEventOptions,
-  ) => CurryEventReceivedWithP2<Actor>) &
-  (<Actor extends AnyEventReceiverActor>(
-    actor: Actor,
-  ) => CurryEventReceivedWithP1<Actor>);
+  ) => CurryEventReceivedWithP2<TActor>) &
+  (<TActor extends AnyEventReceiverActor>(
+    actor: TActor,
+  ) => CurryEventReceivedWithP1<TActor>);
 
-export type CurryEventReceivedWithP1<Actor extends AnyEventReceiverActor> =
-  (() => CurryEventReceivedWithP1<Actor>) &
-    ((options: AuditionEventOptions) => CurryEventReceivedWithP2<Actor>) &
-    (<const EventReceivedTypes extends ActorEventTypeTuple<Actor>>(
+export type CurryEventReceivedWithP1<TActor extends AnyEventReceiverActor> =
+  (() => CurryEventReceivedWithP1<TActor>) &
+    ((options: AuditionEventOptions) => CurryEventReceivedWithP2<TActor>) &
+    (<const TEventTypes extends ActorEventTypeTuple<TActor>>(
       options: AuditionOptions,
-      eventTypes: EventReceivedTypes,
-    ) => CurryEventReceivedWithP3<Actor, EventReceivedTypes>);
+      eventTypes: TEventTypes,
+    ) => CurryEventReceivedWithP3<TActor, TEventTypes>);
 
-export type CurryEventReceivedWithP2<Actor extends AnyEventReceiverActor> =
-  (() => CurryEventReceivedWithP2<Actor>) &
-    (<const EventReceivedTypes extends ActorEventTypeTuple<Actor>>(
-      eventTypes: EventReceivedTypes,
-    ) => CurryEventReceivedWithP3<Actor, EventReceivedTypes>);
+export type CurryEventReceivedWithP2<TActor extends AnyEventReceiverActor> =
+  (() => CurryEventReceivedWithP2<TActor>) &
+    (<const TEventTypes extends ActorEventTypeTuple<TActor>>(
+      eventTypes: TEventTypes,
+    ) => CurryEventReceivedWithP3<TActor, TEventTypes>);
 
 export type CurryEventReceivedWithP3<
-  Actor extends AnyEventReceiverActor,
-  EventReceivedTypes extends ActorEventTypeTuple<Actor>,
-> = Promise<ActorEventTuple<Actor, EventReceivedTypes>>;
+  TActor extends AnyEventReceiverActor,
+  TEventTypes extends ActorEventTypeTuple<TActor>,
+> = Promise<ActorEventTuple<TActor, TEventTypes>>;
 
 /**
  * Runs an XState `Actor` until it receives one or more events (in order).
  *
- * @template Actor The type of `actor`
- * @template EventReceivedTypes The type of `eventTypes`
+ * @template TActor The type of `actor`
+ * @template TEventTypes The type of `eventTypes`
  * @param actor An XState `Actor` that can receive events
  * @param eventTypes One or more _event names_ (the `type` field) to wait for
  *   (in order)
@@ -86,25 +87,25 @@ export type CurryEventReceivedWithP3<
  *   occurred in order)
  */
 export function runUntilEventReceived<
-  Actor extends AnyEventReceiverActor,
-  const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
+  TActor extends AnyEventReceiverActor,
+  const TEventTypes extends ActorEventTypeTuple<TActor>,
 >(
-  actor: Actor,
-  eventTypes: EventReceivedTypes,
-): CurryEventReceivedP2<Actor, EventReceivedTypes>;
+  actor: TActor,
+  eventTypes: TEventTypes,
+): CurryEventReceivedP2<TActor, TEventTypes>;
 
 /**
  * Returns a function which runs an actor until it sends one or more events (in
  * order).
  *
- * @template Actor The type of `actor`
+ * @template TActor The type of `actor`
  * @param actor An XState `Actor` that can receive events
  * @returns A function which runs an actor until it sends one or more events (in
  *   order)
  */
-export function runUntilEventReceived<Actor extends AnyEventReceiverActor>(
-  actor: Actor,
-): CurryEventReceivedP1<Actor>;
+export function runUntilEventReceived<TActor extends AnyEventReceiverActor>(
+  actor: TActor,
+): CurryEventReceivedP1<TActor>;
 
 /**
  * Returns itself.
@@ -114,57 +115,57 @@ export function runUntilEventReceived<Actor extends AnyEventReceiverActor>(
 export function runUntilEventReceived(): CurryEventReceived;
 
 export function runUntilEventReceived<
-  Actor extends AnyEventReceiverActor,
-  const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
->(actor?: Actor, events?: EventReceivedTypes) {
+  TActor extends AnyEventReceiverActor,
+  const TEventTypes extends ActorEventTypeTuple<TActor>,
+>(actor?: TActor, events?: TEventTypes) {
   return runUntilEventReceived_(actor, events);
 }
 
 export function runUntilEventReceivedWith(): CurryEventReceivedWith;
 
-export function runUntilEventReceivedWith<Actor extends AnyEventReceiverActor>(
-  actor: Actor,
-): CurryEventReceivedWithP1<Actor>;
+export function runUntilEventReceivedWith<TActor extends AnyEventReceiverActor>(
+  actor: TActor,
+): CurryEventReceivedWithP1<TActor>;
 
-export function runUntilEventReceivedWith<Actor extends AnyEventReceiverActor>(
-  actor: Actor,
+export function runUntilEventReceivedWith<TActor extends AnyEventReceiverActor>(
+  actor: TActor,
   options: AuditionEventOptions,
-): CurryEventReceivedWithP2<Actor>;
+): CurryEventReceivedWithP2<TActor>;
 
 export function runUntilEventReceivedWith<
-  Actor extends AnyEventReceiverActor,
-  const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
+  TActor extends AnyEventReceiverActor,
+  const TEventTypes extends ActorEventTypeTuple<TActor>,
 >(
-  actor: Actor,
+  actor: TActor,
   options: AuditionOptions,
-  eventTypes: EventReceivedTypes,
-): CurryEventReceivedWithP3<Actor, EventReceivedTypes>;
+  eventTypes: TEventTypes,
+): CurryEventReceivedWithP3<TActor, TEventTypes>;
 
 export function runUntilEventReceivedWith<
-  Actor extends AnyEventReceiverActor,
-  const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
->(actor?: Actor, options?: AuditionOptions, events?: EventReceivedTypes) {
+  TActor extends AnyEventReceiverActor,
+  const TEventTypes extends ActorEventTypeTuple<TActor>,
+>(actor?: TActor, options?: AuditionOptions, events?: TEventTypes) {
   return runUntilEventReceivedWith_(actor, options, events);
 }
 
 export function waitForEventReceived(): CurryEventReceived;
 
-export function waitForEventReceived<Actor extends AnyEventReceiverActor>(
-  actor: Actor,
-): CurryEventReceivedP1<Actor>;
+export function waitForEventReceived<TActor extends AnyEventReceiverActor>(
+  actor: TActor,
+): CurryEventReceivedP1<TActor>;
 
 export function waitForEventReceived<
-  Actor extends AnyEventReceiverActor,
-  const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
+  TActor extends AnyEventReceiverActor,
+  const TEventTypes extends ActorEventTypeTuple<TActor>,
 >(
-  actor: Actor,
-  eventTypes: EventReceivedTypes,
-): CurryEventReceivedP2<Actor, EventReceivedTypes>;
+  actor: TActor,
+  eventTypes: TEventTypes,
+): CurryEventReceivedP2<TActor, TEventTypes>;
 
 export function waitForEventReceived<
-  Actor extends AnyEventReceiverActor,
-  const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
->(actor?: Actor, events?: EventReceivedTypes) {
+  TActor extends AnyEventReceiverActor,
+  const TEventTypes extends ActorEventTypeTuple<TActor>,
+>(actor?: TActor, events?: TEventTypes) {
   return waitForEventReceived_(actor, events);
 }
 
@@ -180,38 +181,38 @@ export function waitForEventReceivedWith(): CurryEventReceivedWith;
  * {@link ActorEventTypeTuple event types}, will waits until an XState `Actor`
  * receives one or more events (in order).
  *
- * @template Actor The type of `actor`
+ * @template TActor The type of `actor`
  * @param actor An XState `Actor` that can receive events
  * @returns Returns a function which, if provided
  *   {@link AuditionEventOptions options} and
  *   {@link ActorEventTypeTuple event types}, will waits until an XState `Actor`
  *   receives one or more events (in order).
  */
-export function waitForEventReceivedWith<Actor extends AnyEventReceiverActor>(
-  actor: Actor,
-): CurryEventReceivedWithP1<Actor>;
+export function waitForEventReceivedWith<TActor extends AnyEventReceiverActor>(
+  actor: TActor,
+): CurryEventReceivedWithP1<TActor>;
 
 /**
  * Returns a function which waits until an XState `Actor` receives one or more
  * events (in order).
  *
- * @template Actor The type of `actor`
+ * @template TActor The type of `actor`
  * @param actor An XState `Actor` that can receive events
  * @param options Options, including `otherActorId` which will filter on the
  *   sender
  * @returns A `Promise` fulfilling with the matching events (assuming they all
  *   occurred in order)
  */
-export function waitForEventReceivedWith<Actor extends AnyEventReceiverActor>(
-  actor: Actor,
+export function waitForEventReceivedWith<TActor extends AnyEventReceiverActor>(
+  actor: TActor,
   options: AuditionEventOptions,
-): CurryEventReceivedWithP2<Actor>;
+): CurryEventReceivedWithP2<TActor>;
 
 /**
  * Wait until an XState `Actor` receives one or more events (in order).
  *
- * @template Actor The type of `actor`
- * @template EventReceivedTypes The type of `eventTypes`
+ * @template TActor The type of `actor`
+ * @template TEventTypes The type of `eventTypes`
  * @param actor An XState `Actor` that can receive events
  * @param options Options, including `otherActorId` which will filter on the
  *   sender
@@ -221,38 +222,38 @@ export function waitForEventReceivedWith<Actor extends AnyEventReceiverActor>(
  *   occurred in order)
  */
 export function waitForEventReceivedWith<
-  Actor extends AnyEventReceiverActor,
-  const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
+  TActor extends AnyEventReceiverActor,
+  const TEventTypes extends ActorEventTypeTuple<TActor>,
 >(
-  actor: Actor,
+  actor: TActor,
   options: AuditionOptions,
-  eventTypes: EventReceivedTypes,
-): CurryEventReceivedWithP3<Actor, EventReceivedTypes>;
+  eventTypes: TEventTypes,
+): CurryEventReceivedWithP3<TActor, TEventTypes>;
 
 export function waitForEventReceivedWith<
-  Actor extends AnyEventReceiverActor,
-  const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
->(actor?: Actor, options?: AuditionOptions, events?: EventReceivedTypes) {
+  TActor extends AnyEventReceiverActor,
+  const TEventTypes extends ActorEventTypeTuple<TActor>,
+>(actor?: TActor, options?: AuditionOptions, events?: TEventTypes) {
   return waitForEventReceivedWith_(actor, options, events);
 }
 
 const createEventFn = (stop = false) => {
   const curryEvent = <
-    Actor extends AnyEventReceiverActor,
-    const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
+    TActor extends AnyEventReceiverActor,
+    const TEventTypes extends ActorEventTypeTuple<TActor>,
   >(
-    actor?: Actor,
-    events?: EventReceivedTypes,
+    actor?: TActor,
+    events?: TEventTypes,
   ) => {
     if (actor) {
       if (events) {
         return untilEventReceived(actor, {stop}, events);
       }
 
-      return ((events?: EventReceivedTypes) =>
+      return ((events?: TEventTypes) =>
         events
           ? curryEvent(actor, events)
-          : curryEvent(actor)) as CurryEventReceivedP1<Actor>;
+          : curryEvent(actor)) as CurryEventReceivedP1<TActor>;
     }
 
     return curryEvent as CurryEventReceived;
@@ -263,12 +264,12 @@ const createEventFn = (stop = false) => {
 
 const createEventReceivedWithFn = (stop = false) => {
   const curryEventReceivedWith = <
-    Actor extends AnyEventReceiverActor,
-    const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
+    TActor extends AnyEventReceiverActor,
+    const TEventTypes extends ActorEventTypeTuple<TActor>,
   >(
-    actor?: Actor,
+    actor?: TActor,
     options?: AuditionOptions,
-    events?: EventReceivedTypes,
+    events?: TEventTypes,
   ) => {
     if (actor) {
       if (options) {
@@ -283,14 +284,14 @@ const createEventReceivedWithFn = (stop = false) => {
           );
         }
 
-        return ((events?: EventReceivedTypes) => {
+        return ((events?: TEventTypes) => {
           return events
             ? curryEventReceivedWith(actor, options, events)
             : curryEventReceivedWith(actor, options);
-        }) as CurryEventReceivedWithP2<Actor>;
+        }) as CurryEventReceivedWithP2<TActor>;
       }
 
-      return ((options?: AuditionOptions, events?: EventReceivedTypes) => {
+      return ((options?: AuditionOptions, events?: TEventTypes) => {
         if (options) {
           return events
             ? curryEventReceivedWith(actor, options, events)
@@ -298,7 +299,7 @@ const createEventReceivedWithFn = (stop = false) => {
         }
 
         return curryEventReceivedWith(actor);
-      }) as CurryEventReceivedWithP1<Actor>;
+      }) as CurryEventReceivedWithP1<TActor>;
     }
 
     return curryEventReceivedWith as CurryEventReceivedWith;
@@ -308,13 +309,13 @@ const createEventReceivedWithFn = (stop = false) => {
 };
 
 const untilEventReceived = async <
-  Actor extends AnyEventReceiverActor,
-  const EventReceivedTypes extends ActorEventTypeTuple<Actor>,
+  TActor extends AnyEventReceiverActor,
+  const TEventTypes extends ActorEventTypeTuple<TActor>,
 >(
-  actor: Actor,
+  actor: TActor,
   options: InternalAuditionEventOptions,
-  eventTypes: EventReceivedTypes,
-): Promise<ActorEventTuple<Actor, EventReceivedTypes>> => {
+  eventTypes: TEventTypes,
+): Promise<ActorEventTuple<TActor, TEventTypes>> => {
   const {id} = actor;
 
   const opts = applyDefaults(options);
@@ -322,7 +323,7 @@ const untilEventReceived = async <
   const {inspector, otherActorId, stop, timeout} = opts;
 
   const {abortController, promise, reject, resolve} =
-    createAbortablePromiseKit<ActorEventTuple<Actor, EventReceivedTypes>>();
+    createAbortablePromiseKit<ActorEventTuple<TActor, TEventTypes>>();
 
   const inspectorObserver = xs.toObserver(inspector);
 
@@ -352,10 +353,10 @@ const untilEventReceived = async <
    */
   const matchesEventToActor = (
     evt: xs.InspectionEvent,
-    type: EventReceivedTypes[number],
+    type: TEventTypes[number],
   ): evt is xs.InspectedEventEvent =>
     isActorRef(evt.actorRef) &&
-    evt.type === '@xstate.event' &&
+    evt.type === XSTATE_EVENT &&
     type === evt.event.type &&
     evt.actorRef.id === id;
 
@@ -386,7 +387,7 @@ const untilEventReceived = async <
         return;
       }
 
-      if (evt.type === '@xstate.event' && expectedEventQueue.length) {
+      if (evt.type === XSTATE_EVENT && expectedEventQueue.length) {
         const type = head(expectedEventQueue);
 
         if (matchesEventToActor(evt, type)) {
@@ -395,7 +396,7 @@ const untilEventReceived = async <
             return;
           }
 
-          seenEvents.push(evt.event as EventFromEventType<Actor, typeof type>);
+          seenEvents.push(evt.event as EventFromEventType<TActor, typeof type>);
           expectedEventQueue.shift();
 
           if (!expectedEventQueue.length) {
@@ -423,7 +424,7 @@ const untilEventReceived = async <
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const seenEvents: ActorEventTuple<Actor, EventReceivedTypes> = [] as any;
+  const seenEvents: ActorEventTuple<TActor, TEventTypes> = [] as any;
 
   void xs.toPromise(actor).catch(reject);
   actor.start();

@@ -53,6 +53,12 @@ function assertNonEmptyArray<T>(arr: T[]): asserts arr is NonEmptyArray<T> {
   }
 }
 
+/**
+ * An inspection event which represents a "microstep"
+ *
+ * @remarks
+ * This type exists in the XState codebase, but is not exported.
+ */
 export type InspectedMicrostepEvent = {
   _transitions: AnyTransitionDefinition[];
   type: '@xstate.microstep';
