@@ -4,24 +4,24 @@
 
 **xstate-audition** is a _dependency-free_ library for testing the behavior of [XState Actors][].
 
-➡️ [**API Documentation**](https://boneskull.github.io/xstate-audition) |
+[**API Documentation**](https://boneskull.github.io/xstate-audition) |
 [**GitHub**](https://github.com/boneskull/xstate-audition) |
 [**npm**](https://npm.im/xstate-audition)
 
 ---
 
 - [Usage \& Examples](#usage--examples)
-  - [`runUntilDone(actorRef)`](#rununtildoneactorref)
-  - [`runUntilEmitted(actorRef, emittedTypes)`](#rununtilemittedactorref-emittedtypes)
-  - [`runUntilTransition(actorRef, fromStateId, toStateId)`](#rununtiltransitionactorref-fromstateid-tostateid)
-  - [`runUntilSnapshot(actorRef, predicate)`](#rununtilsnapshotactorref-predicate)
-  - [`runUntilSpawn(actorRef, childId)`](#rununtilspawnactorref-childid)
-  - [`runUntilEventReceived(actorRef, eventTypes)`](#rununtileventreceivedactorref-eventtypes)
+  - [`runUntilDone(actor)`](#rununtildoneactor)
+  - [`runUntilEmitted(actor, emittedTypes)`](#rununtilemittedactor-emittedtypes)
+  - [`runUntilTransition(actor, fromStateId, toStateId)`](#rununtiltransitionactor-fromstateid-tostateid)
+  - [`runUntilSnapshot(actor, predicate)`](#rununtilsnapshotactor-predicate)
+  - [`runUntilSpawn(actor, childId)`](#rununtilspawnactor-childid)
+  - [`runUntilEventReceived(actor, eventTypes)`](#rununtileventreceivedactor-eventtypes)
   - [`runUntilEventSent()`](#rununtileventsent)
   - [`createActorFromLogic(logic, options)`](#createactorfromlogiclogic-options)
   - [`createActorWith(options, logic)`](#createactorwithoptions-logic)
-  - [`patchActor(actorRef, options)`](#patchactoractorref-options)
-  - [`unpatchActor(actorRef)`](#unpatchactoractorref)
+  - [`patchActor(actor, options)`](#patchactoractor-options)
+  - [`unpatchActor(actor)`](#unpatchactoractor)
   - [`AuditionOptions`](#auditionoptions)
 - [Requirements](#requirements)
 - [Installation](#installation)
@@ -41,25 +41,25 @@
 4. Now, you can `await` the `Promise<T>` from step 2.
 5. Finally, make an assertion about `T`.
 
-### `runUntilDone(actorRef)`
+### `runUntilDone(actor)`
 
 _Run a Promise Actor or State Machine to Completion_
 
 #### API Docs
 
-- [`runUntilDone(actorRef)`](https://boneskull.github.io/xstate-audition/functions/runUntilDone.html)
-- [`runUntilDoneWith(actorRef, options)`](https://boneskull.github.io/xstate-audition/functions/runUntilDoneWith.html)
-- [`waitForDone(actorRef)`](https://boneskull.github.io/xstate-audition/functions/waitForDone.html)
-- [`waitForDoneWith(actorRef, options)`](https://boneskull.github.io/xstate-audition/functions/waitForDoneWith.html)
+- [`runUntilDone(actor)`](https://boneskull.github.io/xstate-audition/functions/runUntilDone.html)
+- [`runUntilDoneWith(actor, options)`](https://boneskull.github.io/xstate-audition/functions/runUntilDoneWith.html)
+- [`waitForDone(actor)`](https://boneskull.github.io/xstate-audition/functions/waitForDone.html)
+- [`waitForDoneWith(actor, options)`](https://boneskull.github.io/xstate-audition/functions/waitForDoneWith.html)
 
 #### Description
 
-`runUntilDone(actorRef)` / `runUntilDoneWith(actorRef, options)` are curried functions that will start a [Promise Actor][] or [State Machine Actor][] and run it until it reaches a final state. Once the `ActorRef` reaches a final state, it will immediately be stopped. The `Promise` will be resolved with the output of the `ActorRef`.
+`runUntilDone(actor)` / `runUntilDoneWith(actor, options)` are curried functions that will start a [Promise Actor][] or [State Machine Actor][] and run it until it reaches a final state. Once the `Actor` reaches a final state, it will immediately be stopped. The `Promise` will be resolved with the output of the `Actor`.
 
 > [!NOTE]
 >
 > - `runUntilDone()` is not significantly different than XState's `toPromise()`.
-> - `runUntilDoneWith()` may be used to overwrite the internal logger and/or add an inspector callback (or `Observer`) to an `ActorRef`.
+> - `runUntilDoneWith()` may be used to overwrite the internal logger and/or add an inspector callback (or `Observer`) to an `Actor`.
 > - _There is no such_ `waitForDone(...)` / `waitForDoneWith(...)` variant, since that would be silly.
 
 #### Example
@@ -111,7 +111,7 @@ describe('logic', () => {
 
   it('should abort when provided a too-short timeout', async () => {
     await assert.rejects(
-      runUntilDoneWith(actorRef, {timeout: 100}),
+      runUntilDoneWith(actor, {timeout: 100}),
       (err: Error) => {
         assert.equal(err.message, 'Actor did not complete in 100ms');
 
@@ -122,22 +122,22 @@ describe('logic', () => {
 });
 ```
 
-### `runUntilEmitted(actorRef, emittedTypes)`
+### `runUntilEmitted(actor, emittedTypes)`
 
 _Run a State Machine Until It Emits Events_
 
 #### API Docs
 
-- [`runUntilEmitted(actorRef, emittedTypes)`](https://boneskull.github.io/xstate-audition/functions/runUntilEmitted.html)
-- [`runUntilEmittedWith(actorRef, options, emittedTypes)`](https://boneskull.github.io/xstate-audition/functions/runUntilEmittedWith.html)
-- [`waitForEmitted(actorRef, emittedTypes)`](https://boneskull.github.io/xstate-audition/functions/waitForEmitted.html)
-- [`waitForEmittedWith(actorRef, options, emittedTypes)`](https://boneskull.github.io/xstate-audition/functions/waitForEmittedWith.html)
+- [`runUntilEmitted(actor, emittedTypes)`](https://boneskull.github.io/xstate-audition/functions/runUntilEmitted.html)
+- [`runUntilEmittedWith(actor, options, emittedTypes)`](https://boneskull.github.io/xstate-audition/functions/runUntilEmittedWith.html)
+- [`waitForEmitted(actor, emittedTypes)`](https://boneskull.github.io/xstate-audition/functions/waitForEmitted.html)
+- [`waitForEmittedWith(actor, options, emittedTypes)`](https://boneskull.github.io/xstate-audition/functions/waitForEmittedWith.html)
 
 #### Description
 
-`runUntilEmitted(actorRef, eventTypes)` / `runUntilEmittedWith(actorRef, options, eventTypes)` are curried function that will start an `ActorRef` and run it until emits one or more events of the specified `type`. Once the events have been emitted, the actor will immediately be stopped.
+`runUntilEmitted(actor, eventTypes)` / `runUntilEmittedWith(actor, options, eventTypes)` are curried function that will start an `Actor` and run it until emits one or more events of the specified `type`. Once the events have been emitted, the actor will immediately be stopped.
 
-`waitForEmitted(actorRef, eventTypes)` / `waitForEmittedWith(actorRef, options, eventTypes)` are similar, but do not stop the actor.
+`waitForEmitted(actor, eventTypes)` / `waitForEmittedWith(actor, options, eventTypes)` are similar, but do not stop the actor.
 
 > [!NOTE]
 >
@@ -191,22 +191,22 @@ describe('emitterMachine', () => {
 });
 ```
 
-### `runUntilTransition(actorRef, fromStateId, toStateId)`
+### `runUntilTransition(actor, fromStateId, toStateId)`
 
 _Run a State Machine Until It Transitions from One State to Another_
 
 #### API Docs
 
-- [`runUntilTransition(actorRef, fromStateId, toStateId)`](https://boneskull.github.io/xstate-audition/functions/runUntilTransition.html)
-- [`runUntilTransitionWith(actorRef, options, fromStateId, toStateId)`](https://boneskull.github.io/xstate-audition/functions/runUntilTransitionWith.html)
-- [`waitForTransition(actorRef, fromStateId, toStateId)`](https://boneskull.github.io/xstate-audition/functions/waitForTransition.html)
-- [`waitForTransitionWith(actorRef, options, fromStateId, toStateId)`](https://boneskull.github.io/xstate-audition/functions/waitForTransitionWith.html)
+- [`runUntilTransition(actor, fromStateId, toStateId)`](https://boneskull.github.io/xstate-audition/functions/runUntilTransition.html)
+- [`runUntilTransitionWith(actor, options, fromStateId, toStateId)`](https://boneskull.github.io/xstate-audition/functions/runUntilTransitionWith.html)
+- [`waitForTransition(actor, fromStateId, toStateId)`](https://boneskull.github.io/xstate-audition/functions/waitForTransition.html)
+- [`waitForTransitionWith(actor, options, fromStateId, toStateId)`](https://boneskull.github.io/xstate-audition/functions/waitForTransitionWith.html)
 
 #### Description
 
-`runUntilTransition(actorRef, fromStateId, toStateId)` / `runUntilTransitionWith(actorRef, options, fromStateId, toStateId)` are curried functions that will start an `ActorRef` and run it until it transitions from state with ID `fromStateId` to state with ID `toStateId`. Once the `ActorRef` transitions to the specified state, it will immediately be stopped.
+`runUntilTransition(actor, fromStateId, toStateId)` / `runUntilTransitionWith(actor, options, fromStateId, toStateId)` are curried functions that will start an `Actor` and run it until it transitions from state with ID `fromStateId` to state with ID `toStateId`. Once the `Actor` transitions to the specified state, it will immediately be stopped.
 
-`waitForTransition(actorRef, fromStateId, toStateId)` / `waitForStateWith(actorRef, options, fromStateId, toStateId)` are similar, but do not stop the `ActorRef`.
+`waitForTransition(actor, fromStateId, toStateId)` / `waitForStateWith(actor, options, fromStateId, toStateId)` are similar, but do not stop the `Actor`.
 
 #### Example
 
@@ -246,7 +246,7 @@ describe('transitionMachine', () => {
   beforeEach(() => {
     actor = createActor(transitionMachine);
     // curried
-    runWithFirst = runUntilTransition(actorRef, 'transitionMachine.first');
+    runWithFirst = runUntilTransition(actor, 'transitionMachine.first');
   });
 
   it('should transition from "first" to "second"', async () => {
@@ -259,20 +259,20 @@ describe('transitionMachine', () => {
 });
 ```
 
-### `runUntilSnapshot(actorRef, predicate)`
+### `runUntilSnapshot(actor, predicate)`
 
 _Run a Actor Until It Satisfies a Snapshot Predicate_
 
 #### API Docs
 
-- [`runUntilSnapshot(actorRef, predicate)`](https://boneskull.github.io/xstate-audition/functions/runUntilSnapshot.html)
-- [`runUntilSnapshotWith(actorRef, options, predicate)`](https://boneskull.github.io/xstate-audition/functions/runUntilSnapshotWith.html)
-- [`waitForSnapshot(actorRef, predicate)`](https://boneskull.github.io/xstate-audition/functions/waitForSnapshot.html)
-- [`waitForSnapshotWith(actorRef, options, predicate)`](https://boneskull.github.io/xstate-audition/functions/waitForSnapshotWith.html)
+- [`runUntilSnapshot(actor, predicate)`](https://boneskull.github.io/xstate-audition/functions/runUntilSnapshot.html)
+- [`runUntilSnapshotWith(actor, options, predicate)`](https://boneskull.github.io/xstate-audition/functions/runUntilSnapshotWith.html)
+- [`waitForSnapshot(actor, predicate)`](https://boneskull.github.io/xstate-audition/functions/waitForSnapshot.html)
+- [`waitForSnapshotWith(actor, options, predicate)`](https://boneskull.github.io/xstate-audition/functions/waitForSnapshotWith.html)
 
 #### Description
 
-`runUntilSnapshot(actorRef, predicate)` / `runUntilSnapshotWith(actorRef, options,  predicate)` are curried functions that will start an `ActorRef` and run it until the actor's [Snapshot][snapshot] satisfies `predicate` (which is the same type as the `predicate` parameter of [`xstate.waitFor()`][waitFor]). Once the snapshot matches the predicate, the actor will immediately be stopped.
+`runUntilSnapshot(actor, predicate)` / `runUntilSnapshotWith(actor, options,  predicate)` are curried functions that will start an `Actor` and run it until the actor's [Snapshot][snapshot] satisfies `predicate` (which is the same type as the `predicate` parameter of [`xstate.waitFor()`][waitFor]). Once the snapshot matches the predicate, the actor will immediately be stopped.
 
 > [!NOTE]
 >
@@ -329,7 +329,7 @@ describe('snapshotLogic', () => {
   it('should contain word "bar" in state "second"', async () => {
     const actor = createActor(snapshotLogic);
 
-    const snapshot = await runUntilSnapshot(actorRef, (snapshot) =>
+    const snapshot = await runUntilSnapshot(actor, (snapshot) =>
       snapshot.matches('second'),
     );
 
@@ -349,22 +349,22 @@ describe('snapshotLogic', () => {
 });
 ```
 
-### `runUntilSpawn(actorRef, childId)`
+### `runUntilSpawn(actor, childId)`
 
 _Run a State Machine Actor Until Its System Spawns a Child Actor_
 
 #### API Docs
 
-- [`runUntilSpawn(actorRef, childId)`](https://boneskull.github.io/xstate-audition/functions/runUntilSpawn.html)
-- [`runUntilSpawnWith(actorRef, options, childId)`](https://boneskull.github.io/xstate-audition/functions/runUntilSpawnWith.html)
-- [`waitForSpawn(actorRef, childId)`](https://boneskull.github.io/xstate-audition/functions/waitForSpawn.html)
-- [`waitForSpawnWith(actorRef, options, childId)`](https://boneskull.github.io/xstate-audition/functions/waitForSpawnWith.html)
+- [`runUntilSpawn(actor, childId)`](https://boneskull.github.io/xstate-audition/functions/runUntilSpawn.html)
+- [`runUntilSpawnWith(actor, options, childId)`](https://boneskull.github.io/xstate-audition/functions/runUntilSpawnWith.html)
+- [`waitForSpawn(actor, childId)`](https://boneskull.github.io/xstate-audition/functions/waitForSpawn.html)
+- [`waitForSpawnWith(actor, options, childId)`](https://boneskull.github.io/xstate-audition/functions/waitForSpawnWith.html)
 
 #### Description
 
-`runUntilSpawn(actorRef, childId)` / `runUntilSpawnWith(actorRef, options, childId)` are curried functions that will start an `ActorRef` and run it until it spawns a child `ActorRef` with `id` matching `childId` (which may be a `RegExp`). Once the child `ActorRef` is spawned, the `ActorRef` will immediately be stopped. The `Promise` will be resolved with a reference to the spawned `ActorRef` (an `AnyActorRef` by default).
+`runUntilSpawn(actor, childId)` / `runUntilSpawnWith(actor, options, childId)` are curried functions that will start an `Actor` and run it until it spawns a child `ActorRef` with `id` matching `childId` (which may be a `RegExp`). Once the child `ActorRef` is spawned, the `Actor` will immediately be stopped. The `Promise` will be resolved with a reference to the spawned `ActorRef` (an `AnyActorRef` by default).
 
-`waitForSpawn(actorRef, childId)` / `waitForSpawnWith(actorRef, options, childId)` are similar, but do not stop the actor.
+`waitForSpawn(actor, childId)` / `waitForSpawnWith(actor, options, childId)` are similar, but do not stop the actor.
 
 The root State Machine actor itself needn't spawn the child with the matching `id`, but _any_ `ActorRef` within the root actor's system may spawn the child.
 
@@ -428,26 +428,26 @@ describe('spawnerMachine', () => {
 });
 ```
 
-### `runUntilEventReceived(actorRef, eventTypes)`
+### `runUntilEventReceived(actor, eventTypes)`
 
 _Run an Actor Until It Receives an Event_
 
 #### API Docs
 
-- [`runUntilEventReceived(actorRef, eventTypes)`](https://boneskull.github.io/xstate-audition/functions/runUntilEventReceived.html)
-- [`runUntilEventReceivedWith(actorRef, options, eventTypes)`](https://boneskull.github.io/xstate-audition/functions/runUntilEventReceivedWith.html)
-- [`waitForEventReceived(actorRef, eventTypes)`](https://boneskull.github.io/xstate-audition/functions/waitForEventReceived.html)
-- [`waitForEventReceivedWith(actorRef, options, eventTypes)`](https://boneskull.github.io/xstate-audition/functions/waitForEventReceivedWith.html)
+- [`runUntilEventReceived(actor, eventTypes)`](https://boneskull.github.io/xstate-audition/functions/runUntilEventReceived.html)
+- [`runUntilEventReceivedWith(actor, options, eventTypes)`](https://boneskull.github.io/xstate-audition/functions/runUntilEventReceivedWith.html)
+- [`waitForEventReceived(actor, eventTypes)`](https://boneskull.github.io/xstate-audition/functions/waitForEventReceived.html)
+- [`waitForEventReceivedWith(actor, options, eventTypes)`](https://boneskull.github.io/xstate-audition/functions/waitForEventReceivedWith.html)
 
 #### Description
 
-`runUntilEventReceived(actorRef, eventTypes)` / `runUntilEventReceivedWith(actorRef, options, eventTypes)` are curried functions that will start a [State Machine Actor][], [Callback Actor][], or [Transition Actor][] and run it until it receives event(s) of the specified `type`. Once the event(s) are received, the actor will immediately be stopped. The `Promise` will be resolved with the received event(s).
+`runUntilEventReceived(actor, eventTypes)` / `runUntilEventReceivedWith(actor, options, eventTypes)` are curried functions that will start a [State Machine Actor][], [Callback Actor][], or [Transition Actor][] and run it until it receives event(s) of the specified `type`. Once the event(s) are received, the actor will immediately be stopped. The `Promise` will be resolved with the received event(s).
 
 `runUntilEventReceived()`'s `options` parameter accepts an `otherActorId` (`string` or `RegExp`) property. If set, this will ensure the event was _received from_ the actor with ID matching `otherActorId`.
 
-`withForEventReceived(actorRef, eventTypes)` / `waitForEventReceivedWith(actorRef, options, eventTypes)` are similar, but do not stop the actor.
+`withForEventReceived(actor, eventTypes)` / `waitForEventReceivedWith(actor, options, eventTypes)` are similar, but do not stop the actor.
 
-Usage is similar to [`runUntilEmitted()`](#rununtilemittedactorref-emittedtypes)—with the exception of the `otherActorId` property as described above.
+Usage is similar to [`runUntilEmitted()`](#rununtilemittedactor-emittedtypes)—with the exception of the `otherActorId` property as described above.
 
 ### `runUntilEventSent()`
 
@@ -455,20 +455,20 @@ _Run an Actor Until It Sends an Event_
 
 #### API Docs
 
-- [`runUntilEventSent(actorRef, eventTypes)`](https://boneskull.github.io/xstate-audition/functions/runUntilEventSent.html)
-- [`runUntilEventSentWith(actorRef, options, eventTypes)`](https://boneskull.github.io/xstate-audition/functions/runUntilEventSentWith.html)
-- [`waitForEventSent(actorRef, eventTypes)`](https://boneskull.github.io/xstate-audition/functions/waitForEventSent.html)
-- [`waitForEventSentWith(actorRef, options, eventTypes)`](https://boneskull.github.io/xstate-audition/functions/waitForEventSentWith.html)
+- [`runUntilEventSent(actor, eventTypes)`](https://boneskull.github.io/xstate-audition/functions/runUntilEventSent.html)
+- [`runUntilEventSentWith(actor, options, eventTypes)`](https://boneskull.github.io/xstate-audition/functions/runUntilEventSentWith.html)
+- [`waitForEventSent(actor, eventTypes)`](https://boneskull.github.io/xstate-audition/functions/waitForEventSent.html)
+- [`waitForEventSentWith(actor, options, eventTypes)`](https://boneskull.github.io/xstate-audition/functions/waitForEventSentWith.html)
 
 #### Description
 
-`runUntilEventSent(actorRef, eventTypes)` / `runUntilEventSentWith(actorRef, options, eventTypes)` are curried functions that will start an `ActorRef` and run it until it sends event(s) of the specified `type`. Once the event(s) are sent, the actor will immediately be stopped. The `Promise` will be resolved with the sent event(s).
+`runUntilEventSent(actor, eventTypes)` / `runUntilEventSentWith(actor, options, eventTypes)` are curried functions that will start an `Actor` and run it until it sends event(s) of the specified `type`. Once the event(s) are sent, the actor will immediately be stopped. The `Promise` will be resolved with the sent event(s).
 
 `runUntilEventSentWith()`'s `options` parameter accepts an `otherActorId` (`string` or `RegExp`) property. If set, this will ensure the event was _sent to_ the actor with ID matching `otherActorId`.
 
-`waitForEventSent(actorRef, eventTypes)` / `waitForEventSentWith(actorRef, options, eventTypes)` are similar, but do not stop the actor.
+`waitForEventSent(actor, eventTypes)` / `waitForEventSentWith(actor, options, eventTypes)` are similar, but do not stop the actor.
 
-Usage is similar to [`runUntilEmitted()`](#rununtilemittedactorref-emittedtypes)—with the exception of the `otherActorId` property as described above.
+Usage is similar to [`runUntilEmitted()`](#rununtilemittedactor-emittedtypes)—with the exception of the `otherActorId` property as described above.
 
 ### `createActorFromLogic(logic, options)`
 
@@ -490,12 +490,12 @@ See also [`createActorWith()`](#createactorwithoptions-logic).
 const createActor = createActorFromLogic(myLogic);
 
 it('should do x with input y', () => {
-  const actorRef = createActor({input: 'y'});
+  const actor = createActor({input: 'y'});
   // ...
 });
 
 it('should do x2 with input z', () => {
-  const actorRef = createActor({input: 'z'});
+  const actor = createActor({input: 'z'});
   // ...
 });
 ```
@@ -520,33 +520,33 @@ See also [`createActorFromLogic()`](#createactorfromlogiclogic-options).
 const createYActor = createActorWith({input: 'y'}});
 
 it('should do x with FooMachine', () => {
-  const actorRef = createYActor(fooMachine);
+  const actor = createYActor(fooMachine);
   // ...
 });
 
 it('should do x2 with BarMachine', () => {
-  const actorRef = createYActor(barMachine);
+  const actor = createYActor(barMachine);
   // ...
 });
 ```
 
-### `patchActor(actorRef, options)`
+### `patchActor(actor, options)`
 
 _Modify an Actor for Use with **xstate-audition**_
 
 #### API Docs
 
-- [`patchActor(actorRef, options)`](https://boneskull.github.io/xstate-audition/functions/patchActor.html)
+- [`patchActor(actor, options)`](https://boneskull.github.io/xstate-audition/functions/patchActor.html)
 
 This is used internally by all of the other curried functions to ~~violate~~ mutate existing actors. You shouldn't need to use it, but it's there if you want to.
 
-### `unpatchActor(actorRef)`
+### `unpatchActor(actor)`
 
 _Revert Modifications Made to an Actor by **xstate-audition**_
 
 #### API Docs
 
-- [`unpatchActor(actorRef)`](https://boneskull.github.io/xstate-audition/functions/unpatchActor.html)
+- [`unpatchActor(actor)`](https://boneskull.github.io/xstate-audition/functions/unpatchActor.html)
 
 #### Description
 
@@ -554,9 +554,9 @@ _Revert Modifications Made to an Actor by **xstate-audition**_
 >
 > _This function is experimental and may be removed in a future release._
 
-`unpatchActor(actorRef)` will "undo" what **xstate-inspector** did in [patchActor](#patchactoractorref-options).
+`unpatchActor(actor)` will "undo" what **xstate-inspector** did in [patchActor](#patchactoractor-options).
 
-If **xstate-audition** has never mutated the `ActorRef`, this function is a no-op.
+If **xstate-audition** has never mutated the `Actor`, this function is a no-op.
 
 ### `AuditionOptions`
 
@@ -609,7 +609,7 @@ npm install xstate-audition -D
 
 - All functions exposed by **xstate-audition**'s are curried. The final return type of each function is `Promise<T>`.
 - All functions ending in `With()` accept an [`AuditionOptions`](#auditionoptions) object as the _second_ argument. **If the function name doesn't end with `With()`, it does not accept an `AuditionOptions` object** (excepting [`createActorFromLogic`](#createactorfromlogiclogic-options)).
-- Any inspectors _already attached_ to an `ActorRef` provided to **xstate-audition** will be preserved.
+- Any inspectors _already attached_ to an `Actor` provided to **xstate-audition** will be preserved.
 - At this time, **xstate-audition** offers no mechanism to set global defaults for [`AuditionOptions`][AuditionOptions].
 
 ## License
@@ -628,6 +628,6 @@ _This project is not affiliated with nor endorsed by [Stately.ai](https://statel
 [XState actors]: https://stately.ai/docs/category/actors
 [snapshot]: https://stately.ai/docs/actors#actor-snapshots
 [AuditionOptions]: #auditionoptions
-[runUntilDone]: #rununtildoneactorref
+[runUntilDone]: #rununtildoneactor
 [boneskull]: https://github.com/boneskull
 [event-emitter]: https://stately.ai/docs/event-emitter
