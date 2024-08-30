@@ -101,7 +101,7 @@
     "prettier-plugin-organize-imports": "4.0.0",
     "prettier-plugin-pkg": "0.18.1",
     "tshy": "3.0.2",
-    "tsx": "4.18.0",
+    "tsx": "4.19.0",
     "typedoc": "0.26.6",
     "typedoc-github-theme": "0.1.2",
     "typescript": "5.5.4",
