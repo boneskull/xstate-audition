@@ -70,11 +70,13 @@ export default tseslint.config(
 
       '@stylistic/semi': ['error', 'always'],
 
+      // normalize type exports
       '@typescript-eslint/consistent-type-exports': [
         'error',
         {fixMixedExportsWithInlineTypeSpecifier: true},
       ],
 
+      // normalize type imports
       '@typescript-eslint/consistent-type-imports': [
         'error',
         {
@@ -87,21 +89,10 @@ export default tseslint.config(
       // and sometimes you gotta use any
       '@typescript-eslint/no-explicit-any': 'off',
 
-      // this rule seems broken
-      '@typescript-eslint/no-invalid-void-type': 'off',
-
       // HATE IT
       '@typescript-eslint/no-non-null-assertion': 'off',
-      '@typescript-eslint/no-unnecessary-boolean-literal-compare': [
-        'error',
-        {
-          allowComparingNullableBooleansToFalse: true,
-          allowComparingNullableBooleansToTrue: true,
-        },
-      ],
-      // too many false positives
-      '@typescript-eslint/no-unnecessary-condition': 'off',
 
+      // allow prefixing unused vars with _
       '@typescript-eslint/no-unused-vars': [
         'error',
         {
@@ -116,11 +107,9 @@ export default tseslint.config(
       // I like my template expressions
       '@typescript-eslint/restrict-template-expressions': 'off',
 
-      // this conflicts with eslint-plugin-perfectionist (just in case)
-      '@typescript-eslint/sort-type-constituents': 'off',
-
       '@typescript-eslint/switch-exhaustiveness-check': 'error',
 
+      // better for overloading
       '@typescript-eslint/unified-signatures': [
         'error',
         {
