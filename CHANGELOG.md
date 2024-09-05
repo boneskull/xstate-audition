@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.0.0](https://github.com/boneskull/xstate-audition/compare/xstate-audition-v1.2.0...xstate-audition-v2.0.0) (2024-09-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* Peer dependency on `xstate` increased from `>=v5.0.0` to `>=v5.14.0`.
+
+### Bug Fixes
+
+* add compat tests ([273920a](https://github.com/boneskull/xstate-audition/commit/273920a9ce35a5604ded7cb68a3b496143012de3))
+* **types:** normalize type arg names and XState imports ([44077d3](https://github.com/boneskull/xstate-audition/commit/44077d342ad26a4549c81b181849713e84fd11c6))
+
 ## [1.2.0](https://github.com/boneskull/xstate-audition/compare/xstate-audition-v1.1.0...xstate-audition-v1.2.0) (2024-08-20)
 
 
