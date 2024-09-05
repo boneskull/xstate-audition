@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
+// @ts-check
+
 import eslint from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
 import n from 'eslint-plugin-n';
@@ -27,7 +27,7 @@ export default tseslint.config(
   perfectionist.configs['recommended-natural'],
   ...tseslint.config({
     extends: tseslint.configs.recommendedTypeChecked,
-    files: ['**/*.js', '**/*.ts'],
+    files: ['**/*.ts', '**/*.mts', '**/*.cts'],
     languageOptions: {
       parserOptions: {
         projectService: {
@@ -119,7 +119,6 @@ export default tseslint.config(
 
       // seems to be incompatible with tshy
       'n/no-extraneous-import': 'off',
-
       'n/no-unpublished-import': 'off',
 
       'no-empty': [
