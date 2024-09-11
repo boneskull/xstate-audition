@@ -85,16 +85,16 @@ export function isInspectedMicrostepEvent(
  * @returns `true` if the value is an {@link AnyActorRef ActorRef}
  */
 export function isActorRef(value: unknown): value is AnyActorRef {
-  return Boolean(
+  return !!(
     value &&
-      typeof value === 'object' &&
-      'id' in value &&
-      value.id &&
-      'sessionId' in value &&
-      value.sessionId &&
-      'getSnapshot' in value &&
-      typeof value.getSnapshot === 'function' &&
-      'send' in value &&
-      typeof value.send === 'function',
+    typeof value === 'object' &&
+    'id' in value &&
+    value.id &&
+    'sessionId' in value &&
+    value.sessionId &&
+    'getSnapshot' in value &&
+    typeof value.getSnapshot === 'function' &&
+    'send' in value &&
+    typeof value.send === 'function'
   );
 }

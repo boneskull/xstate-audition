@@ -404,10 +404,9 @@ const untilTransition = <TActor extends AnyStateMachineActor>(
     targetId: string,
     {_transitions: transitions}: InspectedMicrostepEvent,
   ) =>
-    transitions.some(({source, target}) =>
-      Boolean(
-        source.id === sourceId && target?.some(({id}) => id === targetId),
-      ),
+    transitions.some(
+      ({source, target}) =>
+        !!(source.id === sourceId && target?.some(({id}) => id === targetId)),
     );
 
   const {abortController, promise, reject, resolve} =
