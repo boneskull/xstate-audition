@@ -1,6 +1,5 @@
 #!/usr/bin/env tsx
 
-import {setMaxListeners} from 'node:events';
 import {parse} from 'semver';
 import {$} from 'zx';
 
@@ -19,8 +18,6 @@ import {$} from 'zx';
  *
  * @packageDocumentation
  */
-// zx doesn't dispose its signal listeners, apparently
-setMaxListeners(30);
 
 /**
  * The known minimum version of `xstate` that works with `xstate-audition`.
