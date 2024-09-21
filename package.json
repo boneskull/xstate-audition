@@ -90,7 +90,7 @@
     "@types/node": "20.16.5",
     "@types/semver": "7.5.8",
     "c8": "10.1.2",
-    "cspell": "8.14.3",
+    "cspell": "8.14.4",
     "eslint": "9.10.0",
     "eslint-plugin-n": "17.10.3",
     "eslint-plugin-perfectionist": "3.6.0",
