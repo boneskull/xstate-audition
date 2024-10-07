@@ -22,16 +22,16 @@ import {
 export type CurryTransition = (() => CurryTransition) &
   (<TActor extends AnyStateMachineActor>(
     actor: TActor,
-    source: string,
-    target: string,
-  ) => CurryTransitionP3) &
+  ) => CurryTransitionP1<TActor>) &
   (<TActor extends AnyStateMachineActor>(
     actor: TActor,
     source: string,
   ) => CurryTransitionP2<TActor>) &
   (<TActor extends AnyStateMachineActor>(
     actor: TActor,
-  ) => CurryTransitionP1<TActor>);
+    source: string,
+    target: string,
+  ) => CurryTransitionP3);
 
 export type CurryTransitionP1<TActor extends AnyStateMachineActor> =
   (() => CurryTransitionP1<TActor>) &
@@ -60,10 +60,11 @@ export type CurryTransitionP3 = Promise<void>;
 export type CurryTransitionWith = (() => CurryTransitionWith) &
   (<TActor extends AnyStateMachineActor>(
     actor: TActor,
+  ) => CurryTransitionWithP1<TActor>) &
+  (<TActor extends AnyStateMachineActor>(
+    actor: TActor,
     options: AuditionOptions,
-    source: string,
-    target: string,
-  ) => CurryTransitionWithP4) &
+  ) => CurryTransitionWithP2<TActor>) &
   (<TActor extends AnyStateMachineActor>(
     actor: TActor,
     options: AuditionOptions,
@@ -72,32 +73,31 @@ export type CurryTransitionWith = (() => CurryTransitionWith) &
   (<TActor extends AnyStateMachineActor>(
     actor: TActor,
     options: AuditionOptions,
-  ) => CurryTransitionWithP2<TActor>) &
-  (<TActor extends AnyStateMachineActor>(
-    actor: TActor,
-  ) => CurryTransitionWithP1<TActor>);
+    source: string,
+    target: string,
+  ) => CurryTransitionWithP4);
 
 // conflict with eslint-plugin-perfectionist
 // prettier-ignore
 export type CurryTransitionWithP1<TActor extends AnyStateMachineActor> =
+  & (() => CurryTransitionWithP1<TActor>)
+  & ((options: AuditionOptions) => CurryTransitionWithP2<TActor>)
+  & ((options: AuditionOptions, source: string) => CurryTransitionWithP3<TActor>)
   & ((
       options: AuditionOptions,
       source: string,
       target: string,
-    ) => CurryTransitionWithP4)
-  & (() => CurryTransitionWithP1<TActor>)
-  & ((options: AuditionOptions) => CurryTransitionWithP2<TActor>)
-  & ((options: AuditionOptions, source: string) => CurryTransitionWithP3<TActor>);
+    ) => CurryTransitionWithP4);
 
 // conflict with eslint-plugin-perfectionist
 // prettier-ignore
 export type CurryTransitionWithP2<TActor extends AnyStateMachineActor> =
+  & (() => CurryTransitionWithP2<TActor>)
+  & ((source: string) => CurryTransitionWithP3<TActor>)
   & ((
       source: string,
       target: string,
-    ) => CurryTransitionWithP4)
-  & (() => CurryTransitionWithP2<TActor>)
-  & ((source: string) => CurryTransitionWithP3<TActor>);
+    ) => CurryTransitionWithP4);
 
 export type CurryTransitionWithP3<TActor extends AnyStateMachineActor> =
   (() => CurryTransitionWithP3<TActor>) &

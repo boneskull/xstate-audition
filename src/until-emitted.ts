@@ -59,20 +59,19 @@ export type CurryEmittedWith = (() => CurryEmittedWith) &
   ) => Promise<ActorEmittedTuple<TActor, TEmittedTypes>>) &
   (<TActor extends AnyStateMachineActor>(
     actor: TActor,
-    options: AuditionOptions,
-  ) => CurryEmittedWithP2<TActor>) &
+  ) => CurryEmittedWithP1<TActor>) &
   (<TActor extends AnyStateMachineActor>(
     actor: TActor,
-  ) => CurryEmittedWithP1<TActor>);
-
-export type CurryEmittedWithP1<TActor extends AnyStateMachineActor> = ((
-  options: AuditionOptions,
-) => CurryEmittedWithP2<TActor>) &
-  (() => CurryEmittedWithP1<TActor>) &
-  (<const TEmittedTypes extends ActorEmittedTypeTuple<TActor>>(
     options: AuditionOptions,
-    emittedTypes: TEmittedTypes,
-  ) => Promise<ActorEmittedTuple<TActor, TEmittedTypes>>);
+  ) => CurryEmittedWithP2<TActor>);
+
+export type CurryEmittedWithP1<TActor extends AnyStateMachineActor> =
+  (() => CurryEmittedWithP1<TActor>) &
+    ((options: AuditionOptions) => CurryEmittedWithP2<TActor>) &
+    (<const TEmittedTypes extends ActorEmittedTypeTuple<TActor>>(
+      options: AuditionOptions,
+      emittedTypes: TEmittedTypes,
+    ) => Promise<ActorEmittedTuple<TActor, TEmittedTypes>>);
 
 export type CurryEmittedWithP2<TActor extends AnyStateMachineActor> =
   (() => CurryEmittedWithP2<TActor>) &

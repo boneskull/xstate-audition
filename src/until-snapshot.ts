@@ -12,16 +12,17 @@ import {
 export type CurrySnapshot = (() => CurrySnapshot) &
   (<TActor extends AnySnapshotEmitterActor>(
     actor: TActor,
-    predicate: SnapshotPredicate<TActor['logic']>,
-  ) => CurrySnapshotP2<TActor>) &
+  ) => CurrySnapshotP1<TActor>) &
   (<TActor extends AnySnapshotEmitterActor>(
     actor: TActor,
-  ) => CurrySnapshotP1<TActor>);
+    predicate: SnapshotPredicate<TActor['logic']>,
+  ) => CurrySnapshotP2<TActor>);
 
-export type CurrySnapshotP1<TActor extends AnySnapshotEmitterActor> = ((
-  predicate: SnapshotPredicate<TActor['logic']>,
-) => CurrySnapshotP2<TActor>) &
-  (() => CurrySnapshotP1<TActor>);
+export type CurrySnapshotP1<TActor extends AnySnapshotEmitterActor> =
+  (() => CurrySnapshotP1<TActor>) &
+    ((
+      predicate: SnapshotPredicate<TActor['logic']>,
+    ) => CurrySnapshotP2<TActor>);
 
 export type CurrySnapshotP2<TActor extends AnySnapshotEmitterActor> = Promise<
   xs.SnapshotFrom<TActor['logic']>
@@ -30,26 +31,26 @@ export type CurrySnapshotP2<TActor extends AnySnapshotEmitterActor> = Promise<
 export type CurrySnapshotWith = (() => CurrySnapshotWith) &
   (<TActor extends AnySnapshotEmitterActor>(
     actor: TActor,
-    predicate: SnapshotPredicate<TActor['logic']>,
-    options: AuditionOptions,
-  ) => CurrySnapshotWithP3<TActor>) &
+  ) => CurrySnapshotWithP1<TActor>) &
   (<TActor extends AnySnapshotEmitterActor>(
     actor: TActor,
     predicate: SnapshotPredicate<TActor['logic']>,
   ) => CurrySnapshotWithP2<TActor>) &
   (<TActor extends AnySnapshotEmitterActor>(
     actor: TActor,
-  ) => CurrySnapshotWithP1<TActor>);
+    predicate: SnapshotPredicate<TActor['logic']>,
+    options: AuditionOptions,
+  ) => CurrySnapshotWithP3<TActor>);
 
 // prettier-ignore
-export type CurrySnapshotWithP1<TActor extends AnySnapshotEmitterActor> = ((
+export type CurrySnapshotWithP1<TActor extends AnySnapshotEmitterActor> = (() => CurrySnapshotWithP1<TActor>) &
+  ((
     predicate: SnapshotPredicate<TActor['logic']>,
   ) => CurrySnapshotWithP2<TActor>) &
   ((
   predicate: SnapshotPredicate<TActor['logic']>,
   options: AuditionOptions,
-) => CurrySnapshotWithP3<TActor>) &
-  (() => CurrySnapshotWithP1<TActor>);
+) => CurrySnapshotWithP3<TActor>);
 
 export type CurrySnapshotWithP2<TActor extends AnySnapshotEmitterActor> =
   (() => CurrySnapshotWithP2<TActor>) &

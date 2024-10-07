@@ -16,11 +16,11 @@ export type SpawnTarget = RegExp | string;
 export type CurrySpawn = (() => CurrySpawn) &
   (<TLogic extends xs.AnyActorLogic>(
     actor: AnyStateMachineActor,
-    target: SpawnTarget,
-  ) => CurrySpawnP2<TLogic>) &
+  ) => CurrySpawnP1<TLogic>) &
   (<TLogic extends xs.AnyActorLogic>(
     actor: AnyStateMachineActor,
-  ) => CurrySpawnP1<TLogic>);
+    target: SpawnTarget,
+  ) => CurrySpawnP2<TLogic>);
 
 export type CurrySpawnP1<TLogic extends xs.AnyActorLogic> =
   (() => CurrySpawnP1<TLogic>) &
@@ -33,23 +33,24 @@ export type CurrySpawnP2<TLogic extends xs.AnyActorLogic> = Promise<
 export type CurrySpawnWith = (() => CurrySpawnWith) &
   (<TLogic extends xs.AnyActorLogic>(
     actor: AnyStateMachineActor,
-    options: AuditionOptions,
-    target: SpawnTarget,
-  ) => CurrySpawnWithP3<TLogic>) &
+  ) => CurrySpawnWithP1<TLogic>) &
   (<TLogic extends xs.AnyActorLogic>(
     actor: AnyStateMachineActor,
     options: AuditionOptions,
   ) => CurrySpawnWithP2<TLogic>) &
   (<TLogic extends xs.AnyActorLogic>(
     actor: AnyStateMachineActor,
-  ) => CurrySpawnWithP1<TLogic>);
+    options: AuditionOptions,
+    target: SpawnTarget,
+  ) => CurrySpawnWithP3<TLogic>);
 
-export type CurrySpawnWithP1<TLogic extends xs.AnyActorLogic> = ((
-  options: AuditionOptions,
-  target: SpawnTarget,
-) => CurrySpawnWithP3<TLogic>) &
+export type CurrySpawnWithP1<TLogic extends xs.AnyActorLogic> =
   (() => CurrySpawnWithP1<TLogic>) &
-  ((options: AuditionOptions) => CurrySpawnWithP2<TLogic>);
+    ((options: AuditionOptions) => CurrySpawnWithP2<TLogic>) &
+    ((
+      options: AuditionOptions,
+      target: SpawnTarget,
+    ) => CurrySpawnWithP3<TLogic>);
 
 export type CurrySpawnWithP2<TLogic extends xs.AnyActorLogic> =
   (() => CurrySpawnWithP2<TLogic>) &

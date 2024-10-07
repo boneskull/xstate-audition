@@ -23,30 +23,28 @@ export type CreateActorOptions<TLogic extends xs.AnyActorLogic> =
 export type CurryCreateActorFromLogic = (() => CurryCreateActorFromLogic) &
   (<TLogic extends xs.AnyActorLogic>(
     logic: TLogic,
-    options: CreateActorOptions<TLogic>,
-  ) => xs.Actor<TLogic>) &
+  ) => CurryCreateActorFromLogicP1<TLogic>) &
   (<TLogic extends xs.AnyActorLogic>(
     logic: TLogic,
-  ) => CurryCreateActorFromLogicP1<TLogic>);
+    options: CreateActorOptions<TLogic>,
+  ) => xs.Actor<TLogic>);
 
-export type CurryCreateActorFromLogicP1<TLogic extends xs.AnyActorLogic> = ((
-  options: CreateActorOptions<TLogic>,
-) => xs.Actor<TLogic>) &
-  (() => CurryCreateActorFromLogicP1<TLogic>);
+export type CurryCreateActorFromLogicP1<TLogic extends xs.AnyActorLogic> =
+  (() => CurryCreateActorFromLogicP1<TLogic>) &
+    ((options: CreateActorOptions<TLogic>) => xs.Actor<TLogic>);
 
 export type CurryCreateActorWith = (() => CurryCreateActorWith) &
   (<TLogic extends xs.AnyActorLogic>(
     options: CreateActorOptions<TLogic>,
-    logic: TLogic,
-  ) => xs.Actor<TLogic>) &
+  ) => CurryCreateActorWithP1<TLogic>) &
   (<TLogic extends xs.AnyActorLogic>(
     options: CreateActorOptions<TLogic>,
-  ) => CurryCreateActorWithP1<TLogic>);
+    logic: TLogic,
+  ) => xs.Actor<TLogic>);
 
-export type CurryCreateActorWithP1<TLogic extends xs.AnyActorLogic> = ((
-  logic: TLogic,
-) => xs.Actor<TLogic>) &
-  (() => CurryCreateActorWithP1<TLogic>);
+export type CurryCreateActorWithP1<TLogic extends xs.AnyActorLogic> =
+  (() => CurryCreateActorWithP1<TLogic>) &
+    ((logic: TLogic) => xs.Actor<TLogic>);
 
 /**
  * Returns itself
