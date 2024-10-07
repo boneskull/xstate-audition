@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/boneskull/xstate-audition/compare/xstate-audition-v2.0.0...xstate-audition-v2.0.1) (2024-10-07)
+
+
+### Bug Fixes
+
+* compatibility with XState v5.18.2 ([7945ebb](https://github.com/boneskull/xstate-audition/commit/7945ebbcc669610dd251afbbc2e9f511116d9127))
+
 ## [2.0.0](https://github.com/boneskull/xstate-audition/compare/xstate-audition-v1.2.0...xstate-audition-v2.0.0) (2024-09-05)
 
 
