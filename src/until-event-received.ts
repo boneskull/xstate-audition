@@ -339,7 +339,8 @@ const untilEventReceived = async <
    * matches the target.
    */
   const matchesTarget = otherActorId
-    ? (actorRef?: xs.AnyActorRef) => actorRef?.id === otherActorId
+    ? (actorRef?: xs.ActorRefLike) =>
+        isActorRef(actorRef) && actorRef.id === otherActorId
     : () => true;
 
   /**
