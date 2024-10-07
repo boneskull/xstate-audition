@@ -404,9 +404,12 @@ const untilEventSent = async <
     evt: xs.InspectionEvent,
     type: TEventTypes[number],
   ): evt is xs.InspectedEventEvent =>
-    evt.type === XSTATE_EVENT &&
-    evt.sourceRef?.id === id &&
-    type === evt.event.type;
+    !!(
+      evt.type === XSTATE_EVENT &&
+      isActorRef(evt.sourceRef) &&
+      evt.sourceRef.id === id &&
+      type === evt.event.type
+    );
 
   const eventSentInspector: xs.Observer<xs.InspectionEvent> = {
     complete: () => {
