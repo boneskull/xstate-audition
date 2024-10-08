@@ -119,6 +119,7 @@ export default tseslint.config(
 
       // seems to be incompatible with tshy
       'n/no-extraneous-import': 'off',
+
       'n/no-unpublished-import': 'off',
 
       'no-empty': [
@@ -129,6 +130,20 @@ export default tseslint.config(
       ],
 
       'no-use-before-define': 'off',
+
+      'perfectionist/sort-intersection-types': [
+        'error',
+        {
+          type: 'line-length',
+        },
+      ],
+
+      'perfectionist/sort-union-types': [
+        'error',
+        {
+          type: 'line-length',
+        },
+      ],
     },
   }),
   {

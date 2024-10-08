@@ -32,7 +32,7 @@ export type AbortablePromiseKit<T> = {
    *
    * @param value Whatever `promise` should resolve with
    */
-  resolve: (value: PromiseLike<T> | T) => void;
+  resolve: (value: T | PromiseLike<T>) => void;
 };
 
 /**
@@ -79,7 +79,7 @@ export function createAbortablePromiseKit<T>(
 
   const {signal} = abortController;
 
-  let resolve!: (value: PromiseLike<T> | T) => void;
+  let resolve!: (value: T | PromiseLike<T>) => void;
 
   let reject!: (reason: unknown) => void;
 

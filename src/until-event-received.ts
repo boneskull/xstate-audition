@@ -17,16 +17,16 @@ import {
 import {head, isActorRef} from './util.js';
 
 export type CurryEventReceived = (() => CurryEventReceived) &
+  (<TActor extends AnyEventReceiverActor>(
+    actor: TActor,
+  ) => CurryEventReceivedP1<TActor>) &
   (<
     TActor extends AnyEventReceiverActor,
     const TEventTypes extends ActorEventTypeTuple<TActor>,
   >(
     actor: TActor,
     eventTypes: TEventTypes,
-  ) => CurryEventReceivedP2<TActor, TEventTypes>) &
-  (<TActor extends AnyEventReceiverActor>(
-    actor: TActor,
-  ) => CurryEventReceivedP1<TActor>);
+  ) => CurryEventReceivedP2<TActor, TEventTypes>);
 
 export type CurryEventReceivedP1<TActor extends AnyEventReceiverActor> =
   (() => CurryEventReceivedP1<TActor>) &
@@ -40,6 +40,13 @@ export type CurryEventReceivedP2<
 > = Promise<ActorEventTuple<TActor, TEventTypes>>;
 
 export type CurryEventReceivedWith = (() => CurryEventReceivedWith) &
+  (<TActor extends AnyEventReceiverActor>(
+    actor: TActor,
+  ) => CurryEventReceivedWithP1<TActor>) &
+  (<TActor extends AnyEventReceiverActor>(
+    actor: TActor,
+    options: AuditionEventOptions,
+  ) => CurryEventReceivedWithP2<TActor>) &
   (<
     TActor extends AnyEventReceiverActor,
     const TEventTypes extends ActorEventTypeTuple<TActor>,
@@ -47,14 +54,7 @@ export type CurryEventReceivedWith = (() => CurryEventReceivedWith) &
     actor: TActor,
     options: AuditionOptions,
     eventTypes: TEventTypes,
-  ) => CurryEventReceivedWithP3<TActor, TEventTypes>) &
-  (<TActor extends AnyEventReceiverActor>(
-    actor: TActor,
-    options: AuditionEventOptions,
-  ) => CurryEventReceivedWithP2<TActor>) &
-  (<TActor extends AnyEventReceiverActor>(
-    actor: TActor,
-  ) => CurryEventReceivedWithP1<TActor>);
+  ) => CurryEventReceivedWithP3<TActor, TEventTypes>);
 
 export type CurryEventReceivedWithP1<TActor extends AnyEventReceiverActor> =
   (() => CurryEventReceivedWithP1<TActor>) &

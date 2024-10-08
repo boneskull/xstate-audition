@@ -31,16 +31,16 @@ export type ActorEmittedTypeTuple<TActor extends AnyStateMachineActor> =
   ReadableArray<[ActorEmittedType<TActor>, ...ActorEmittedType<TActor>[]]>;
 
 export type CurryEmitted = (() => CurryEmitted) &
+  (<TActor extends AnyStateMachineActor>(
+    actor: TActor,
+  ) => CurryEmittedP1<TActor>) &
   (<
     TActor extends AnyStateMachineActor,
     const TEmittedTypes extends Readonly<ActorEmittedTypeTuple<TActor>>,
   >(
     actor: TActor,
     emittedTypes: TEmittedTypes,
-  ) => Promise<ActorEmittedTuple<TActor, TEmittedTypes>>) &
-  (<TActor extends AnyStateMachineActor>(
-    actor: TActor,
-  ) => CurryEmittedP1<TActor>);
+  ) => Promise<ActorEmittedTuple<TActor, TEmittedTypes>>);
 
 export type CurryEmittedP1<TActor extends AnyStateMachineActor> =
   (() => CurryEmittedP1<TActor>) &
@@ -49,6 +49,13 @@ export type CurryEmittedP1<TActor extends AnyStateMachineActor> =
     ) => Promise<ActorEmittedTuple<TActor, TEmittedTypes>>);
 
 export type CurryEmittedWith = (() => CurryEmittedWith) &
+  (<TActor extends AnyStateMachineActor>(
+    actor: TActor,
+  ) => CurryEmittedWithP1<TActor>) &
+  (<TActor extends AnyStateMachineActor>(
+    actor: TActor,
+    options: AuditionOptions,
+  ) => CurryEmittedWithP2<TActor>) &
   (<
     TActor extends AnyStateMachineActor,
     const TEmittedTypes extends ActorEmittedTypeTuple<TActor>,
@@ -56,14 +63,7 @@ export type CurryEmittedWith = (() => CurryEmittedWith) &
     actor: TActor,
     options: AuditionOptions,
     emittedTypes: TEmittedTypes,
-  ) => Promise<ActorEmittedTuple<TActor, TEmittedTypes>>) &
-  (<TActor extends AnyStateMachineActor>(
-    actor: TActor,
-    options: AuditionOptions,
-  ) => CurryEmittedWithP2<TActor>) &
-  (<TActor extends AnyStateMachineActor>(
-    actor: TActor,
-  ) => CurryEmittedWithP1<TActor>);
+  ) => Promise<ActorEmittedTuple<TActor, TEmittedTypes>>);
 
 export type CurryEmittedWithP1<TActor extends AnyStateMachineActor> =
   (() => CurryEmittedWithP1<TActor>) &

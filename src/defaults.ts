@@ -18,7 +18,7 @@ import {DEFAULT_TIMEOUT} from './util.js';
  */
 export function applyDefaults<T extends AuditionOptions>(
   options?: T,
-): {timeout: number} & AuditionOptions & Omit<T, keyof AuditionOptions> {
+): AuditionOptions & {timeout: number} & Omit<T, keyof AuditionOptions> {
   const {inspector, logger, timeout = DEFAULT_TIMEOUT, ...rest} = options ?? {};
 
   const extra = rest as Omit<T, keyof AuditionOptions>;

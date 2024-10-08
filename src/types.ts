@@ -43,9 +43,9 @@ export type AnySnapshotEmitterActor = xs.Actor<AnySnapshotEmitterLogic>;
 
 export type AnyStateMachineActor = xs.Actor<xs.AnyStateMachine>;
 
-export type AuditionEventOptions = {
+export type AuditionEventOptions = AuditionOptions & {
   otherActorId?: RegExp | string;
-} & AuditionOptions;
+};
 
 /**
  * Options for all `*With()` functions
@@ -105,12 +105,12 @@ export type InternalAuditionEventOptions = AuditionEventOptions &
  *
  * @internal
  */
-export type InternalAuditionOptions = {
+export type InternalAuditionOptions = AuditionOptions & {
   /**
    * If `true`, the actor will be stopped after a successful operation
    */
   stop: boolean;
-} & AuditionOptions;
+};
 
 /**
  * A logger function for an XState Actor
@@ -120,7 +120,7 @@ export type LoggerFn = NonNullable<xs.ActorOptions<any>['logger']>;
 /**
  * An array or tuple which is either readonly or mutable
  */
-export type ReadableArray<T extends readonly any[]> = Readonly<T> | T;
+export type ReadableArray<T extends readonly any[]> = T | Readonly<T>;
 
 /**
  * Any actor logic that can receive events
@@ -128,8 +128,8 @@ export type ReadableArray<T extends readonly any[]> = Readonly<T> | T;
  * @see {@link https://stately.ai/docs/actors#actor-logic-capabilities}
  */
 export type AnyEventReceiverLogic =
-  | AnyStateMachineLogic
   | SomeTransitionLogic
+  | AnyStateMachineLogic
   | xs.ActorLogic<xs.CallbackSnapshot<any>, any, any, any, any>;
 
 /**
