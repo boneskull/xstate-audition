@@ -50,11 +50,11 @@ export type CurryEventReceivedWith = (() => CurryEventReceivedWith) &
   ) => CurryEventReceivedWithP3<TActor, TEventTypes>) &
   (<TActor extends AnyEventReceiverActor>(
     actor: TActor,
-  ) => CurryEventReceivedWithP1<TActor>) &
+    options: AuditionEventOptions,
+  ) => CurryEventReceivedWithP2<TActor>) &
   (<TActor extends AnyEventReceiverActor>(
     actor: TActor,
-    options: AuditionEventOptions,
-  ) => CurryEventReceivedWithP2<TActor>);
+  ) => CurryEventReceivedWithP1<TActor>);
 
 export type CurryEventReceivedWithP1<TActor extends AnyEventReceiverActor> =
   (() => CurryEventReceivedWithP1<TActor>) &
