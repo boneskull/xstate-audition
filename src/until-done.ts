@@ -25,11 +25,11 @@ export type CurryDoneWith =
   | (() => CurryDoneWith)
   | (<Actor extends AnyTerminalActor, Output extends xs.OutputFrom<Actor>>(
       actor: Actor,
-    ) => CurryDoneWithP1<Actor, Output>)
+      options: AuditionOptions,
+    ) => CurryDoneWithP2<Actor, Output>)
   | (<Actor extends AnyTerminalActor, Output extends xs.OutputFrom<Actor>>(
       actor: Actor,
-      options: AuditionOptions,
-    ) => CurryDoneWithP2<Actor, Output>);
+    ) => CurryDoneWithP1<Actor, Output>);
 
 export type CurryDoneWithP1<
   Actor extends AnyTerminalActor,
