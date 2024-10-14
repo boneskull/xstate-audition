@@ -79,7 +79,7 @@
     "test:types": "tsc -p tsconfig.tsc.json"
   },
   "peerDependencies": {
-    "xstate": ">=5.14.0"
+    "xstate": ">=5.17.4"
   },
   "devDependencies": {
     "@commitlint/cli": "19.5.0",
