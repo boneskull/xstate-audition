@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/boneskull/xstate-audition/compare/xstate-audition-v2.0.1...xstate-audition-v3.0.0) (2024-10-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* **pkg:** This package now has a peer dependency of `xstate@5.17.4` or newer.
+
+### Bug Fixes
+
+* **pkg:** update peer dependency ([9c84904](https://github.com/boneskull/xstate-audition/commit/9c849046aa7277befb07bad7a3134a68cd9e179e))
+
 ## [2.0.1](https://github.com/boneskull/xstate-audition/compare/xstate-audition-v2.0.0...xstate-audition-v2.0.1) (2024-10-07)
 
 
