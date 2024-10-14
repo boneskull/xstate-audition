@@ -1,8 +1,4 @@
 #!/usr/bin/env tsx
-
-import {parse} from 'semver';
-import {$} from 'zx';
-
 /**
  * This script runs the test suite against all versions of `xstate` greater than
  * or equal to the {@link KNOWN_MINIMUM known minimum version}.
@@ -19,10 +15,15 @@ import {$} from 'zx';
  * @packageDocumentation
  */
 
+import {minVersion, parse, Range} from 'semver';
+import {$, type ProcessOutput} from 'zx';
+
+import {peerDependencies} from '../package.json' with {type: 'json'};
+
 /**
  * The known minimum version of `xstate` that works with `xstate-audition`.
  */
-const KNOWN_MINIMUM = '5.14.0';
+const KNOWN_MINIMUM = minVersion(new Range(peerDependencies.xstate))!.format();
 
 /**
  * All versions of `xstate` available on npm
@@ -64,7 +65,12 @@ process
     process.stderr.write(' done\n');
   });
 
-const unexpectedFailures: string[] = [];
+type Failure = {
+  error: ProcessOutput;
+  version: string;
+};
+
+const unexpectedFailures: Failure[] = [];
 
 // unfortunately this must run in serial
 for (const version of versionsUnderTest) {
@@ -72,7 +78,7 @@ for (const version of versionsUnderTest) {
     continue;
   }
   try {
-    await $({signal})`npm i xstate@${version} --no-save`;
+    await $({quiet: true, signal})`npm i xstate@${version} --no-save`;
   } catch (err) {
     if (signal.aborted) {
       continue;
@@ -82,7 +88,7 @@ for (const version of versionsUnderTest) {
   }
   try {
     process.stderr.write(`xstate@${version} …`);
-    await $({signal})`npm test`;
+    await $({quiet: true, signal})`npm run build && npm test`;
     foundMinimum ||= version;
     process.stderr.write(` OK\n`);
   } catch (err) {
@@ -90,20 +96,21 @@ for (const version of versionsUnderTest) {
       continue;
     }
     process.stderr.write(` NOT OK\n`);
-    console.error(err);
-    if (foundMinimum) {
-      unexpectedFailures.push(version);
-    }
+    unexpectedFailures.push({error: err as ProcessOutput, version});
   }
 }
 
 if (!signal.aborted) {
   if (unexpectedFailures.length) {
-    console.error('Unexpected failures:', unexpectedFailures.join(', '));
+    console.error('Unexpected failures:');
+    for (const {error, version} of unexpectedFailures) {
+      console.error(`xstate@${version}:`);
+      console.error(error);
+    }
     process.exitCode = 1;
   }
   if (foundMinimum) {
-    console.log(foundMinimum);
+    console.log('Minimum compatible version:', foundMinimum);
   } else {
     console.error('No passing versions found!');
     process.exitCode = 1;
