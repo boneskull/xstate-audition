@@ -107,7 +107,7 @@
     "prettier-plugin-organize-imports": "4.1.0",
     "prettier-plugin-pkg": "0.18.1",
     "semver": "7.6.3",
-    "serve": "14.2.3",
+    "serve": "14.2.4",
     "tshy": "3.0.2",
     "tsx": "4.19.1",
     "typedoc": "0.26.9",
