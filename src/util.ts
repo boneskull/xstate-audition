@@ -24,36 +24,6 @@ export const noop = () => {};
 export const DEFAULT_TIMEOUT = 1000;
 
 /**
- * Get the first element of an array
- *
- * @param arr Non-empty array
- * @returns First element of the array
- * @throws If the array is empty
- */
-export function head<T>(arr: T[]): T {
-  assertNonEmptyArray(arr);
-
-  return arr[0];
-}
-
-export type NonEmptyArray<T> = [T, ...T[]];
-
-function isNonEmptyArray<T>(arr: T[]): arr is NonEmptyArray<T> {
-  return arr.length > 0;
-}
-
-/**
- * Assertion for non-empty array
- *
- * @param arr Any array
- */
-function assertNonEmptyArray<T>(arr: T[]): asserts arr is NonEmptyArray<T> {
-  if (!isNonEmptyArray(arr)) {
-    throw new Error('Array is empty');
-  }
-}
-
-/**
  * An inspection event which represents a "microstep"
  *
  * @remarks
@@ -64,18 +34,19 @@ export type InspectedMicrostepEvent = InspectionEvent & {
   type: '@xstate.microstep';
 };
 
+export type NonEmptyArray<T> = [T, ...T[]];
+
 /**
- * Type guard for `InspectedMicrostepEvent`
+ * Get the first element of an array
  *
- * @remarks
- * XState does not export this type, unfortunately.
- * @param value Any inspection event
- * @returns `true` if the event is an inspected microstep event
+ * @param arr Non-empty array
+ * @returns First element of the array
+ * @throws If the array is empty
  */
-export function isInspectedMicrostepEvent(
-  value: InspectionEvent,
-): value is InspectedMicrostepEvent {
-  return value.type === '@xstate.microstep' && '_transitions' in value;
+export function head<T>(arr: T[]): T {
+  assertNonEmptyArray(arr);
+
+  return arr[0];
 }
 
 /**
@@ -97,4 +68,33 @@ export function isActorRef(value: unknown): value is AnyActorRef {
     'send' in value &&
     typeof value.send === 'function'
   );
+}
+
+/**
+ * Type guard for `InspectedMicrostepEvent`
+ *
+ * @remarks
+ * XState does not export this type, unfortunately.
+ * @param value Any inspection event
+ * @returns `true` if the event is an inspected microstep event
+ */
+export function isInspectedMicrostepEvent(
+  value: InspectionEvent,
+): value is InspectedMicrostepEvent {
+  return value.type === '@xstate.microstep' && '_transitions' in value;
+}
+
+/**
+ * Assertion for non-empty array
+ *
+ * @param arr Any array
+ */
+function assertNonEmptyArray<T>(arr: T[]): asserts arr is NonEmptyArray<T> {
+  if (!isNonEmptyArray(arr)) {
+    throw new Error('Array is empty');
+  }
+}
+
+function isNonEmptyArray<T>(arr: T[]): arr is NonEmptyArray<T> {
+  return arr.length > 0;
 }

@@ -37,11 +37,47 @@ export type AnyActor = xs.AnyActor;
 
 export type AnyEventReceiverActor = xs.Actor<AnyEventReceiverLogic>;
 
-export type AnyTerminalActor = xs.Actor<AnyTerminalLogic>;
+/**
+ * Any actor logic that can receive events
+ *
+ * @see {@link https://stately.ai/docs/actors#actor-logic-capabilities}
+ */
+export type AnyEventReceiverLogic =
+  | SomeTransitionLogic
+  | AnyStateMachineLogic
+  | xs.ActorLogic<xs.CallbackSnapshot<any>, any, any, any, any>;
 
 export type AnySnapshotEmitterActor = xs.Actor<AnySnapshotEmitterLogic>;
 
+/**
+ * Any actor logic which can theoretically emit snapshots
+ *
+ * @see {@link https://stately.ai/docs/actors#actor-logic-capabilities}
+ */
+export type AnySnapshotEmitterLogic =
+  | AnyTerminalLogic
+  | SomeTransitionLogic
+  | xs.ActorLogic<xs.ObservableSnapshot<any, any>, any, any, any, any>;
+
 export type AnyStateMachineActor = xs.Actor<xs.AnyStateMachine>;
+
+/**
+ * Any state machine logic
+ *
+ * @see {@link https://stately.ai/docs/actors#actor-logic-capabilities}
+ */
+export type AnyStateMachineLogic = xs.AnyStateMachine;
+
+export type AnyTerminalActor = xs.Actor<AnyTerminalLogic>;
+
+/**
+ * Any actor logic which can theoretically terminate and/or produce output.
+ *
+ * @see {@link https://stately.ai/docs/actors#actor-logic-capabilities}
+ */
+export type AnyTerminalLogic =
+  | AnyStateMachineLogic
+  | xs.ActorLogic<xs.PromiseSnapshot<any, any>, any, any, any, any>;
 
 export type AuditionEventOptions = AuditionOptions & {
   otherActorId?: RegExp | string;
@@ -121,42 +157,6 @@ export type LoggerFn = NonNullable<xs.ActorOptions<any>['logger']>;
  * An array or tuple which is either readonly or mutable
  */
 export type ReadableArray<T extends readonly any[]> = T | Readonly<T>;
-
-/**
- * Any actor logic that can receive events
- *
- * @see {@link https://stately.ai/docs/actors#actor-logic-capabilities}
- */
-export type AnyEventReceiverLogic =
-  | SomeTransitionLogic
-  | AnyStateMachineLogic
-  | xs.ActorLogic<xs.CallbackSnapshot<any>, any, any, any, any>;
-
-/**
- * Any actor logic which can theoretically emit snapshots
- *
- * @see {@link https://stately.ai/docs/actors#actor-logic-capabilities}
- */
-export type AnySnapshotEmitterLogic =
-  | AnyTerminalLogic
-  | SomeTransitionLogic
-  | xs.ActorLogic<xs.ObservableSnapshot<any, any>, any, any, any, any>;
-
-/**
- * Any state machine logic
- *
- * @see {@link https://stately.ai/docs/actors#actor-logic-capabilities}
- */
-export type AnyStateMachineLogic = xs.AnyStateMachine;
-
-/**
- * Any actor logic which can theoretically terminate and/or produce output.
- *
- * @see {@link https://stately.ai/docs/actors#actor-logic-capabilities}
- */
-export type AnyTerminalLogic =
-  | AnyStateMachineLogic
-  | xs.ActorLogic<xs.PromiseSnapshot<any, any>, any, any, any, any>;
 
 /**
  * Any Transition Actor logic
