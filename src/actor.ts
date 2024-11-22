@@ -19,6 +19,31 @@ type PatchData = {inspectorSubscription?: xs.Subscription; logger?: LoggerFn};
 const patchData = new WeakMap<xs.AnyActorRef, PatchData[]>();
 
 /**
+ * Returns a function which patches an `ActorRef` with the given options.
+ *
+ * Avoids patching the same `ActorRef` multiple times.
+ *
+ * @param options
+ * @returns Function to patch an `ActorRef`
+ * @internal
+ */
+export function createPatcher(opts: AuditionOptions = {}) {
+  const knownActorRefs = new WeakSet<xs.AnyActorRef>();
+
+  return (evt: xs.AnyActorRef | xs.InspectionEvent) => {
+    if (isActorRef(evt)) {
+      if (!knownActorRefs.has(evt)) {
+        patchActor(evt, opts);
+        knownActorRefs.add(evt);
+      }
+    } else if (isActorRef(evt.actorRef) && !knownActorRefs.has(evt.actorRef)) {
+      patchActor(evt.actorRef, opts);
+      knownActorRefs.add(evt.actorRef);
+    }
+  };
+}
+
+/**
  * Utility to _mutate_ an existing {@link TActor} allowing addition of an
  * inspector and/or new logger.
  *
@@ -164,29 +189,4 @@ export function unpatchActor<TActor extends xs.AnyActorRef>(
   }
 
   return actor;
-}
-
-/**
- * Returns a function which patches an `ActorRef` with the given options.
- *
- * Avoids patching the same `ActorRef` multiple times.
- *
- * @param options
- * @returns Function to patch an `ActorRef`
- * @internal
- */
-export function createPatcher(opts: AuditionOptions = {}) {
-  const knownActorRefs = new WeakSet<xs.AnyActorRef>();
-
-  return (evt: xs.AnyActorRef | xs.InspectionEvent) => {
-    if (isActorRef(evt)) {
-      if (!knownActorRefs.has(evt)) {
-        patchActor(evt, opts);
-        knownActorRefs.add(evt);
-      }
-    } else if (isActorRef(evt.actorRef) && !knownActorRefs.has(evt.actorRef)) {
-      patchActor(evt.actorRef, opts);
-      knownActorRefs.add(evt.actorRef);
-    }
-  };
 }

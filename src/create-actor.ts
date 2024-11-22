@@ -1,15 +1,6 @@
 import * as xs from 'xstate';
 
 /**
- * Required input values for `TLogic`.
- *
- * @template TLogic Actor logic type
- * @see {@link CreateActorOptions}
- */
-export type RequiredOptions<TLogic extends xs.AnyActorLogic> =
-  undefined extends xs.InputFrom<TLogic> ? never : 'input';
-
-/**
  * Options for creating an actor from actor logic.
  *
  * @see {@link createActorFromLogic}
@@ -46,6 +37,15 @@ export type CurryCreateActorWith = (() => CurryCreateActorWith) &
 export type CurryCreateActorWithP1<TLogic extends xs.AnyActorLogic> =
   ((logic: TLogic) => xs.Actor<TLogic>) &
     (() => CurryCreateActorWithP1<TLogic>);
+
+/**
+ * Required input values for `TLogic`.
+ *
+ * @template TLogic Actor logic type
+ * @see {@link CreateActorOptions}
+ */
+export type RequiredOptions<TLogic extends xs.AnyActorLogic> =
+  undefined extends xs.InputFrom<TLogic> ? never : 'input';
 
 /**
  * Returns itself

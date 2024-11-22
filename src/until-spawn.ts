@@ -11,8 +11,6 @@ import {
 } from './types.js';
 import {isActorRef} from './util.js';
 
-export type SpawnTarget = RegExp | string;
-
 export type CurrySpawn = (() => CurrySpawn) &
   (<TLogic extends xs.AnyActorLogic>(
     actor: AnyStateMachineActor,
@@ -59,6 +57,8 @@ export type CurrySpawnWithP2<TLogic extends xs.AnyActorLogic> =
 export type CurrySpawnWithP3<TLogic extends xs.AnyActorLogic> = Promise<
   xs.ActorRefFrom<TLogic>
 >;
+
+export type SpawnTarget = RegExp | string;
 
 export function runUntilSpawn<TLogic extends xs.AnyActorLogic>(
   actor: AnyStateMachineActor,
