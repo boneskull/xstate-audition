@@ -216,6 +216,25 @@ describe('xstate-audition', () => {
           });
         });
       });
+
+      describe('when provided an actor and options', () => {
+        it('should timeout if the actor does not complete in time', async () => {
+          const timeout = 10; // Set a short timeout for testing
+
+          const actor = createActor(emitterMachine);
+
+          await assert.rejects(
+            runUntilEmittedWith(actor, {timeout}, ['EMIT']),
+            (err) => {
+              // NOTE: this is slightly different than the message used by `waitFor`
+              // (and thusly `runUntilSnapshot`)
+              assert.match((err as Error).message, /Event not emitted in 10ms/);
+
+              return true;
+            },
+          );
+        });
+      });
     });
 
     describe('waitForEmittedWith()', () => {
