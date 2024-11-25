@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.1](https://github.com/boneskull/xstate-audition/compare/xstate-audition-v3.0.0...xstate-audition-v3.0.1) (2024-11-25)
+
+
+### Bug Fixes
+
+* **pkg:** add publishConfig ([388c326](https://github.com/boneskull/xstate-audition/commit/388c32688d6ce8df7a4633f8ff4e9fcc6a8552cb))
+
 ## [3.0.0](https://github.com/boneskull/xstate-audition/compare/xstate-audition-v2.0.1...xstate-audition-v3.0.0) (2024-10-14)
 
 
