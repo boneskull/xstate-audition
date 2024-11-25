@@ -118,6 +118,10 @@
     "xstate": "5.19.0",
     "zx": "8.2.2"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "commitlint": {
     "extends": [
       "@commitlint/config-conventional"
