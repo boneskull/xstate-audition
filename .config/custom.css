@@ -7,3 +7,7 @@
     Menlo, Consolas, 'DejaVu Sans Mono', monospace;
   font-weight: normal;
 }
+
+.tsd-typography {
+  line-height: 1.5em;
+}
