@@ -52,7 +52,7 @@ describe('xstate-audition', () => {
         });
 
         it('should satisfy the expected type', () => {
-          runUntilEmitted satisfies CurryEmitted;
+          expectTypeOf(runUntilEmitted).toMatchTypeOf<CurryEmitted>();
         });
 
         describe('when called with all arguments', () => {
@@ -105,7 +105,7 @@ describe('xstate-audition', () => {
         });
 
         it('should satisfy the expected type', () => {
-          waitForEmitted satisfies CurryEmitted;
+          expectTypeOf(waitForEmitted).toMatchTypeOf<CurryEmitted>();
         });
 
         describe('when called with all arguments', () => {
@@ -168,7 +168,7 @@ describe('xstate-audition', () => {
         });
 
         it('should satisfy the expected type', () => {
-          runUntilEmittedWith satisfies CurryEmittedWith;
+          expectTypeOf(runUntilEmittedWith).toMatchTypeOf<CurryEmittedWith>();
         });
 
         describe('when called with all arguments', () => {

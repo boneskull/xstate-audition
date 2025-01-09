@@ -1,9 +1,10 @@
 import {expectTypeOf} from 'expect-type';
 import {strict as assert} from 'node:assert';
 import {beforeEach, describe, it} from 'node:test';
-import {type Actor, createActor} from 'xstate';
+import {type Actor} from 'xstate';
 
 import {
+  createActorWith,
   runUntilEventSent,
   runUntilEventSentWith,
   waitForEventSent,
@@ -18,6 +19,10 @@ import {testCurried} from './harness.js';
 
 describe('xstate-audition', () => {
   describe('until-event-sent', () => {
+    const createActor = createActorWith<typeof senderMachine>({
+      logger: () => {},
+    });
+
     describe('runUntilEventSent()', () => {
       let actor: Actor<typeof senderMachine>;
 

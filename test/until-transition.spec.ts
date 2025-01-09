@@ -1,9 +1,10 @@
 import {expectTypeOf} from 'expect-type';
 import {strict as assert} from 'node:assert';
 import {describe, it} from 'node:test';
-import {type Actor, createActor, createMachine} from 'xstate';
+import * as xs from 'xstate';
 
 import {
+  createActorWith,
   runUntilTransition,
   runUntilTransitionWith,
   waitForTransition,
@@ -20,7 +21,11 @@ describe('xstate-audition', () => {
       'ReceiverMachine.wait',
     ] as const;
 
-    const resolver = (actor: Actor<typeof receiverMachine>) => {
+    const createActor = createActorWith<typeof receiverMachine>({
+      logger: () => {},
+    });
+
+    const resolver = (actor: xs.Actor<typeof receiverMachine>) => {
       actor.send({type: 'PING'});
     };
 
@@ -46,8 +51,8 @@ describe('xstate-audition', () => {
         it('should reject with the thrown error', async () => {
           const err = new Error('yikes');
 
-          const badActor = createActor(
-            createMachine({
+          const badActor = xs.createActor(
+            xs.createMachine({
               id: 'Bad',
               initial: 'one',
               states: {

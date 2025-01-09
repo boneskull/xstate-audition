@@ -19,7 +19,7 @@ const spawnerMachine = setup({
 
 describe('spawnerMachine', () => {
   it('should spawn a child with ID "noopPromise" when "SPAWN" event received', async () => {
-    const actor = createActor(spawnerMachine);
+    const actor = createActor(spawnerMachine, {logger: () => {}});
 
     try {
       // spawnerMachine needs an event to spawn the actor. but at this point,

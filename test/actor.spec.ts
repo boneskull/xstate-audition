@@ -16,6 +16,22 @@ import {dummyLogic} from './fixture.js';
 describe('xstate-audition', () => {
   describe('actor', () => {
     describe('patchActor()', () => {
+      describe('when "actor" is not an ActorRef', () => {
+        it('should throw', () => {
+          const notAnActor = {};
+
+          assert.throws(
+            () => {
+              // @ts-expect-error bad type
+              patchActor(notAnActor);
+            },
+            {
+              message: 'patchActor() called with a non-ActorRef',
+              name: 'TypeError',
+            },
+          );
+        });
+      });
       describe('when no inspector provided', () => {
         it('should not add an inspector to the actor', () => {
           const actor = createActor(dummyLogic);
@@ -148,98 +164,126 @@ describe('xstate-audition', () => {
 
       let inspector: Mock<(evt: InspectionEvent) => void>;
 
-      beforeEach(() => {
-        actor = createActor(dummyLogic);
+      describe('when actor was previously patched', () => {
+        beforeEach(() => {
+          actor = createActor(dummyLogic);
 
-        originalLogger =
-          // @ts-expect-error private
-          actor.logger =
-          // @ts-expect-error private
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          actor._actorScope.logger =
-          actor.system._logger =
-            mock.fn();
+          originalLogger =
+            // @ts-expect-error private
+            actor.logger =
+            // @ts-expect-error private
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            actor._actorScope.logger =
+            actor.system._logger =
+              mock.fn();
 
-        newLogger = mock.fn<LoggerFn>();
-        inspector = mock.fn<(evt: InspectionEvent) => void>();
+          newLogger = mock.fn<LoggerFn>();
+          inspector = mock.fn<(evt: InspectionEvent) => void>();
 
-        patchActor(actor, {inspector, logger: newLogger});
-      });
-
-      describe('when patched once', () => {
-        it('should restore the original logger', () => {
-          // @ts-expect-error private
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-          actor.logger('test');
-          assert.equal(
-            originalLogger.mock.callCount(),
-            0,
-            'original logger was called',
-          );
-          assert.equal(
-            newLogger.mock.callCount(),
-            1,
-            'new logger was not called once',
-          );
-
-          unpatchActor(actor);
-
-          // @ts-expect-error private
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-          actor.logger('test');
-
-          assert.equal(
-            originalLogger.mock.callCount(),
-            1,
-            'original logger was not called once',
-          );
+          patchActor(actor, {inspector, logger: newLogger});
         });
+        describe('when patched once', () => {
+          it('should restore the original logger', () => {
+            // @ts-expect-error private
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+            actor.logger('test');
+            assert.equal(
+              originalLogger.mock.callCount(),
+              0,
+              'original logger was called',
+            );
+            assert.equal(
+              newLogger.mock.callCount(),
+              1,
+              'new logger was not called once',
+            );
 
-        it('should unsubscribe the inspector', () => {
-          actor.start();
-          actor.stop();
-          assert.equal(inspector.mock.callCount(), 3);
+            unpatchActor(actor);
 
-          unpatchActor(actor);
-          actor.start();
+            // @ts-expect-error private
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+            actor.logger('test');
 
-          try {
-            assert.equal(inspector.mock.callCount(), 3);
-          } finally {
+            assert.equal(
+              originalLogger.mock.callCount(),
+              1,
+              'original logger was not called once',
+            );
+          });
+
+          it('should unsubscribe the inspector', () => {
+            actor.start();
             actor.stop();
-          }
+            assert.equal(inspector.mock.callCount(), 3);
+
+            unpatchActor(actor);
+            actor.start();
+
+            try {
+              assert.equal(inspector.mock.callCount(), 3);
+            } finally {
+              actor.stop();
+            }
+          });
         });
+        describe('when patched multiple times', () => {
+          it('should restore the previous logger', () => {
+            const evenNewerLogger = mock.fn<LoggerFn>();
+
+            patchActor(actor, {logger: evenNewerLogger});
+            // @ts-expect-error private
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+            actor.logger('test');
+            assert.equal(
+              newLogger.mock.callCount(),
+              0,
+              'new logger was called before unpatching',
+            );
+            assert.equal(
+              evenNewerLogger.mock.callCount(),
+              1,
+              'even newer logger was not called once before unpatching',
+            );
+
+            unpatchActor(actor);
+            // @ts-expect-error private
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+            actor.logger('test');
+
+            assert.equal(
+              newLogger.mock.callCount(),
+              1,
+              'new logger was not called once after unpatching',
+            );
+          });
+        });
+
+        it.todo('should inherit parent logger');
       });
 
-      describe('when patched multiple times', () => {
-        it('should restore the previous logger', () => {
-          const evenNewerLogger = mock.fn<LoggerFn>();
+      describe('when actor was not previously patched', () => {
+        beforeEach(() => {
+          actor = createActor(dummyLogic);
 
-          patchActor(actor, {logger: evenNewerLogger});
+          originalLogger =
+            // @ts-expect-error private
+            actor.logger =
+            // @ts-expect-error private
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            actor._actorScope.logger =
+            actor.system._logger =
+              mock.fn();
+        });
+
+        it('should not mutate the actor', () => {
           // @ts-expect-error private
           // eslint-disable-next-line @typescript-eslint/no-unsafe-call
           actor.logger('test');
-          assert.equal(
-            newLogger.mock.callCount(),
-            0,
-            'new logger was called before unpatching',
-          );
-          assert.equal(
-            evenNewerLogger.mock.callCount(),
-            1,
-            'even newer logger was not called once before unpatching',
-          );
-
           unpatchActor(actor);
           // @ts-expect-error private
           // eslint-disable-next-line @typescript-eslint/no-unsafe-call
           actor.logger('test');
-
-          assert.equal(
-            newLogger.mock.callCount(),
-            1,
-            'new logger was not called once after unpatching',
-          );
+          assert.equal(originalLogger.mock.callCount(), 2);
         });
       });
     });
