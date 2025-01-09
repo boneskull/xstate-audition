@@ -1,20 +1,17 @@
 import {strict as assert} from 'node:assert';
 import {afterEach, beforeEach, describe, it} from 'node:test';
 import {isPromise} from 'node:util/types';
-import {
-  type Actor,
-  type AnyActorLogic,
-  createActor,
-  type Snapshot,
-} from 'xstate';
+import {type Actor, type AnyActorLogic, type Snapshot} from 'xstate';
 
-import {type AnyActor} from '../src/types.js';
+import {createActorWith} from '../src/create-actor.js';
+import {type AnyActor, type AuditionOptions} from '../src/types.js';
 import {noop} from '../src/util.js';
 
-export type TestAuditionOptions<Actor extends AnyActor = AnyActor> = {
+export interface TestAuditionOptions<Actor extends AnyActor = AnyActor>
+  extends Omit<AuditionOptions, 'timeout'> {
   resolver?: (actor: Actor) => void;
   shouldStop?: boolean;
-};
+}
 
 /**
  * Tests a curried function by verifying its behavior when called with partial
@@ -32,6 +29,7 @@ export type TestAuditionOptions<Actor extends AnyActor = AnyActor> = {
  * @param args - The arguments to be passed to the source function.
  * @param resolver - A function which will trigger the final `Promise` to
  *   resolve, if needed
+ * @param options - Additional options to configure the test.
  * @throws Will throw an error if the number of provided arguments does not
  *   match the arity of the source function.
  * @throws Will throw an error if the source function does not have at least one
@@ -46,7 +44,12 @@ export function testCurried<
   expectationFn: (actual: TReturn) => void,
   logic: Logic,
   args?: unknown[],
-  {resolver = noop, shouldStop = false}: TestAuditionOptions = {},
+  {
+    inspector: inspect = noop,
+    logger = noop,
+    resolver = noop,
+    shouldStop = false,
+  }: TestAuditionOptions = {},
 ) {
   const arity = sourceFn.length;
 
@@ -58,6 +61,8 @@ export function testCurried<
   );
   assert.ok(arity > 0, 'source function must have at least one argument');
   assert.ok(logic, 'must provide logic to create actor');
+
+  const createActor = createActorWith<Logic>({inspect, logger});
 
   describe('common behavior', () => {
     let actor: Actor<Logic>;

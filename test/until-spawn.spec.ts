@@ -1,8 +1,9 @@
 import {expectTypeOf} from 'expect-type';
 import {strict as assert} from 'node:assert';
 import {afterEach, beforeEach, describe, it} from 'node:test';
-import {type Actor, type AnyActorRef, createActor} from 'xstate';
+import {type Actor, type AnyActorRef} from 'xstate';
 
+import {createActorWith} from '../src/create-actor.js';
 import {
   runUntilSpawn,
   runUntilSpawnWith,
@@ -14,6 +15,10 @@ import {testCurried} from './harness.js';
 
 describe('xstate-audition', () => {
   describe('until-spawn', () => {
+    const createActor = createActorWith<typeof spawnerMachine>({
+      logger: () => {},
+    });
+
     describe('runUntilSpawn()', () => {
       testCurried<AnyActorRef>(
         runUntilSpawn,
