@@ -112,7 +112,7 @@
     "tsx": "4.19.2",
     "typedoc": "0.27.6",
     "typedoc-github-theme": "0.2.1",
-    "typedoc-plugin-mdn-links": "4.0.10",
+    "typedoc-plugin-mdn-links": "4.0.11",
     "typescript": "5.7.3",
     "typescript-eslint": "8.22.0",
     "xstate": "5.19.2",
