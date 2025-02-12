@@ -1,10 +1,12 @@
 :root,
 :root[data-theme='light'],
 :root[data-theme='dark'] {
-  --font-sans: Bahnschrift, 'DIN Alternate', 'Franklin Gothic Medium',
+  --font-sans:
+    Bahnschrift, 'DIN Alternate', 'Franklin Gothic Medium',
     'Nimbus Sans Narrow', sans-serif-condensed, sans-serif;
-  --font-mono: font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro',
-    Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+  --font-mono:
+    font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo,
+    Consolas, 'DejaVu Sans Mono', monospace;
   font-weight: normal;
 }
 
