@@ -64,7 +64,7 @@
     "dev:types": "tsc -p tsconfig.tsc.json --watch",
     "docs:serve": "serve docs",
     "docs:watch": "typedoc --watch",
-    "format": "prettier .",
+    "format": "prettier . --write",
     "lint": "eslint . --max-warnings 0",
     "lint:commit": "commitlint",
     "lint:fix": "eslint . --fix && prettier --write .",
