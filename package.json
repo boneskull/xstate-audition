@@ -93,7 +93,7 @@
     "cspell": "8.18.1",
     "eslint": "9.23.0",
     "eslint-plugin-n": "17.17.0",
-    "eslint-plugin-perfectionist": "4.10.1",
+    "eslint-plugin-perfectionist": "4.11.0",
     "expect-type": "1.2.1",
     "husky": "9.1.7",
     "knip": "5.44.0",
