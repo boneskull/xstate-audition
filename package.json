@@ -16,6 +16,7 @@
     "node": ">=20.2.0"
   },
   "main": "./dist/commonjs/index.js",
+  "types": "./dist/commonjs/index.d.ts",
   "module": "./dist/esm/index.js",
   "exports": {
     "./package.json": "./package.json",
@@ -30,7 +31,6 @@
       }
     }
   },
-  "types": "./dist/commonjs/index.d.ts",
   "directories": {
     "test": "test"
   },
@@ -86,7 +86,6 @@
     "@commitlint/config-conventional": "19.8.0",
     "@eslint/js": "9.25.1",
     "@stylistic/eslint-plugin": "4.2.0",
-    "@types/eslint__js": "9.14.0",
     "@types/node": "22.14.1",
     "@types/semver": "7.7.0",
     "c8": "10.1.3",
@@ -96,7 +95,7 @@
     "eslint-plugin-perfectionist": "4.11.0",
     "expect-type": "1.2.1",
     "husky": "9.1.7",
-    "knip": "5.44.0",
+    "knip": "5.50.5",
     "lint-staged": "15.5.1",
     "markdownlint-cli2": "0.17.2",
     "markdownlint-cli2-formatter-pretty": "0.0.7",
