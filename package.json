@@ -96,7 +96,7 @@
     "expect-type": "1.2.1",
     "husky": "9.1.7",
     "knip": "5.53.0",
-    "lint-staged": "15.5.1",
+    "lint-staged": "15.5.2",
     "markdownlint-cli2": "0.17.2",
     "markdownlint-cli2-formatter-pretty": "0.0.7",
     "npm-run-all2": "8.0.1",
