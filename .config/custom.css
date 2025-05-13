@@ -13,3 +13,12 @@
 .tsd-typography {
   line-height: 1.5em;
 }
+
+/* hide the markdown header from README.md */
+body
+  > div.container.container-main
+  > div.col-content
+  > div.tsd-panel.tsd-typography
+  > h1 {
+  display: none;
+}
