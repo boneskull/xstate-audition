@@ -11,7 +11,6 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  id-token: write
 
 jobs:
   release-please:
@@ -19,31 +18,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create Release
-        id: release
         uses: googleapis/release-please-action@a02a34c4d625f9be7cb89156071d8567266a2445 # v4
-
-      # see https://github.com/google-github-actions/release-please-action#automating-publication-to-npm
-      - name: Checkout Repository
-        if: ${{ steps.release.outputs.release_created }}
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-
-      - name: Setup Node.js
-        if: ${{ steps.release.outputs.release_created }}
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with:
-          node-version: 20
-          registry-url: 'https://registry.npmjs.org'
-
-      - name: Install
-        if: ${{ steps.release.outputs.release_created }}
-        uses: bahmutov/npm-install@6bbff949458c1dd99b20e185cee8c4d6fcf1212a # v1.10.9
-
-      - name: Build
-        if: ${{ steps.release.outputs.release_created }}
-        run: npm run build
-
-      - name: Publish to npm
-        if: ${{ steps.release.outputs.release_created }}
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-        run: npm publish --provenance --access public
