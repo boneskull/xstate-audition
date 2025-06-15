@@ -108,7 +108,7 @@
     "semver": "7.7.2",
     "serve": "14.2.4",
     "tshy": "3.0.2",
-    "tsx": "4.19.4",
+    "tsx": "4.20.2",
     "typedoc": "0.28.5",
     "typedoc-github-theme": "0.3.0",
     "typedoc-plugin-mdn-links": "5.0.2",
