@@ -115,7 +115,7 @@
     "typescript": "5.8.3",
     "typescript-eslint": "8.34.1",
     "xstate": "5.20.0",
-    "zx": "8.5.5"
+    "zx": "8.6.0"
   },
   "publishConfig": {
     "access": "public",
