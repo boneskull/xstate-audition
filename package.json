@@ -85,7 +85,7 @@
     "@commitlint/cli": "19.8.1",
     "@commitlint/config-conventional": "19.8.1",
     "@eslint/js": "9.29.0",
-    "@stylistic/eslint-plugin": "4.4.1",
+    "@stylistic/eslint-plugin": "5.0.0",
     "@types/node": "22.15.32",
     "@types/semver": "7.7.0",
     "c8": "10.1.3",
