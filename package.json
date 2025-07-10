@@ -113,7 +113,7 @@
     "typedoc-github-theme": "0.3.0",
     "typedoc-plugin-mdn-links": "5.0.3",
     "typescript": "5.8.3",
-    "typescript-eslint": "8.35.1",
+    "typescript-eslint": "8.36.0",
     "xstate": "5.20.1",
     "zx": "8.6.1"
   },
