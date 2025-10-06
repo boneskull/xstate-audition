@@ -114,7 +114,7 @@
     "typedoc-plugin-mdn-links": "5.0.9",
     "typescript": "5.9.3",
     "typescript-eslint": "8.45.0",
-    "xstate": "5.22.0",
+    "xstate": "5.22.1",
     "zx": "8.8.4"
   },
   "publishConfig": {
