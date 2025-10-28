@@ -6,7 +6,7 @@ runs:
   steps:
     - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6
       with:
-        node-version: '22'
+        node-version: '24'
     - name: Install dependencies
       uses: bahmutov/npm-install@4488656f8e90d3c85e3a964db0018dd624f340e7 # v1.11.1
       with:
