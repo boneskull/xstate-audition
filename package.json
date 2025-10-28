@@ -95,7 +95,7 @@
     "eslint-plugin-perfectionist": "4.15.1",
     "expect-type": "1.2.2",
     "husky": "9.1.7",
-    "knip": "5.66.2",
+    "knip": "5.66.3",
     "lint-staged": "16.2.6",
     "markdownlint-cli2": "0.18.1",
     "markdownlint-cli2-formatter-pretty": "0.0.8",
