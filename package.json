@@ -101,7 +101,7 @@
     "markdownlint-cli2-formatter-pretty": "0.0.9",
     "npm-run-all2": "8.0.4",
     "prettier": "3.6.2",
-    "prettier-plugin-curly": "0.4.0",
+    "prettier-plugin-curly": "0.4.1",
     "prettier-plugin-jsdoc": "1.5.0",
     "prettier-plugin-organize-imports": "4.3.0",
     "prettier-plugin-pkg": "0.21.2",
