@@ -98,7 +98,7 @@
     "knip": "5.78.0",
     "lint-staged": "16.2.7",
     "markdownlint-cli2": "0.20.0",
-    "markdownlint-cli2-formatter-pretty": "0.0.9",
+    "markdownlint-cli2-formatter-pretty": "0.0.10",
     "npm-run-all2": "8.0.4",
     "prettier": "3.7.4",
     "prettier-plugin-curly": "0.4.1",
